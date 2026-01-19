@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Circle / Disc v4 - <?php echo date('Y-m-d_H-i-s'); ?></title>
+<title>Sphere Calculator v4 - <?php echo date('Y-m-d_H-i-s'); ?></title>
 
 <style>
 :root{--ink:#000;--line:#cfcfcf;--muted:#666;--blue:#2563eb;--red:#dc2626}
@@ -116,8 +116,8 @@ label{font-size:11px;color:var(--muted)}
 <div class="controls-row">
   <div class="left-panel">
     <div class="block shape-block">
-      <div class="shape-title">Circle / Disc</div>
-      <div class="shape-sub">2D shape</div>
+      <div class="shape-title">Sphere</div>
+      <div class="shape-sub">3D shape</div>
     </div>
     
     <div class="controls-stack">
@@ -139,6 +139,7 @@ label{font-size:11px;color:var(--muted)}
 
   <div class="block radius-block">
     <div class="radius-header">
+      <h3>Radius (must be integer)</h3>
       <input type="number" class="value-input" id="valueInput" min="0" max="11" step="0.01" value="7">
     </div>
     <div class="radius-display" id="radiusDisplay"><i>r</i> = 7</div>
@@ -157,52 +158,37 @@ label{font-size:11px;color:var(--muted)}
   </div>
 </div>
 
-<!-- MAIN: Diagram + Circumference + Area -->
+<!-- MAIN: Diagram + Surface Area + Volume -->
 <div class="main">
   <div class="diagram-area">
     <div class="diagram">
-      <svg viewBox="0 0 260 260" aria-label="Circle diagram">
+      <svg viewBox="0 0 260 260" aria-label="Sphere diagram">
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
                   markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="#000"/>
           </marker>
         </defs>
+        <!-- Sphere representation -->
         <circle cx="130" cy="130" r="105" fill="none" stroke="#000" stroke-width="3"/>
+        <!-- Inner circle to give 3D effect -->
+        <circle cx="130" cy="130" r="85" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="4,4"/>
         <line x1="130" y1="130" x2="235" y2="130" stroke="#000" stroke-width="3" marker-end="url(#arrow)"/>
         <text id="rLabel" x="138" y="112" font-size="18"
               font-family="Times New Roman" font-style="italic">r</text>
-        <text x="215" y="215" font-size="20"
-              font-family="Times New Roman" font-style="italic">l</text>
-        <!-- A label on left half of circle, moved left and down -->
-        <text x="78" y="170" font-size="24" font-family="Times New Roman" font-weight="bold"
+        <!-- A label inside sphere -->
+        <text x="130" y="170" font-size="24" font-family="Times New Roman" font-weight="bold"
               text-anchor="middle" dominant-baseline="middle">[A]</text>
       </svg>
     </div>
     <div class="formulas">
-      <div class="f"><i>l</i> = 2π<i>r</i></div>
-      <div class="f"><i>A</i> = π<i>r</i>²</div>
+      <div class="f"><i>A</i> = 4π<i>r</i>²</div>
+      <div class="f"><i>V</i> = <sup>4</sup>⁄<sub>3</sub>π<i>r</i>³</div>
     </div>
   </div>
 
-  <div class="calc" id="circumferenceCalc">
-    <h2>Circumference</h2>
-    <div class="line" id="lF"></div>
-    <div class="line" id="lS"></div>
-    
-    <div class="answer-container">
-      <div class="answer-box" id="lE"></div>
-    </div>
-    
-    <div class="trunc-line" id="lTrunc"></div>
-    
-    <div class="answer-container">
-      <div class="answer-box" id="lN"></div>
-    </div>
-  </div>
-
-  <div class="calc" id="areaCalc">
-    <h2>Area</h2>
+  <div class="calc" id="surfaceAreaCalc">
+    <h2>Surface Area</h2>
     <div class="line" id="aF"></div>
     <div class="line" id="aS"></div>
     
@@ -214,6 +200,22 @@ label{font-size:11px;color:var(--muted)}
     
     <div class="answer-container">
       <div class="answer-box" id="aN"></div>
+    </div>
+  </div>
+
+  <div class="calc" id="volumeCalc">
+    <h2>Volume</h2>
+    <div class="line" id="vF"></div>
+    <div class="line" id="vS"></div>
+    
+    <div class="answer-container">
+      <div class="answer-box" id="vE"></div>
+    </div>
+    
+    <div class="trunc-line" id="vTrunc"></div>
+    
+    <div class="answer-container">
+      <div class="answer-box" id="vN"></div>
     </div>
   </div>
 </div>
@@ -246,8 +248,8 @@ const valueInput = document.getElementById("valueInput");
 const fractionLine = document.getElementById("fractionLine");
 const fractionLineLabels = document.getElementById("fractionLineLabels");
 const revealBtn = document.getElementById("revealBtn");
-const circumferenceCalc = document.getElementById("circumferenceCalc");
-const areaCalc = document.getElementById("areaCalc");
+const surfaceAreaCalc = document.getElementById("surfaceAreaCalc");
+const volumeCalc = document.getElementById("volumeCalc");
 
 // Build fixed 0-11 number line
 function buildNumline() {
@@ -493,12 +495,12 @@ revealBtn.addEventListener("click", () => {
   
   if (answersVisible) {
     revealBtn.textContent = "Hide";
-    circumferenceCalc.classList.remove("hidden");
-    areaCalc.classList.remove("hidden");
+    surfaceAreaCalc.classList.remove("hidden");
+    volumeCalc.classList.remove("hidden");
   } else {
     revealBtn.textContent = "Reveal";
-    circumferenceCalc.classList.add("hidden");
-    areaCalc.classList.add("hidden");
+    surfaceAreaCalc.classList.add("hidden");
+    volumeCalc.classList.add("hidden");
   }
 });
 
@@ -562,6 +564,7 @@ function update() {
   const isInteger = Math.abs(fraction) < 0.001;
   const unitStr = unit && unit.symbol ? ' ' + unit.symbol : '';
   const unitStr2 = unit && unit.symbol ? ' ' + unit.symbol + '²' : '';
+  const unitStr3 = unit && unit.symbol ? ' ' + unit.symbol + '³' : '';
 
   const rDisp = r.toFixed(2);
   
@@ -577,42 +580,43 @@ function update() {
     setInfo.className = "set-info rational";
   }
 
-  const l = 2 * Math.PI * r;
-  const a = Math.PI * r * r;
+  // Sphere formulas
+  const a = 4 * Math.PI * r * r; // Surface area
+  const v = (4/3) * Math.PI * r * r * r; // Volume
 
-  const twoR = 2 * r;
-  const r2 = r * r;
+  const fourR2 = 4 * r * r;
+  const fourThirdsR3 = (4/3) * r * r * r;
 
-  const twoRDisp = fmt(twoR, 2);
-  const r2Disp = fmt(r2, 4);
+  const fourR2Disp = fmt(fourR2, 2);
+  const fourThirdsR3Disp = fmt(fourThirdsR3, 4);
 
-  // Circumference - FORMULA LINES (no change)
-  document.getElementById("lF").innerHTML = `<i>l</i> = 2π<i>r</i>`;
-  document.getElementById("lS").innerHTML = `= 2π × ${rDisp}${unitStr}`;
+  // Surface Area - FORMULA LINES
+  document.getElementById("aF").innerHTML = `<i>A</i> = 4π<i>r</i>²`;
+  document.getElementById("aS").innerHTML = `= 4π × ${rDisp}²${unitStr2}`;
   
-  // Circumference - EXACT ANSWER (with l = and (exact))
-  document.getElementById("lE").innerHTML = 
-    `<span class="label">l =</span> <span class="value">${twoRDisp}π${unitStr}</span> <span class="dp-info">(exact)</span>`;
-  
-  document.getElementById("lTrunc").innerHTML = getTruncatedWithRounding(l, dp, unitStr);
-  
-  // Circumference - ROUNDED ANSWER (with l = and (dp dp))
-  document.getElementById("lN").innerHTML = 
-    `<span class="label">l =</span> <span class="value">${fmt(l, dp)}${unitStr}</span> <span class="dp-info">(${dp} dp)</span>`;
-
-  // Area - FORMULA LINES (no change)
-  document.getElementById("aF").innerHTML = `<i>A</i> = π<i>r</i>²`;
-  document.getElementById("aS").innerHTML = `= π × ${rDisp}²${unitStr2}`;
-  
-  // Area - EXACT ANSWER (with A = and (exact))
+  // Surface Area - EXACT ANSWER
   document.getElementById("aE").innerHTML = 
-    `<span class="label">A =</span> <span class="value">${r2Disp}π${unitStr2}</span> <span class="dp-info">(exact)</span>`;
+    `<span class="label">A =</span> <span class="value">${fourR2Disp}π${unitStr2}</span> <span class="dp-info">(exact)</span>`;
   
   document.getElementById("aTrunc").innerHTML = getTruncatedWithRounding(a, dp, unitStr2);
   
-  // Area - ROUNDED ANSWER (with A = and (dp dp))
+  // Surface Area - ROUNDED ANSWER
   document.getElementById("aN").innerHTML = 
     `<span class="label">A =</span> <span class="value">${fmt(a, dp)}${unitStr2}</span> <span class="dp-info">(${dp} dp)</span>`;
+
+  // Volume - FORMULA LINES
+  document.getElementById("vF").innerHTML = `<i>V</i> = <sup>4</sup>⁄<sub>3</sub>π<i>r</i>³`;
+  document.getElementById("vS").innerHTML = `= <sup>4</sup>⁄<sub>3</sub>π × ${rDisp}³${unitStr3}`;
+  
+  // Volume - EXACT ANSWER
+  document.getElementById("vE").innerHTML = 
+    `<span class="label">V =</span> <span class="value"><sup>4</sup>⁄<sub>3</sub>π × ${rDisp}³${unitStr3}</span> <span class="dp-info">(exact)</span>`;
+  
+  document.getElementById("vTrunc").innerHTML = getTruncatedWithRounding(v, dp, unitStr3);
+  
+  // Volume - ROUNDED ANSWER
+  document.getElementById("vN").innerHTML = 
+    `<span class="label">V =</span> <span class="value">${fmt(v, dp)}${unitStr3}</span> <span class="dp-info">(${dp} dp)</span>`;
 }
 
 // Add JavaScript timestamp for filename when saving
@@ -620,7 +624,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // This will set a timestamp in the title when the page loads
   const now = new Date();
   const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  document.title = `Circle Calculator ${timestamp}`;
+  document.title = `Sphere Calculator ${timestamp}`;
 });
 
 unit = units[0];
