@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Slope + Point → Line Equation (Algebra & Proportions)</title>
+<title>Slope + Point → Line Equation</title>
 
 <style>
   :root{
@@ -45,114 +45,133 @@
     color:var(--ink);
   }
 
-  .wrap{max-width:1100px;margin:10px auto;padding:0 10px 20px}
+  .wrap{max-width:900px;margin:20px auto;padding:0 20px}
   .topbar{
     display:flex;gap:10px;align-items:center;justify-content:space-between;
-    margin:10px 0 10px;
+    margin:0 0 20px;
   }
-  .title{
-    display:flex;flex-direction:column;gap:2px;
-  }
-  .title h1{margin:0;font-size:18px;letter-spacing:.2px}
-  .title .sub{color:var(--muted);font-size:12px}
+  .title h1{margin:0;font-size:22px;letter-spacing:.2px}
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
   .btn{
     appearance:none;border:1px solid var(--line);
     background:var(--panel);color:var(--ink);
-    padding:8px 10px;border-radius:10px;
-    font-size:12px;cursor:pointer;
+    padding:10px 14px;border-radius:10px;
+    font-size:13px;cursor:pointer;
   }
   .btn:hover{border-color:var(--muted)}
   .btn.primary{border-color:transparent;background:var(--blue);color:#fff}
-  .btn.danger{border-color:transparent;background:var(--red);color:#fff}
-
-  .grid{
-    display:grid;
-    grid-template-columns: 380px 1fr;
-    gap:10px;
-    align-items:start;
-  }
-  @media (max-width: 960px){
-    .grid{grid-template-columns:1fr}
-  }
 
   .card{
     background:var(--panel);
     border:1px solid var(--line);
     border-radius:var(--radius);
     box-shadow:var(--shadow);
-    overflow:hidden;
+    padding:24px;
+    margin-bottom:20px;
   }
-  .card .hd{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 12px;
-    border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg, var(--panel), var(--soft));
-  }
-  .card .hd h2{margin:0;font-size:13px;letter-spacing:.2px}
-  .card .bd{padding:10px 12px}
 
-  .help{
-    border-left:4px solid var(--blue);
-    background:rgba(37,99,235,.08);
-    padding:8px 10px;border-radius:10px;
-    font-size:12px;color:var(--ink);
+  .inputSection{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:24px;
+    margin-bottom:30px;
   }
-  [data-theme="dark"] .help{background:rgba(37,99,235,.16)}
+  @media (max-width: 700px){
+    .inputSection{grid-template-columns:1fr}
+  }
 
-  .formrow{display:grid;grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px}
-  .block{
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:8px;
-    background:var(--panel);
+  .inputBlock h2{
+    margin:0 0 16px;
+    font-size:16px;
+    color:var(--muted);
+    font-weight:600;
   }
-  .block h3{margin:0 0 6px;font-size:12px;color:var(--muted);font-weight:600}
-  label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+
+  .slopeInputs{
+    display:grid;
+    grid-template-columns: 80px 1fr 60px 1fr;
+    gap:12px;
+    align-items:center;
+  }
+  .slopeInputs label{
+    font-size:14px;
+    color:var(--muted);
+    font-weight:500;
+  }
+  .slopeInputs .slash{
+    text-align:center;
+    font-size:32px;
+    color:var(--muted);
+    font-weight:300;
+  }
+
   input, select{
     width:100%;
-    padding:8px;
-    border:1px solid var(--line);
+    padding:14px;
+    border:2px solid var(--line);
     border-radius:10px;
     background:var(--panel);
     color:var(--ink);
-    font-size:13px;
+    font-size:18px;
+    font-weight:600;
     outline:none;
+    text-align:center;
   }
   input:focus, select:focus{border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.15)}
-  .tiny{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35}
 
-  /* fraction input */
-  .frac{
+  .pointInputs{
     display:grid;
-    grid-template-columns: 64px 1fr 16px 1fr;
-    gap:6px;
-    align-items:center;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
   }
-  .frac .slash{
-    text-align:center;
+  .pointInputs label{
+    display:block;
+    font-size:14px;
     color:var(--muted);
+    font-weight:500;
+    margin-bottom:8px;
+  }
+
+  .stepsCard{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:32px;
+  }
+
+  .stepsCard h2{
+    margin:0 0 24px;
+    font-size:18px;
     font-weight:700;
   }
-  .signhint{font-size:11px;color:var(--muted);margin-top:6px}
 
-  /* nice fraction display */
-  .eq{
+  .step{
+    font-size:22px;
+    line-height:1.8;
+    margin:16px 0;
     font-family:var(--mono);
-    font-size:13px;
-    line-height:1.5;
   }
-  .eq .blue{color:var(--blue);font-weight:700}
-  .eq .red{color:var(--red);font-weight:700}
-  .eq .muted{color:var(--muted)}
-  .eqbox{
-    border:1px dashed var(--line);
+  .step.large{
+    font-size:26px;
+    font-weight:600;
+    margin:24px 0;
+    padding:16px;
+    background:var(--soft);
     border-radius:10px;
-    padding:8px;
-    background:linear-gradient(180deg, var(--soft), transparent);
-    margin-top:8px;
+    border-left:4px solid var(--blue);
   }
+
+  .methodSep{
+    margin:40px 0;
+    border-top:2px solid var(--line);
+    padding-top:24px;
+  }
+
+  .blue{color:var(--blue);font-weight:700}
+  .red{color:var(--red);font-weight:700}
+  .muted{color:var(--muted)}
 
   .fracDisp{
     display:inline-grid;
@@ -160,83 +179,16 @@
     align-items:center;
     justify-items:center;
     vertical-align:middle;
-    margin:0 2px;
+    margin:0 4px;
   }
-  .fracDisp .top{padding:0 4px}
+  .fracDisp .top{padding:0 6px;font-size:20px}
   .fracDisp .bar{
-    height:1px;width:100%;
+    height:2px;width:100%;
     background:currentColor;
     opacity:.8;
-    margin:1px 0;
+    margin:2px 0;
   }
-  .fracDisp .bot{padding:0 4px}
-
-  .row3{display:grid;grid-template-columns: 1fr 1fr 1fr; gap:8px}
-  .row2{display:grid;grid-template-columns: 1fr 1fr; gap:8px}
-
-  .pill{
-    display:inline-flex;align-items:center;gap:6px;
-    padding:4px 8px;border-radius:999px;
-    border:1px solid var(--line);
-    background:var(--panel);
-    font-size:11px;color:var(--muted);
-  }
-  .dot{width:8px;height:8px;border-radius:50%}
-  .dot.blue{background:var(--blue)}
-  .dot.red{background:var(--red)}
-
-  canvas{
-    width:100%;
-    height:520px;
-    display:block;
-    background:var(--panel);
-  }
-  .canvasWrap{padding:10px}
-
-  .method{
-    border:1px solid var(--line);
-    border-radius:12px;
-    overflow:hidden;
-    margin-top:10px;
-  }
-  .method .mh{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 12px;
-    background:linear-gradient(180deg, var(--panel), var(--soft));
-    border-bottom:1px solid var(--line);
-  }
-  .method .mh .left{
-    display:flex;flex-direction:column;gap:4px;
-  }
-  .method .mh .name{font-size:12px;font-weight:700}
-  .method .mh .formula{font-family:var(--mono);font-size:12px;color:var(--muted)}
-  .method .mb{padding:10px 12px;display:none}
-  .method.open .mb{display:block}
-
-  .miniBtns{display:flex;gap:6px}
-  .mini{
-    padding:6px 8px;border-radius:10px;
-    border:1px solid var(--line);
-    background:var(--panel);
-    font-size:11px;cursor:pointer;color:var(--ink);
-  }
-  .mini:hover{border-color:var(--muted)}
-
-  .warn{
-    margin-top:8px;
-    padding:8px 10px;
-    border-left:4px solid var(--red);
-    background:rgba(220,38,38,.08);
-    border-radius:10px;
-    font-size:12px;
-  }
-  [data-theme="dark"] .warn{background:rgba(220,38,38,.14)}
-
-  .footerNote{
-    margin-top:10px;
-    font-size:11px;
-    color:var(--muted);
-  }
+  .fracDisp .bot{padding:0 6px;font-size:20px}
 </style>
 </head>
 
@@ -245,130 +197,50 @@
   <div class="topbar">
     <div class="title">
       <h1>Slope + Point → Equation of a Line</h1>
-      <div class="sub">Reference slope segment through the origin, then point-slope form, then two solution methods (Algebra + Proportions/Check).</div>
     </div>
     <div class="toolbar">
-      <span class="pill"><span class="dot blue"></span>Reference slope</span>
-      <span class="pill"><span class="dot red"></span>Line through the given point</span>
       <button class="btn" id="themeBtn" type="button">Dark</button>
       <button class="btn" id="resetBtn" type="button">Reset</button>
     </div>
   </div>
 
-  <div class="grid">
-    <!-- LEFT: Inputs + working -->
-    <div class="card">
-      <div class="hd">
-        <h2>Inputs</h2>
-        <button class="btn primary" type="button" id="updateBtn">Update</button>
+  <div class="card">
+    <div class="inputSection">
+      <div class="inputBlock">
+        <h2>Slope (as fraction)</h2>
+        <div class="slopeInputs">
+          <label>Sign:</label>
+          <select id="sign">
+            <option value="+" selected>+</option>
+            <option value="-">−</option>
+          </select>
+          <input id="num" inputmode="numeric" type="number" min="0" step="1" value="2" />
+          <div class="slash">/</div>
+          <input id="den" inputmode="numeric" type="number" min="1" step="1" value="3" />
+        </div>
       </div>
-      <div class="bd">
-        <div class="help">
-          <div><strong>Use:</strong> enter the slope as a signed fraction, then enter the point.</div>
-          <div>Blank sign means positive. You may type “+” if you want.</div>
-        </div>
 
-        <div class="formrow">
-          <div class="block">
-            <h3>Slope as a fraction</h3>
-            <label>m = (sign) × numerator / denominator</label>
-            <div class="frac">
-              <select id="sign">
-                <option value="" selected>(blank)</option>
-                <option value="+">+</option>
-                <option value="-">−</option>
-              </select>
-              <input id="num" inputmode="numeric" type="number" min="0" step="1" placeholder="p" value="2" />
-              <div class="slash">/</div>
-              <input id="den" inputmode="numeric" type="number" min="1" step="1" placeholder="q" value="3" />
-            </div>
-            <div class="signhint">If sign is blank, the slope is taken as positive.</div>
-            <div class="tiny" id="slopePreview"></div>
+      <div class="inputBlock">
+        <h2>Point on the line</h2>
+        <div class="pointInputs">
+          <div>
+            <label>x₁</label>
+            <input id="x1" inputmode="numeric" type="number" step="1" value="1" />
           </div>
-
-          <div class="block">
-            <h3>Point</h3>
-            <div class="row2">
-              <div>
-                <label>x₁</label>
-                <input id="x1" inputmode="numeric" type="number" step="1" value="1" />
-              </div>
-              <div>
-                <label>y₁</label>
-                <input id="y1" inputmode="numeric" type="number" step="1" value="4" />
-              </div>
-            </div>
-            <div class="tiny">This point lies on the required line.</div>
+          <div>
+            <label>y₁</label>
+            <input id="y1" inputmode="numeric" type="number" step="1" value="4" />
           </div>
-        </div>
-
-        <div class="block" style="margin-top:10px">
-          <h3>Reference slope segment (through the origin)</h3>
-          <div class="eq" id="refText"></div>
-          <div class="tiny">Positive slope is shown into Quadrant I. Negative slope is shown into Quadrant II.</div>
-        </div>
-
-        <div class="block" style="margin-top:10px">
-          <h3>Point-slope form</h3>
-          <div class="eqbox">
-            <div class="eq" id="psGeneral"></div>
-            <div class="eq" id="psSub"></div>
-          </div>
-        </div>
-
-        <div class="method open" id="mAlgebra">
-          <div class="mh">
-            <div class="left">
-              <div class="name">Algebra Solution</div>
-              <div class="formula" id="algFormula">y − y₁ = m(x − x₁)</div>
-            </div>
-            <div class="miniBtns">
-              <button class="mini" type="button" data-toggle="#mAlgebra">Hide/Show</button>
-            </div>
-          </div>
-          <div class="mb">
-            <div class="eq" id="algSteps"></div>
-          </div>
-        </div>
-
-        <div class="method" id="mProp">
-          <div class="mh">
-            <div class="left">
-              <div class="name">Proportions Method (Check your answer)</div>
-              <div class="formula" id="propFormula">p x − s·q y = p x₁ − s·q y₁</div>
-            </div>
-            <div class="miniBtns">
-              <button class="mini" type="button" data-toggle="#mProp">Hide/Show</button>
-            </div>
-          </div>
-          <div class="mb">
-            <div class="eq" id="propSteps"></div>
-          </div>
-        </div>
-
-        <div id="warnBox" class="warn" style="display:none"></div>
-
-        <div class="footerNote">
-          Notes: The “Proportions/Check” method builds a standard form directly from the slope fraction.
-          Here, s = +1 for positive slope and s = −1 for negative slope (so the sign flips on the y-term).
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Graph -->
-    <div class="card">
-      <div class="hd">
-        <h2>Coordinate Plane</h2>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn" id="toggleLineBtn" type="button">Hide line</button>
-          <button class="btn" id="togglePointBtn" type="button">Hide point</button>
-        </div>
-      </div>
-      <div class="canvasWrap">
-        <canvas id="plane" width="980" height="720"></canvas>
-        <div class="tiny" id="graphNote" style="margin-top:8px"></div>
-      </div>
-    </div>
+    <button class="btn primary" type="button" id="updateBtn" style="width:100%;padding:16px;font-size:16px">Calculate</button>
+  </div>
+
+  <div class="stepsCard">
+    <h2>Solution Steps</h2>
+    <div id="steps"></div>
   </div>
 </div>
 
@@ -377,9 +249,6 @@
   const $ = (sel) => document.querySelector(sel);
 
   const app = $("#app");
-  const canvas = $("#plane");
-  const ctx = canvas.getContext("2d", { alpha: false });
-
   const inputs = {
     sign: $("#sign"),
     num: $("#num"),
@@ -389,23 +258,11 @@
   };
 
   const out = {
-    slopePreview: $("#slopePreview"),
-    refText: $("#refText"),
-    psGeneral: $("#psGeneral"),
-    psSub: $("#psSub"),
-    algSteps: $("#algSteps"),
-    propSteps: $("#propSteps"),
-    warnBox: $("#warnBox"),
-    graphNote: $("#graphNote"),
+    steps: $("#steps"),
     themeBtn: $("#themeBtn"),
     resetBtn: $("#resetBtn"),
-    updateBtn: $("#updateBtn"),
-    toggleLineBtn: $("#toggleLineBtn"),
-    togglePointBtn: $("#togglePointBtn")
+    updateBtn: $("#updateBtn")
   };
-
-  let showLine = true;
-  let showPoint = true;
 
   function gcd(a,b){
     a = Math.abs(a); b = Math.abs(b);
@@ -413,23 +270,13 @@
     return a || 1;
   }
 
-  function fracHTML(p,q,signChar){
-    // signChar: "" | "+" | "-"
-    const s = (signChar === "-") ? "−" : (signChar === "+") ? "+" : "";
-    const frac = `
-      <span class="muted">m</span> = ${s ? `<span class="red">${s}</span>` : ""}
-      <span class="fracDisp ${signChar==="-" ? "red": "blue"}">
-        <span class="top">${p}</span>
-        <span class="bar"></span>
-        <span class="bot">${q}</span>
-      </span>
-    `;
-    return frac;
+  function fmtIntOrDec(v){
+    return Number.isInteger(v) ? String(v) : v.toFixed(2);
   }
 
   function readState(){
     const signRaw = (inputs.sign.value || "").trim();
-    const sign = (signRaw === "-" || signRaw === "−") ? "-" : (signRaw === "+") ? "+" : "";
+    const sign = (signRaw === "-" || signRaw === "−") ? "-" : "+";
     let p = parseInt(inputs.num.value, 10);
     let q = parseInt(inputs.den.value, 10);
     let x1 = parseFloat(inputs.x1.value);
@@ -440,396 +287,97 @@
     if (!Number.isFinite(x1)) x1 = 0;
     if (!Number.isFinite(y1)) y1 = 0;
 
-    // ensure nonnegative p, positive q
     p = Math.abs(p);
     q = Math.abs(q);
     if (q === 0) q = 1;
 
-    // simplify
     const g = gcd(p,q);
     const ps = p / g;
     const qs = q / g;
 
-    const s = (sign === "-") ? -1 : 1; // blank or "+" => positive
+    const s = (sign === "-") ? -1 : 1;
     const m = (qs === 0) ? 0 : s * (ps / qs);
 
     return { sign, s, p: ps, q: qs, m, x1, y1 };
   }
 
-  function warn(msg){
-    out.warnBox.style.display = "block";
-    out.warnBox.textContent = msg;
-  }
-  function clearWarn(){
-    out.warnBox.style.display = "none";
-    out.warnBox.textContent = "";
-  }
+  function buildSteps(state){
+    const { sign, p, q, x1, y1, s, m } = state;
 
-  function fmtIntOrDec(v){
-    // keep integer-looking numbers clean
-    return Number.isInteger(v) ? String(v) : String(v);
-  }
-
-  function buildPointSlope(state){
-    const { sign, p, q, x1, y1 } = state;
-    const sChar = (sign === "-") ? "−" : ""; // show minus only (blank treated as +)
-    const frac = `<span class="fracDisp ${sign==="-" ? "red":"blue"}"><span class="top">${p}</span><span class="bar"></span><span class="bot">${q}</span></span>`;
-    const mPart = (sign === "-") ? `<span class="red">−</span>${frac}` : `${frac}`;
-
-    const g1 = `y − (${fmtIntOrDec(y1)}) = m(x − (${fmtIntOrDec(x1)}))`;
-    const g2 = `y − (${fmtIntOrDec(y1)}) = ${mPart}(x − (${fmtIntOrDec(x1)}))`;
-
-    out.psGeneral.innerHTML = `<span class="muted">General:</span> ${g1}`;
-    out.psSub.innerHTML = `<span class="muted">Substitute m:</span> ${g2}`;
-  }
-
-  function buildReference(state){
-    const { sign, p, q } = state;
-    const isNeg = (sign === "-");
-    // reference endpoint: Q1 for positive => (q,p); Q2 for negative => (-q,p)
-    const rx = isNeg ? -q : q;
-    const ry = p;
-
-    const mDisp = fracHTML(p,q, sign || "+").replace("+",""); // don't force plus glyph
-    const pt = `(${fmtIntOrDec(rx)}, ${fmtIntOrDec(ry)})`;
-    out.refText.innerHTML =
-      `${mDisp}<br>` +
-      `<span class="blue">Reference slope segment:</span> from (0, 0) to <span class="blue">${pt}</span>`;
-  }
-
-  function buildAlgebra(state){
-    const { sign, p, q, x1, y1, s } = state;
-
-    // Start: y - y1 = (s*p/q)(x - x1)
-    // Multiply by q: q(y - y1) = s*p(x - x1)
-    // Expand: qy - qy1 = s*p x - s*p x1
-    // Standard: s*p x - qy = s*p x1 - qy1
-    // Solve for y: qy = s*p x + (qy1 - s*p x1) => y = (s*p/q)x + b
-    const sGlyph = (s === -1) ? "−" : ""; // show minus only
+    const sGlyph = (s === -1) ? "−" : "";
     const frac = `<span class="fracDisp ${s===-1 ? "red":"blue"}"><span class="top">${p}</span><span class="bar"></span><span class="bot">${q}</span></span>`;
     const mInline = (s===-1) ? `<span class="red">−</span>${frac}` : `${frac}`;
 
-    const line1 = `y − (${fmtIntOrDec(y1)}) = ${mInline}(x − (${fmtIntOrDec(x1)}))`;
-    const line2 = `${q}(y − (${fmtIntOrDec(y1)})) = ${s===-1 ? "−" : ""}${p}(x − (${fmtIntOrDec(x1)}))`;
-    const line3 = `${q}y − ${q}(${fmtIntOrDec(y1)}) = ${s===-1 ? "−" : ""}${p}x − ${s===-1 ? "−" : ""}${p}(${fmtIntOrDec(x1)})`;
+    // Method 1: Point-slope algebra
+    const html = [];
+    
+    html.push(`<div class="step large">Given: m = ${mInline}, Point = (${fmtIntOrDec(x1)}, ${fmtIntOrDec(y1)})</div>`);
 
-    // Standard form target:
-    // s*p x - q y = s*p x1 - q y1
-    const leftStd = `${s===-1 ? "−" : ""}${p}x − ${q}y`;
-    const rightStd = `${s===-1 ? "−" : ""}${p}(${fmtIntOrDec(x1)}) − ${q}(${fmtIntOrDec(y1)})`;
-
+    html.push(`<h3 style="margin:32px 0 16px;font-size:18px">Method 1: Point-Slope Form</h3>`);
+    
+    html.push(`<div class="step">y − y₁ = m(x − x₁)</div>`);
+    html.push(`<div class="step">y − (${fmtIntOrDec(y1)}) = ${mInline}(x − (${fmtIntOrDec(x1)}))</div>`);
+    
+    html.push(`<div class="step">Multiply both sides by ${q}:</div>`);
+    html.push(`<div class="step">${q}(y − (${fmtIntOrDec(y1)})) = ${s===-1 ? "−" : ""}${p}(x − (${fmtIntOrDec(x1)}))</div>`);
+    
+    html.push(`<div class="step">Expand:</div>`);
+    html.push(`<div class="step">${q}y − ${fmtIntOrDec(q*y1)} = ${s===-1 ? "−" : ""}${p}x − ${s===-1 ? "−" : ""}${fmtIntOrDec(p*x1)}</div>`);
+    
+    html.push(`<div class="step">Rearrange to standard form:</div>`);
     const C = (s*p*x1) - (q*y1);
-    const line4 = `<span class="muted">Standard form:</span> ${s===-1 ? "−" : ""}${p}x − ${q}y = ${fmtIntOrDec(C)}`;
-    const line4b = `<span class="muted">From:</span> ${leftStd} = ${rightStd}`;
+    html.push(`<div class="step large">${s===-1 ? "−" : ""}${p}x − ${q}y = ${fmtIntOrDec(C)}</div>`);
 
-    // y-intercept b:
-    // b = y1 - m x1 = y1 - s*(p/q)*x1 = (q*y1 - s*p*x1)/q
     const bNum = (q*y1) - (s*p*x1);
     const b = bNum / q;
+    html.push(`<div class="step">Slope-intercept form:</div>`);
+    html.push(`<div class="step large">y = ${mInline}x + ${fmtIntOrDec(b)}</div>`);
 
-    const line5 = `<span class="muted">Solve for y:</span> y = ${mInline}x + ${fmtIntOrDec(b)}`;
-    const line6 = `<span class="muted">Check:</span> substitute (${fmtIntOrDec(x1)}, ${fmtIntOrDec(y1)}) into y = mx + b`;
-
-    out.algSteps.innerHTML = [
-      `<div>${line1}</div>`,
-      `<div>${line2}</div>`,
-      `<div>${line3}</div>`,
-      `<div style="margin-top:8px">${line4b}</div>`,
-      `<div>${line4}</div>`,
-      `<div style="margin-top:8px">${line5}</div>`,
-      `<div>${line6}</div>`
-    ].join("");
-  }
-
-  function buildProportions(state){
-    const { sign, p, q, x1, y1, s } = state;
-
-    // Proportions/Check method:
-    // If slope m = s*(p/q), then line direction ratio is rise:run = s*p : q
-    // Standard form: p x - s*q y = constant
-    // Find constant by substituting point: p x1 - s*q y1
-    const yCoeff = -s*q; // -s*q multiplies y
+    // Method 2: Direct standard form
+    html.push(`<div class="methodSep"></div>`);
+    html.push(`<h3 style="margin:0 0 16px;font-size:18px">Method 2: Direct Standard Form (Alternative)</h3>`);
+    
+    const yCoeff = -s*q;
     const yCoeffDisp = (yCoeff >= 0) ? `+ ${Math.abs(yCoeff)}y` : `− ${Math.abs(yCoeff)}y`;
-    const left = `${p}x ${yCoeffDisp}`;
+    
+    html.push(`<div class="step">Use slope ratio directly: ${p}x ${yCoeffDisp} = k</div>`);
+    html.push(`<div class="step">Substitute point to find k:</div>`);
     const k = (p*x1) + (yCoeff*y1);
+    html.push(`<div class="step">k = ${p}(${fmtIntOrDec(x1)}) ${yCoeff >= 0 ? "+ " : "− "}${Math.abs(yCoeff)}(${fmtIntOrDec(y1)})</div>`);
+    html.push(`<div class="step">k = ${fmtIntOrDec(k)}</div>`);
+    
+    html.push(`<div class="step large">${p}x ${yCoeffDisp} = ${fmtIntOrDec(k)}</div>`);
 
-    const sub1 = `${p}(${fmtIntOrDec(x1)}) ${yCoeff >= 0 ? "+ " : "− "}${Math.abs(yCoeff)}(${fmtIntOrDec(y1)})`;
-    const sub2 = `${fmtIntOrDec(k)}`;
-
-    // Also show link to y = mx + b
-    const mFrac = `<span class="fracDisp ${s===-1 ? "red":"blue"}"><span class="top">${p}</span><span class="bar"></span><span class="bot">${q}</span></span>`;
-    const mInline = (s===-1) ? `<span class="red">−</span>${mFrac}` : `${mFrac}`;
-
-    out.propSteps.innerHTML = [
-      `<div><span class="muted">Build standard form directly:</span></div>`,
-      `<div style="margin-top:6px"><span class="blue">${left}</span> = k</div>`,
-      `<div style="margin-top:6px"><span class="muted">Substitute the point:</span> k = ${sub1}</div>`,
-      `<div>k = ${sub2}</div>`,
-      `<div style="margin-top:8px"><span class="muted">So:</span> <span class="blue">${left}</span> = <span class="blue">${fmtIntOrDec(k)}</span></div>`,
-      `<div style="margin-top:10px"><span class="muted">Equivalent slope form:</span> y = ${mInline}x + b</div>`
-    ].join("");
-  }
-
-  function buildSlopePreview(state){
-    const { sign, p, q, m } = state;
-    const frac = fracHTML(p,q, sign || "+").replace("+",""); // no forced plus
-    out.slopePreview.innerHTML =
-      `${frac}<br><span class="muted">Decimal:</span> ${m}`;
-  }
-
-  function axisColor(){
-    const theme = app.getAttribute("data-theme") || "light";
-    return theme === "dark" ? "#93a4bd" : "#64748b";
-  }
-  function gridColor(){
-    const theme = app.getAttribute("data-theme") || "light";
-    return theme === "dark" ? "#1b2740" : "#e8edf6";
-  }
-  function bgColor(){
-    return getComputedStyle(app).getPropertyValue("--panel").trim() || "#fff";
-  }
-  function blueColor(){
-    return getComputedStyle(app).getPropertyValue("--blue").trim() || "#2563eb";
-  }
-  function redColor(){
-    return getComputedStyle(app).getPropertyValue("--red").trim() || "#dc2626";
-  }
-  function textColor(){
-    return getComputedStyle(app).getPropertyValue("--ink").trim() || "#0b1220";
-  }
-
-  function draw(state){
-    // size
-    const W = canvas.width, H = canvas.height;
-    // background
-    ctx.fillStyle = bgColor();
-    ctx.fillRect(0,0,W,H);
-
-    const { sign, p, q, x1, y1, s, m } = state;
-
-    // reference endpoint (Q1 or Q2)
-    const rx = (sign === "-") ? -q : q;
-    const ry = p;
-
-    // choose scale based on points of interest: ref endpoint and given point, plus a bit
-    const maxAbs = Math.max(2, Math.abs(rx), Math.abs(ry), Math.abs(x1), Math.abs(y1)) + 2;
-    const units = Math.ceil(maxAbs);
-
-    // map: world coords (-units..units) to canvas with margins
-    const pad = 60;
-    const plotW = W - 2*pad;
-    const plotH = H - 2*pad;
-    const scale = Math.min(plotW, plotH) / (2*units);
-
-    const cx = pad + plotW/2;
-    const cy = pad + plotH/2;
-
-    function X(x){ return cx + x*scale; }
-    function Y(y){ return cy - y*scale; }
-
-    // grid
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = gridColor();
-    for(let i=-units;i<=units;i++){
-      // vertical
-      ctx.beginPath();
-      ctx.moveTo(X(i), Y(-units));
-      ctx.lineTo(X(i), Y(units));
-      ctx.stroke();
-      // horizontal
-      ctx.beginPath();
-      ctx.moveTo(X(-units), Y(i));
-      ctx.lineTo(X(units), Y(i));
-      ctx.stroke();
-    }
-
-    // axes
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = axisColor();
-    ctx.beginPath(); ctx.moveTo(X(-units), Y(0)); ctx.lineTo(X(units), Y(0)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(X(0), Y(-units)); ctx.lineTo(X(0), Y(units)); ctx.stroke();
-
-    // ticks + labels
-    ctx.fillStyle = axisColor();
-    ctx.font = "12px " + getComputedStyle(document.body).fontFamily;
-    for(let i=-units;i<=units;i++){
-      if(i===0) continue;
-      // x ticks
-      ctx.beginPath();
-      ctx.moveTo(X(i), Y(0)-6);
-      ctx.lineTo(X(i), Y(0)+6);
-      ctx.stroke();
-      ctx.fillText(String(i), X(i)-4, Y(0)+22);
-      // y ticks
-      ctx.beginPath();
-      ctx.moveTo(X(0)-6, Y(i));
-      ctx.lineTo(X(0)+6, Y(i));
-      ctx.stroke();
-      ctx.fillText(String(i), X(0)+10, Y(i)+4);
-    }
-
-    // optional: draw full line through point in red
-    if(showLine){
-      // line: y = m(x - x1) + y1 = m x + b
-      const b = y1 - m*x1;
-
-      // compute intersections with square bounds x,y in [-units, units]
-      // sample x at bounds to get y, plus y bounds to get x
-      const candidates = [];
-
-      // x = -units, +units
-      candidates.push({x:-units, y:m*(-units)+b});
-      candidates.push({x: units, y:m*( units)+b});
-
-      // y = -units => x = (y - b)/m, if m != 0
-      if(Math.abs(m) > 1e-12){
-        candidates.push({x:(-units - b)/m, y:-units});
-        candidates.push({x:( units - b)/m, y: units});
-      } else {
-        // horizontal line y=b
-        candidates.push({x:-units, y:b});
-        candidates.push({x: units, y:b});
-      }
-
-      // keep points within bounds
-      const pts = candidates.filter(pt =>
-        pt.x >= -units-1e-9 && pt.x <= units+1e-9 &&
-        pt.y >= -units-1e-9 && pt.y <= units+1e-9
-      );
-
-      // dedupe approximately
-      const uniq = [];
-      const eps = 1e-6;
-      for(const pt of pts){
-        if(!uniq.some(u => Math.abs(u.x-pt.x)<eps && Math.abs(u.y-pt.y)<eps)) uniq.push(pt);
-      }
-
-      if(uniq.length >= 2){
-        // pick two farthest points
-        let a=uniq[0], bpt=uniq[1], best=-1;
-        for(let i=0;i<uniq.length;i++){
-          for(let j=i+1;j<uniq.length;j++){
-            const dx=uniq[i].x-uniq[j].x, dy=uniq[i].y-uniq[j].y;
-            const d=dx*dx+dy*dy;
-            if(d>best){best=d;a=uniq[i];bpt=uniq[j];}
-          }
-        }
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = redColor();
-        ctx.beginPath();
-        ctx.moveTo(X(a.x), Y(a.y));
-        ctx.lineTo(X(bpt.x), Y(bpt.y));
-        ctx.stroke();
-      }
-    }
-
-    // reference slope segment in blue
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = blueColor();
-    ctx.setLineDash([8,6]);
-    ctx.beginPath();
-    ctx.moveTo(X(0), Y(0));
-    ctx.lineTo(X(rx), Y(ry));
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // draw the "rise/run" step box
-    // from origin to (rx,0) to (rx,ry)
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = blueColor();
-    ctx.globalAlpha = 0.9;
-    ctx.beginPath();
-    ctx.moveTo(X(0), Y(0));
-    ctx.lineTo(X(rx), Y(0));
-    ctx.lineTo(X(rx), Y(ry));
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-
-    // point
-    if(showPoint){
-      ctx.fillStyle = redColor();
-      const px = X(x1), py = Y(y1);
-      ctx.beginPath();
-      ctx.arc(px, py, 6, 0, Math.PI*2);
-      ctx.fill();
-
-      ctx.fillStyle = textColor();
-      ctx.font = "13px " + getComputedStyle(document.body).fontFamily;
-      ctx.fillText(`P(${fmtIntOrDec(x1)}, ${fmtIntOrDec(y1)})`, px + 10, py - 10);
-    }
-
-    // labels for reference endpoint
-    ctx.fillStyle = textColor();
-    ctx.font = "13px " + getComputedStyle(document.body).fontFamily;
-    ctx.fillText(`Ref(${rx}, ${ry})`, X(rx) + 10, Y(ry) - 10);
-
-    // note under canvas
-    const qNote = (sign === "-")
-      ? "Negative slope is drawn into Quadrant II using endpoint (−q, p)."
-      : "Positive slope is drawn into Quadrant I using endpoint (q, p).";
-    out.graphNote.textContent = `Scale set to ±${units} on each axis. ${qNote}`;
+    out.steps.innerHTML = html.join("");
   }
 
   function update(){
-    clearWarn();
     const st = readState();
-
-    if(st.q === 0){
-      warn("Denominator cannot be 0. It has been set to 1.");
-    }
-    if(st.p === 0){
-      warn("Numerator is 0, so the slope is 0 (a horizontal line).");
-    }
-
-    buildSlopePreview(st);
-    buildReference(st);
-    buildPointSlope(st);
-    buildAlgebra(st);
-    buildProportions(st);
-    draw(st);
+    buildSteps(st);
   }
 
-  function toggleMethod(sel){
-    const el = document.querySelector(sel);
-    if(!el) return;
-    el.classList.toggle("open");
-  }
-
-  // Theme
   function setTheme(theme){
     app.setAttribute("data-theme", theme);
     out.themeBtn.textContent = theme === "dark" ? "Light" : "Dark";
-    // redraw
-    update();
   }
   function flipTheme(){
     const cur = app.getAttribute("data-theme") || "light";
     setTheme(cur === "dark" ? "light" : "dark");
   }
 
-  // Reset defaults
   function reset(){
-    inputs.sign.value = "";
+    inputs.sign.value = "+";
     inputs.num.value = 2;
     inputs.den.value = 3;
     inputs.x1.value = 1;
     inputs.y1.value = 4;
-    showLine = true;
-    showPoint = true;
-    out.toggleLineBtn.textContent = "Hide line";
-    out.togglePointBtn.textContent = "Hide point";
-    // open algebra, close proportions
-    $("#mAlgebra").classList.add("open");
-    $("#mProp").classList.remove("open");
     update();
   }
 
-  // Events
   out.updateBtn.addEventListener("click", update);
   out.resetBtn.addEventListener("click", reset);
   out.themeBtn.addEventListener("click", flipTheme);
 
-  // update on input changes
   ["change","input"].forEach(evt=>{
     inputs.sign.addEventListener(evt, update);
     inputs.num.addEventListener(evt, update);
@@ -838,26 +386,6 @@
     inputs.y1.addEventListener(evt, update);
   });
 
-  document.addEventListener("click", (e)=>{
-    const t = e.target;
-    if(t && t.matches("[data-toggle]")){
-      toggleMethod(t.getAttribute("data-toggle"));
-    }
-  });
-
-  out.toggleLineBtn.addEventListener("click", ()=>{
-    showLine = !showLine;
-    out.toggleLineBtn.textContent = showLine ? "Hide line" : "Show line";
-    update();
-  });
-
-  out.togglePointBtn.addEventListener("click", ()=>{
-    showPoint = !showPoint;
-    out.togglePointBtn.textContent = showPoint ? "Hide point" : "Show point";
-    update();
-  });
-
-  // init
   setTheme("light");
   update();
 })();
