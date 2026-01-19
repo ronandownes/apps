@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Active Maths 3 - Exercise 22.1 Solutions</title>
+
+<style>
+:root{--ink:#000;--line:#cfcfcf;--muted:#666;--blue:#2563eb;--orange:#f97316;--green:#16a34a}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--ink);line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:12px}
+
+h1{font-size:24px;color:var(--blue);border-bottom:3px solid var(--blue);padding-bottom:8px;margin:0 0 16px}
+h2{font-size:18px;color:#fff;background:var(--orange);padding:8px 12px;border-radius:6px;margin:24px 0 12px}
+h3{font-size:15px;color:var(--orange);margin:16px 0 8px;font-family:"Times New Roman",serif;font-style:italic}
+
+.toc{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:24px}
+.toc h2{background:var(--blue);margin:-16px -16px 12px;border-radius:6px 6px 0 0;padding:10px 16px}
+.toc ul{margin:0;padding:0 0 0 20px}
+.toc li{margin:6px 0}
+.toc a{color:var(--blue);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+.question{background:#fff7ed;border-left:4px solid var(--orange);padding:10px 14px;margin:12px 0;font-size:14px}
+.solution{margin:8px 0 20px;padding:0 10px}
+
+.line{font-family:"Times New Roman",Times,serif;font-size:17px;margin:6px 0}
+.indent{margin-left:24px}
+.answer-box{display:inline-block;border:2px solid #000;padding:6px 12px;font-family:"Times New Roman",serif;font-size:18px;margin:8px 0}
+
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px}
+.frac-num{border-bottom:2px solid #000;padding:0 4px 1px;font-size:0.85em}
+.frac-den{padding:1px 4px 0;font-size:0.85em}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.calc-box{border:1px solid var(--line);border-radius:6px;padding:10px;margin:8px 0;background:#fefefe}
+.calc-box h4{margin:0 0 6px;font-size:13px;color:var(--muted)}
+
+.diagram{text-align:center;margin:12px 0}
+.diagram svg{max-width:200px;height:auto}
+
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+@media print{.toc{page-break-after:always}h2{break-before:auto}}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>Active Maths 3 – Exercise 22.1 Solutions</h1>
+
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <ul>
+    <li><a href="#q1">Q1: Volume of Cylinders</a></li>
+    <li><a href="#q2">Q2: Volume of Spheres and Hemispheres</a></li>
+    <li><a href="#q3">Q3: Surface Area of Cylinders</a></li>
+    <li><a href="#q4">Q4: Surface Area of Spheres and Hemispheres</a></li>
+    <li><a href="#q5">Q5: Cylinder Net</a></li>
+    <li><a href="#q6">Q6: Cylinder Nets A and B</a></li>
+    <li><a href="#q7">Q7: Open Cylinder</a></li>
+    <li><a href="#q8">Q8: Can with Label</a></li>
+    <li><a href="#q9">Q9: Hot Water Container</a></li>
+    <li><a href="#q10">Q10: Lighthouse</a></li>
+    <li><a href="#q11">Q11: Ornament from Block</a></li>
+    <li><a href="#q12">Q12: Sphere/Cylinder in Box</a></li>
+    <li><a href="#q13">Q13: Cans in Box</a></li>
+    <li><a href="#q14">Q14: Tennis Balls in Tube</a></li>
+    <li><a href="#q15">Q15: Vitamin Capsule</a></li>
+    <li><a href="#q16">Q16: Cylinder Ratios</a></li>
+  </ul>
+</nav>
+
+<!-- QUESTION 1 -->
+<h2 id="q1">Question 1: Volume of Cylinders</h2>
+<p class="question">Find the <strong>volume</strong> of each cylinder. V = πr²h</p>
+
+<div class="two-col">
+  <div>
+    <h3>(i) r = 11 m, h = 10 m (π = 3.14)</h3>
+    <div class="solution">
+      <div class="line">V = πr²h</div>
+      <div class="line">V = 3.14 × (11)² × 10</div>
+      <div class="line">V = 3.14 × 121 × 10</div>
+      <div class="answer-box">V = 3799.4 m³</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(ii) r = 8 mm, h = 14 mm (π = 22/7)</h3>
+    <div class="solution">
+      <div class="line">V = πr²h</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × (8)² × 14</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 64 × 14</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">22 × 64 × 14</span><span class="frac-den">7</span></span> = <span class="frac"><span class="frac-num">19712</span><span class="frac-den">7</span></span></div>
+      <div class="answer-box">V = 2816 mm³</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(iii) r = 5 cm, h = 10 cm (π = 3.14)</h3>
+    <div class="solution">
+      <div class="line">V = πr²h</div>
+      <div class="line">V = 3.14 × (5)² × 10</div>
+      <div class="line">V = 3.14 × 25 × 10</div>
+      <div class="answer-box">V = 785 cm³</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(iv) r = 2.5 cm, h = 10 cm (in terms of π)</h3>
+    <div class="solution">
+      <div class="line">V = πr²h</div>
+      <div class="line">V = π × (2.5)² × 10</div>
+      <div class="line">V = π × 6.25 × 10</div>
+      <div class="answer-box">V = 62.5π cm³</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION 2 -->
+<h2 id="q2">Question 2: Volume of Spheres and Hemispheres</h2>
+<p class="question">Sphere: V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span>πr³ &nbsp;&nbsp; Hemisphere: V = <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span>πr³</p>
+
+<div class="two-col">
+  <div>
+    <h3>(i) Sphere: diameter = 30 cm (π = 22/7)</h3>
+    <div class="solution">
+      <div class="line">r = 30 ÷ 2 = 15 cm</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span>πr³</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × (15)³</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 3375</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">4 × 22 × 3375</span><span class="frac-den">21</span></span> = <span class="frac"><span class="frac-num">297000</span><span class="frac-den">21</span></span></div>
+      <div class="answer-box">V = 14142<span class="frac"><span class="frac-num">6</span><span class="frac-den">7</span></span> cm³</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(ii) Sphere: r = 12 m (π = 3.14)</h3>
+    <div class="solution">
+      <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span>πr³</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × 3.14 × (12)³</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × 3.14 × 1728</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">4 × 3.14 × 1728</span><span class="frac-den">3</span></span></div>
+      <div class="answer-box">V = 7234.56 m³</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(iii) Hemisphere: r = 10 mm (π = 3.14)</h3>
+    <div class="solution">
+      <div class="line">V = <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span>πr³</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span> × 3.14 × (10)³</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span> × 3.14 × 1000</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">6280</span><span class="frac-den">3</span></span></div>
+      <div class="answer-box">V = 2093.33 mm³</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(iv) Hemisphere: r = 4.2 cm (in terms of π)</h3>
+    <div class="solution">
+      <div class="line">V = <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span>πr³</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span> × π × (4.2)³</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span> × π × 74.088</div>
+      <div class="line">V = <span class="frac"><span class="frac-num">148.176</span><span class="frac-den">3</span></span>π</div>
+      <div class="answer-box">V = 49.392π cm³</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION 3 -->
+<h2 id="q3">Question 3: Surface Area of Solid Cylinders</h2>
+<p class="question">CSA = 2πrh &nbsp;&nbsp; TSA = 2πrh + 2πr² = 2πr(h + r)</p>
+
+<div class="two-col">
+  <div>
+    <h3>(i) r = 1.5 cm, h = 4 cm (π = 3.14)</h3>
+    <div class="solution">
+      <div class="line">CSA = 2πrh</div>
+      <div class="line">CSA = 2 × 3.14 × 1.5 × 4</div>
+      <div class="answer-box">CSA = 37.68 cm²</div>
+      <div class="line" style="margin-top:12px">TSA = 2πr(h + r)</div>
+      <div class="line">TSA = 2 × 3.14 × 1.5 × (4 + 1.5)</div>
+      <div class="line">TSA = 2 × 3.14 × 1.5 × 5.5</div>
+      <div class="answer-box">TSA = 51.81 cm²</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(ii) r = 80 cm, h = 10 cm (in terms of π)</h3>
+    <div class="solution">
+      <div class="line">CSA = 2πrh</div>
+      <div class="line">CSA = 2 × π × 80 × 10</div>
+      <div class="answer-box">CSA = 1600π cm²</div>
+      <div class="line" style="margin-top:12px">TSA = 2πr(h + r)</div>
+      <div class="line">TSA = 2 × π × 80 × (10 + 80)</div>
+      <div class="line">TSA = 2 × π × 80 × 90</div>
+      <div class="answer-box">TSA = 14400π cm²</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(iii) r = 14 mm, h = 80 mm (π = 22/7)</h3>
+    <div class="solution">
+      <div class="line">CSA = 2πrh</div>
+      <div class="line">CSA = 2 × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 14 × 80</div>
+      <div class="line">CSA = <span class="frac"><span class="frac-num">2 × 22 × 14 × 80</span><span class="frac-den">7</span></span> = <span class="frac"><span class="frac-num">49280</span><span class="frac-den">7</span></span></div>
+      <div class="answer-box">CSA = 7040 mm²</div>
+      <div class="line" style="margin-top:12px">TSA = 2πr(h + r)</div>
+      <div class="line">TSA = 2 × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 14 × (80 + 14)</div>
+      <div class="line">TSA = <span class="frac"><span class="frac-num">2 × 22 × 14 × 94</span><span class="frac-den">7</span></span></div>
+      <div class="answer-box">TSA = 8272 mm²</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(iv) r = 110 m, h = 0.75 m (in terms of π)</h3>
+    <div class="solution">
+      <div class="line">CSA = 2πrh</div>
+      <div class="line">CSA = 2 × π × 110 × 0.75</div>
+      <div class="answer-box">CSA = 165π m²</div>
+      <div class="line" style="margin-top:12px">TSA = 2πr(h + r)</div>
+      <div class="line">TSA = 2 × π × 110 × (0.75 + 110)</div>
+      <div class="line">TSA = 2 × π × 110 × 110.75</div>
+      <div class="answer-box">TSA = 24365π m²</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION 4 -->
+<h2 id="q4">Question 4: Surface Area of Spheres and Hemispheres</h2>
+<p class="question">Sphere: SA = 4πr² &nbsp;&nbsp; Hemisphere: CSA = 2πr², TSA = 3πr²</p>
+
+<div class="two-col">
+  <div>
+    <h3>(i) Sphere: r = 4 m (in terms of π)</h3>
+    <div class="solution">
+      <div class="line">SA = 4πr²</div>
+      <div class="line">SA = 4 × π × (4)²</div>
+      <div class="line">SA = 4 × π × 16</div>
+      <div class="answer-box">SA = 64π m²</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(ii) Hemisphere: r = 25 cm (π = 3.14)</h3>
+    <div class="solution">
+      <div class="line">CSA = 2πr²</div>
+      <div class="line">CSA = 2 × 3.14 × (25)²</div>
+      <div class="line">CSA = 2 × 3.14 × 625</div>
+      <div class="answer-box">CSA = 3925 cm²</div>
+      <div class="line" style="margin-top:12px">TSA = 3πr²</div>
+      <div class="line">TSA = 3 × 3.14 × 625</div>
+      <div class="answer-box">TSA = 5887.5 cm²</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(iii) Sphere: r = 20 mm (π = 22/7)</h3>
+    <div class="solution">
+      <div class="line">SA = 4πr²</div>
+      <div class="line">SA = 4 × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × (20)²</div>
+      <div class="line">SA = <span class="frac"><span class="frac-num">4 × 22 × 400</span><span class="frac-den">7</span></span> = <span class="frac"><span class="frac-num">35200</span><span class="frac-den">7</span></span></div>
+      <div class="answer-box">SA = 5028<span class="frac"><span class="frac-num">4</span><span class="frac-den">7</span></span> mm²</div>
+    </div>
+  </div>
+  
+  <div>
+    <h3>(iv) Hemisphere: r = 40 cm (π = 3.14)</h3>
+    <div class="solution">
+      <div class="line">CSA = 2πr²</div>
+      <div class="line">CSA = 2 × 3.14 × (40)²</div>
+      <div class="line">CSA = 2 × 3.14 × 1600</div>
+      <div class="answer-box">CSA = 10048 cm²</div>
+      <div class="line" style="margin-top:12px">TSA = 3πr²</div>
+      <div class="line">TSA = 3 × 3.14 × 1600</div>
+      <div class="answer-box">TSA = 15072 cm²</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION 5 -->
+<h2 id="q5">Question 5: Cylinder Net</h2>
+<p class="question">Net shows circles of radius 1 cm and rectangle of height 3 cm</p>
+
+<h3>(a) Values of h and r</h3>
+<div class="solution">
+  <div class="line">From the net:</div>
+  <div class="answer-box">r = 1 cm, h = 3 cm</div>
+</div>
+
+<h3>(b) Surface area in terms of π</h3>
+<div class="solution">
+  <div class="line">TSA = 2πr(h + r)</div>
+  <div class="line">TSA = 2 × π × 1 × (3 + 1)</div>
+  <div class="line">TSA = 2 × π × 1 × 4</div>
+  <div class="answer-box">TSA = 8π cm²</div>
+</div>
+
+<h3>(c) Volume in terms of π</h3>
+<div class="solution">
+  <div class="line">V = πr²h</div>
+  <div class="line">V = π × (1)² × 3</div>
+  <div class="answer-box">V = 3π cm³</div>
+</div>
+
+<!-- QUESTION 6 -->
+<h2 id="q6">Question 6: Cylinder Nets A and B</h2>
+<p class="question">Using π = 22/7. Cylinder A: circle d ≈ 5 cm, h = 30 cm. Cylinder B: rectangle 11 cm × 60 cm</p>
+
+<h3>Cylinder A</h3>
+<h3>(a) Values of h and r</h3>
+<div class="solution">
+  <div class="line">From net: diameter ≈ 5 cm, height = 30 cm</div>
+  <div class="answer-box">r = 3 cm (nearest whole), h = 30 cm</div>
+</div>
+
+<h3>(b) Surface area</h3>
+<div class="solution">
+  <div class="line">TSA = 2πr(h + r)</div>
+  <div class="line">TSA = 2 × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 3 × (30 + 3)</div>
+  <div class="line">TSA = <span class="frac"><span class="frac-num">2 × 22 × 3 × 33</span><span class="frac-den">7</span></span> = <span class="frac"><span class="frac-num">4356</span><span class="frac-den">7</span></span></div>
+  <div class="answer-box">TSA = 622<span class="frac"><span class="frac-num">2</span><span class="frac-den">7</span></span> cm²</div>
+</div>
+
+<h3>(c) Volume</h3>
+<div class="solution">
+  <div class="line">V = πr²h</div>
+  <div class="line">V = <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × (3)² × 30</div>
+  <div class="line">V = <span class="frac"><span class="frac-num">22 × 9 × 30</span><span class="frac-den">7</span></span> = <span class="frac"><span class="frac-num">5940</span><span class="frac-den">7</span></span></div>
+  <div class="answer-box">V = 848<span class="frac"><span class="frac-num">4</span><span class="frac-den">7</span></span> cm³</div>
+</div>
+
+<h3>Cylinder B</h3>
+<h3>(a) Values of h and r</h3>
+<div class="solution">
+  <div class="line">Rectangle width = circumference = 2πr</div>
+  <div class="line">11 = 2 × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × r</div>
+  <div class="line">r = <span class="frac"><span class="frac-num">11 × 7</span><span class="frac-den">44</span></span> = <span class="frac"><span class="frac-num">77</span><span class="frac-den">44</span></span> = 1.75</div>
+  <div class="answer-box">r = 2 cm (nearest whole), h = 60 cm</div>
+</div>
+
+<h3>(b) Surface area</h3>
+<div class="solution">
+  <div class="line">TSA = 2πr(h + r)</div>
+  <div class="line">TSA = 2 × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 2 × (60 + 2)</div>
+  <div class="line">TSA = <span class="frac"><span class="frac-num">2 × 22 × 2 × 62</span><span class="frac-den">7</span></span> = <span class="frac"><span class="frac-num">5456</span><span class="frac-den">7</span></span></div>
+  <div class="answer-box">TSA = 779<span class="frac"><span class="frac-num">3</span><span class="frac-den">7</span></span> cm²</div>
+</div>
+
+<h3>(c) Volume</h3>
+<div class="solution">
+  <div class="line">V = πr²h</div>
+  <div class="line">V = <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × (2)² × 60</div>
+  <div class="line">V = <span class="frac"><span class="frac-num">22 × 4 × 60</span><span class="frac-den">7</span></span> = <span class="frac"><span class="frac-num">5280</span><span class="frac-den">7</span></span></div>
+  <div class="answer-box">V = 754<span class="frac"><span class="frac-num">2</span><span class="frac-den">7</span></span> cm³</div>
+</div>
+
+<!-- QUESTION 7 -->
+<h2 id="q7">Question 7: Open Cylinder (no top)</h2>
+<p class="question">r = 3.5 cm, h = 8 cm. Take π = 22/7</p>
+
+<h3>(a) Draw net</h3>
+<div class="solution">
+  <div class="line">Net consists of: 1 circle (base) + 1 rectangle</div>
+  <div class="line">Circle: radius = 3.5 cm</div>
+  <div class="line">Rectangle: width = 2πr = 2 × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 3.5 = 22 cm</div>
+  <div class="line">Rectangle: height = 8 cm</div>
+</div>
+
+<h3>(b) Total surface area</h3>
+<div class="solution">
+  <div class="line">TSA (open) = CSA + πr² (one base only)</div>
+  <div class="line">TSA = 2πrh + πr²</div>
+  <div class="line">TSA = πr(2h + r)</div>
+  <div class="line">TSA = <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 3.5 × (2 × 8 + 3.5)</div>
+  <div class="line">TSA = <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 3.5 × 19.5</div>
+  <div class="line">TSA = 11 × 19.5</div>
+  <div class="answer-box">TSA = 214.5 cm²</div>
+</div>
+
+<!-- QUESTION 8 -->
+<h2 id="q8">Question 8: Can with Label</h2>
+<p class="question">r = 4.5 cm, h = 12 cm. Label overlap = 1.25 cm</p>
+
+<h3>(a) Length of label (to nearest mm)</h3>
+<div class="solution">
+  <div class="line">Length = Circumference + overlap</div>
+  <div class="line">Length = 2πr + 1.25</div>
+  <div class="line">Length = 2 × π × 4.5 + 1.25</div>
+  <div class="line">Length = 9π + 1.25</div>
+  <div class="line">Length = 28.274 + 1.25</div>
+  <div class="answer-box">Length = 295 mm (to nearest mm)</div>
+</div>
+
+<h3>(b) Area of label</h3>
+<div class="solution">
+  <div class="line">Area = Length × height</div>
+  <div class="line">Area = 29.524 × 12</div>
+  <div class="answer-box">Area = 354.29 cm²</div>
+</div>
+
+<h3>(c) Volume of can in terms of π</h3>
+<div class="solution">
+  <div class="line">V = πr²h</div>
+  <div class="line">V = π × (4.5)² × 12</div>
+  <div class="line">V = π × 20.25 × 12</div>
+  <div class="answer-box">V = 243π cm³</div>
+</div>
+
+<!-- QUESTION 9 -->
+<h2 id="q9">Question 9: Hot Water Container</h2>
+<p class="question">Hemisphere on cylinder. r = 25 cm, total height = 90 cm</p>
+
+<h3>(a) Height of cylinder</h3>
+<div class="solution">
+  <div class="line">Height of hemisphere = radius = 25 cm</div>
+  <div class="line">Height of cylinder = 90 − 25</div>
+  <div class="answer-box">h = 65 cm</div>
+</div>
+
+<h3>(b) Internal volume (to 2 dp)</h3>
+<div class="solution">
+  <div class="line">V = V<sub>cylinder</sub> + V<sub>hemisphere</sub></div>
+  <div class="line">V = πr²h + <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span>πr³</div>
+  <div class="line">V = π × (25)² × 65 + <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span> × π × (25)³</div>
+  <div class="line">V = π × 625 × 65 + <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span> × π × 15625</div>
+  <div class="line">V = 40625π + 10416.67π</div>
+  <div class="line">V = 51041.67π</div>
+  <div class="answer-box">V = 160353.98 cm³</div>
+</div>
+
+<h3>(c) Volume in litres (to nearest litre)</h3>
+<div class="solution">
+  <div class="line">1 litre = 1000 cm³</div>
+  <div class="line">Volume = 160353.98 ÷ 1000</div>
+  <div class="answer-box">V = 160 litres</div>
+</div>
+
+<!-- QUESTION 10 -->
+<h2 id="q10">Question 10: Lighthouse</h2>
+<p class="question">Hemisphere on cylinder. Diameter = 14 m, total height = 37 m. π = 22/7</p>
+
+<h3>(a) Why radius of hemisphere is 7 m</h3>
+<div class="solution">
+  <div class="line">Diameter = 14 m</div>
+  <div class="line">Radius = diameter ÷ 2 = 14 ÷ 2</div>
+  <div class="answer-box">r = 7 m</div>
+</div>
+
+<h3>(b) External surface area (ignoring base)</h3>
+<div class="solution">
+  <div class="line">Height of cylinder = 37 − 7 = 30 m</div>
+  <div class="line">SA = CSA<sub>cylinder</sub> + CSA<sub>hemisphere</sub></div>
+  <div class="line">SA = 2πrh + 2πr²</div>
+  <div class="line">SA = 2πr(h + r)</div>
+  <div class="line">SA = 2 × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × 7 × (30 + 7)</div>
+  <div class="line">SA = 2 × 22 × 37</div>
+  <div class="answer-box">SA = 1628 m²</div>
+</div>
+
+<!-- QUESTION 11 -->
+<h2 id="q11">Question 11: Ornament from Block</h2>
+<p class="question">Block: square base, height 24 cm. Ornament: 2 spheres + 2 cubes. Sphere diameter = cube side.</p>
+
+<h3>(a) Length of side of one cube</h3>
+<div class="solution">
+  <div class="line">Total height = 2 spheres + 2 cubes = 24 cm</div>
+  <div class="line">Let side of cube = s = diameter of sphere</div>
+  <div class="line">2s + 2s = 24</div>
+  <div class="line">4s = 24</div>
+  <div class="answer-box">s = 6 cm</div>
+</div>
+
+<h3>(b) Volume of ornament (to 2 dp)</h3>
+<div class="solution">
+  <div class="line">r = 6 ÷ 2 = 3 cm</div>
+  <div class="line">V = 2 × V<sub>cube</sub> + 2 × V<sub>sphere</sub></div>
+  <div class="line">V = 2 × s³ + 2 × <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span>πr³</div>
+  <div class="line">V = 2 × (6)³ + 2 × <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × π × (3)³</div>
+  <div class="line">V = 2 × 216 + <span class="frac"><span class="frac-num">8</span><span class="frac-den">3</span></span> × π × 27</div>
+  <div class="line">V = 432 + 72π</div>
+  <div class="line">V = 432 + 226.19</div>
+  <div class="answer-box">V = 658.19 cm³</div>
+</div>
+
+<h3>(c) Percentage carved away (to 2 dp)</h3>
+<div class="solution">
+  <div class="line">Original block volume = 6 × 6 × 24 = 864 cm³</div>
+  <div class="line">Material removed = 864 − 658.19 = 205.81 cm³</div>
+  <div class="line">Percentage = <span class="frac"><span class="frac-num">205.81</span><span class="frac-den">864</span></span> × 100</div>
+  <div class="answer-box">23.82%</div>
+</div>
+
+<!-- QUESTION 12 -->
+<h2 id="q12">Question 12: Sphere/Cylinder in Box</h2>
+<p class="question">Box: 10 cm × 11 cm × 6 cm</p>
+
+<h3>(a) Largest sphere that fits</h3>
+<div class="solution">
+  <div class="line">Smallest dimension = 6 cm = diameter</div>
+  <div class="line">r = 3 cm</div>
+  <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span>πr³</div>
+  <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × π × (3)³</div>
+  <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × π × 27</div>
+  <div class="answer-box">V = 36π cm³</div>
+</div>
+
+<h3>(b) Largest cylinder that fits</h3>
+<div class="solution">
+  <div class="line">Standing upright: r = 5 cm (half of 10), h = 6 cm</div>
+  <div class="line">V = πr²h = π × 25 × 6 = 150π cm³</div>
+  <div class="line">Or: r = 3 cm (half of 6), h = 11 cm</div>
+  <div class="line">V = πr²h = π × 9 × 11 = 99π cm³</div>
+  <div class="line">Or: r = 3 cm (half of 6), h = 10 cm</div>
+  <div class="line">V = πr²h = π × 9 × 10 = 90π cm³</div>
+  <div class="answer-box">V = 150π cm³ (largest)</div>
+</div>
+
+<!-- QUESTION 13 -->
+<h2 id="q13">Question 13: Cans in Box</h2>
+<p class="question">Can: r = 3.6 cm, h = 10 cm. 24 cans in box.</p>
+
+<h3>(a) Volume of can (to 2 dp)</h3>
+<div class="solution">
+  <div class="line">V = πr²h</div>
+  <div class="line">V = π × (3.6)² × 10</div>
+  <div class="line">V = π × 12.96 × 10</div>
+  <div class="line">V = 129.6π</div>
+  <div class="answer-box">V = 407.15 cm³</div>
+</div>
+
+<h3>(b)(i) Box dimensions</h3>
+<div class="solution">
+  <div class="line">Can diameter = 7.2 cm</div>
+  <div class="line">24 cans arranged as shown (4 × 6 arrangement)</div>
+  <div class="line">Length = 4 × 7.2 = 28.8 cm ✓</div>
+  <div class="line">Width = 6 × 7.2 = 43.2 cm</div>
+  <div class="answer-box">Height = 10 cm, Length = 28.8 cm, Width = 43.2 cm</div>
+</div>
+
+<h3>(b)(ii) Volume of box</h3>
+<div class="solution">
+  <div class="line">V = 28.8 × 43.2 × 10</div>
+  <div class="answer-box">V = 12441.6 cm³</div>
+</div>
+
+<h3>(b)(iii) Percentage occupied by cans (to 1 dp)</h3>
+<div class="solution">
+  <div class="line">Total volume of 24 cans = 24 × 407.15 = 9771.6 cm³</div>
+  <div class="line">Percentage = <span class="frac"><span class="frac-num">9771.6</span><span class="frac-den">12441.6</span></span> × 100</div>
+  <div class="answer-box">78.5%</div>
+</div>
+
+<!-- QUESTION 14 -->
+<h2 id="q14">Question 14: Tennis Balls in Tube</h2>
+<p class="question">Tennis ball radius = 3 cm. 3 balls fit exactly in cylindrical tube.</p>
+
+<h3>(a) Volume of one ball in terms of π</h3>
+<div class="solution">
+  <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span>πr³</div>
+  <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × π × (3)³</div>
+  <div class="line">V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × π × 27</div>
+  <div class="answer-box">V = 36π cm³</div>
+</div>
+
+<h3>(b)(i) Radius and height of tube</h3>
+<div class="solution">
+  <div class="line">Tube radius = ball radius = 3 cm</div>
+  <div class="line">Tube height = 3 × ball diameter = 3 × 6 = 18 cm</div>
+  <div class="answer-box">r = 3 cm, h = 18 cm</div>
+</div>
+
+<h3>(b)(ii) Capacity of tube in terms of π</h3>
+<div class="solution">
+  <div class="line">V = πr²h</div>
+  <div class="line">V = π × (3)² × 18</div>
+  <div class="line">V = π × 9 × 18</div>
+  <div class="answer-box">V = 162π cm³</div>
+</div>
+
+<h3>(b)(iii) Fraction occupied by balls</h3>
+<div class="solution">
+  <div class="line">Volume of 3 balls = 3 × 36π = 108π cm³</div>
+  <div class="line">Fraction = <span class="frac"><span class="frac-num">108π</span><span class="frac-den">162π</span></span> = <span class="frac"><span class="frac-num">108</span><span class="frac-den">162</span></span> = <span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span></div>
+  <div class="answer-box"><span class="frac"><span class="frac-num">2</span><span class="frac-den">3</span></span></div>
+</div>
+
+<!-- QUESTION 15 -->
+<h2 id="q15">Question 15: Vitamin Capsule</h2>
+<p class="question">Capsule: cylinder with hemisphere ends. Length = 20 mm, diameter = 6 mm</p>
+
+<h3>(a) Volume to nearest mm³</h3>
+<div class="solution">
+  <div class="line">r = 3 mm</div>
+  <div class="line">Cylinder height = 20 − 6 = 14 mm</div>
+  <div class="line">V = V<sub>cylinder</sub> + V<sub>sphere</sub> (2 hemispheres = 1 sphere)</div>
+  <div class="line">V = πr²h + <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span>πr³</div>
+  <div class="line">V = π × (3)² × 14 + <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × π × (3)³</div>
+  <div class="line">V = 126π + 36π = 162π</div>
+  <div class="answer-box">V = 509 mm³</div>
+</div>
+
+<h3>(b) Box dimensions for 24 capsules (3 rows of 8)</h3>
+<div class="solution">
+  <div class="line">Length = 8 × 20 = 160 mm</div>
+  <div class="line">Width = 3 × 6 = 18 mm</div>
+  <div class="line">Height = 6 mm</div>
+  <div class="answer-box">160 mm × 18 mm × 6 mm</div>
+</div>
+
+<h3>(c) Volume not occupied by capsules</h3>
+<div class="solution">
+  <div class="line">Box volume = 160 × 18 × 6 = 17280 mm³</div>
+  <div class="line">Capsule volume = 24 × 509 = 12216 mm³</div>
+  <div class="line">Empty space = 17280 − 12216</div>
+  <div class="answer-box">5064 mm³</div>
+</div>
+
+<!-- QUESTION 16 -->
+<h2 id="q16">Question 16: Cylinder Ratios</h2>
+<p class="question">Small cylinder: radius r, height h. Large cylinder: radius 2r, height 2h</p>
+
+<h3>(a) Ratio of curved surface areas</h3>
+<div class="solution">
+  <div class="line">CSA<sub>small</sub> = 2πrh</div>
+  <div class="line">CSA<sub>large</sub> = 2π(2r)(2h) = 8πrh</div>
+  <div class="line">Ratio = <span class="frac"><span class="frac-num">2πrh</span><span class="frac-den">8πrh</span></span> = <span class="frac"><span class="frac-num">1</span><span class="frac-den">4</span></span></div>
+  <div class="answer-box">1 : 4</div>
+</div>
+
+<h3>(b) Ratio of volumes</h3>
+<div class="solution">
+  <div class="line">V<sub>small</sub> = πr²h</div>
+  <div class="line">V<sub>large</sub> = π(2r)²(2h) = π × 4r² × 2h = 8πr²h</div>
+  <div class="line">Ratio = <span class="frac"><span class="frac-num">πr²h</span><span class="frac-den">8πr²h</span></span> = <span class="frac"><span class="frac-num">1</span><span class="frac-den">8</span></span></div>
+  <div class="answer-box">1 : 8</div>
+</div>
+
+</div>
+</body>
+</html>
