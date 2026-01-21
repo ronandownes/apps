@@ -1,4 +1,15 @@
-<!DOCTYPE html>
+import os
+from pathlib import Path
+
+def build_app_index():
+    # Set the directory path
+    apps_dir = Path(r'E:\apps')
+    
+    # Get all HTML files in the apps directory (not in subdirectories)
+    html_files = sorted([f.name for f in apps_dir.glob('*.html') if f.is_file()])
+    
+    # Create the index.html content
+    html_content = '''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -120,19 +131,29 @@
     <div class="container">
         <h1>Apps</h1>
         <div class="apps-list">
-            <div class="app-item">
-                <a href="Calculator.html" class="app-link">Calculator</a>
-            </div>
-            <div class="app-item">
-                <a href="cuboid_calculator.html" class="app-link">Cuboid Calculator</a>
-            </div>
-            <div class="app-item">
-                <a href="cylinder_calculator.html" class="app-link">Cylinder Calculator</a>
-            </div>
-            <div class="app-item">
-                <a href="sphere_calculator.html" class="app-link">Sphere Calculator</a>
-            </div>
-        </div>
+'''
+    
+    # Add links for each HTML file (excluding index.html itself)
+    for html_file in html_files:
+        if html_file != 'index.html':
+            # Create a display name from the filename
+            display_name = html_file.replace('.html', '').replace('-', ' ').replace('_', ' ').title()
+            html_content += f'            <div class="app-item">\n'
+            html_content += f'                <a href="{html_file}" class="app-link">{display_name}</a>\n'
+            html_content += f'            </div>\n'
+    
+    html_content += '''        </div>
     </div>
 </body>
-</html>
+</html>'''
+    
+    # Write the index.html file
+    index_path = apps_dir / 'index.html'
+    with open(index_path, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    
+    print(f"Index built successfully with {len(html_files) - 1} apps")
+    print(f"Location: {index_path}")
+
+if __name__ == '__main__':
+    build_app_index()

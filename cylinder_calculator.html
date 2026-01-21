@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Sphere Calculator</title>
+<title>Cylinder Calculator</title>
 
 <style>
 :root{--ink:#000;--line:#cfcfcf;--muted:#666;--blue:#2563eb}
@@ -30,6 +30,9 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
 .arrow-btn:hover{background:#f0f0f0}
 .arrow-btn:active{background:#e0e0e0}
 .input-display{font-family:"Times New Roman",Times,serif;font-size:18px}
+
+.unit-block{display:flex;align-items:center;gap:8px}
+.unit-select{padding:5px 8px;border:1px solid var(--line);border-radius:5px;font-size:13px;background:#fff;cursor:pointer}
 
 .dprow{display:flex;gap:4px}
 .dprow button{flex:1;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:12px;padding:6px 10px;cursor:pointer}
@@ -73,6 +76,10 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
 
 .blurred{filter:blur(5px)}
 
+.checkbox-row{display:flex;align-items:center;gap:6px;margin-top:8px}
+.checkbox-row input{cursor:pointer}
+.checkbox-row label{cursor:pointer;font-size:12px}
+
 @media(max-width:700px){
   .main{grid-template-columns:1fr}
   .formula-large{font-size:28px}
@@ -98,6 +105,10 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
   <div class="block">
     <h3>Units</h3>
     <div class="btnrow" id="unitBtns"></div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="differentUnits">
+      <label for="differentUnits">Use different units</label>
+    </div>
   </div>
 </div>
 
@@ -105,11 +116,15 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
   <div style="display:flex;gap:40px;margin-bottom:20px;">
     <div class="diagram-area">
       <div class="diagram">
-        <svg viewBox="0 0 200 220" aria-label="Sphere diagram">
+        <svg viewBox="0 0 200 260" aria-label="Cylinder diagram">
           <defs>
-            <radialGradient id="sphereGrad">
+            <linearGradient id="cylGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#e5e7eb"/>
+              <stop offset="50%" style="stop-color:#f9fafb"/>
+              <stop offset="100%" style="stop-color:#e5e7eb"/>
+            </linearGradient>
+            <radialGradient id="topGrad">
               <stop offset="0%" style="stop-color:#f9fafb"/>
-              <stop offset="70%" style="stop-color:#e5e7eb"/>
               <stop offset="100%" style="stop-color:#d1d5db"/>
             </radialGradient>
             <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
@@ -117,41 +132,82 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
             </marker>
           </defs>
           
-          <circle cx="100" cy="110" r="70" fill="url(#sphereGrad)" stroke="#000" stroke-width="2"/>
-          <path d="M 30 110 A 70 20 0 0 1 170 110" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <path d="M 170 110 A 70 20 0 0 1 30 110" fill="none" stroke="#000" stroke-width="1.5"/>
-          <line x1="100" y1="110" x2="168" y2="110" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
-          <text id="rLabel" x="130" y="100" font-size="16" font-family="Times New Roman" font-style="italic">r</text>
+          <!-- Cylinder body -->
+          <rect x="40" y="80" width="120" height="120" fill="url(#cylGrad)" stroke="none"/>
+          <path d="M 40 80 A 60 15 0 0 0 40 200" stroke="#000" stroke-width="2" fill="none"/>
+          <path d="M 160 80 A 60 15 0 0 1 160 200" stroke="#000" stroke-width="2" fill="none"/>
+          
+          <!-- Top ellipse -->
+          <ellipse cx="100" cy="80" rx="60" ry="15" fill="url(#topGrad)" stroke="#000" stroke-width="2"/>
+          
+          <!-- Bottom ellipse -->
+          <path d="M 40 200 A 60 15 0 0 0 160 200" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <path d="M 160 200 A 60 15 0 0 0 40 200" fill="none" stroke="#000" stroke-width="2"/>
+          
+          <!-- Radius line -->
+          <line x1="100" y1="80" x2="158" y2="80" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="125" y="72" font-size="16" font-family="Times New Roman" font-style="italic">r</text>
+          
+          <!-- Height line -->
+          <line x1="175" y1="80" x2="175" y2="200" stroke="#000" stroke-width="2"/>
+          <line x1="172" y1="80" x2="178" y2="80" stroke="#000" stroke-width="2"/>
+          <line x1="172" y1="200" x2="178" y2="200" stroke="#000" stroke-width="2"/>
+          <text x="182" y="145" font-size="16" font-family="Times New Roman" font-style="italic">h</text>
         </svg>
       </div>
     </div>
     
     <div style="margin-top:20px;">
       <div class="block shape-block" style="margin-bottom:12px;">
-        <div class="shape-title">Sphere</div>
-        <div class="shape-sub">3D solid (ball)</div>
+        <div class="shape-title">Cylinder</div>
+        <div class="shape-sub">3D solid</div>
       </div>
       
       <div class="block input-block">
         <h3>Radius</h3>
         <div class="input-container">
-          <input type="number" class="value-input" id="radiusInput" min="0" step="1" value="7">
+          <input type="number" class="value-input" id="radiusInput" min="0" step="1" value="2">
           <div class="arrow-buttons">
             <button class="arrow-btn" id="radiusUp">▲</button>
             <button class="arrow-btn" id="radiusDown">▼</button>
           </div>
         </div>
-        <div class="input-display" id="radiusDisplay"><i>r</i> = 7</div>
+        <div class="input-display" id="radiusDisplay"></div>
+        <div class="unit-block" id="radiusUnitBlock" style="display:none;">
+          <select class="unit-select" id="radiusUnit"></select>
+        </div>
       </div>
+      
+      <div class="block input-block">
+        <h3>Height</h3>
+        <div class="input-container">
+          <input type="number" class="value-input" id="heightInput" min="0" step="1" value="8">
+          <div class="arrow-buttons">
+            <button class="arrow-btn" id="heightUp">▲</button>
+            <button class="arrow-btn" id="heightDown">▼</button>
+          </div>
+        </div>
+        <div class="input-display" id="heightDisplay"></div>
+        <div class="unit-block" id="heightUnitBlock" style="display:none;">
+          <select class="unit-select" id="heightUnit"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div style="margin-bottom:20px;padding:10px;border:1px solid var(--line);border-radius:8px;background:#f9fafb;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">Surface area and volume</div>
+    <div style="font-size:14px;line-height:1.6;">
+      In the following, <i style="font-family:'Times New Roman',Times,serif;">A</i> represents the <strong>curved</strong> surface area and <i style="font-family:'Times New Roman',Times,serif;">V</i> represents the volume of the solid in question.
     </div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">
     <div class="calc-section">
     <div class="formula-header">
-      <div class="formula-label">Surface Area (SA)</div>
+      <div class="formula-label">Curved Surface Area (CSA)</div>
       <div class="formula-meta" id="aMetaWords"></div>
-      <div class="formula-large"><i>A</i> = 4π<i>r</i>²</div>
+      <div class="formula-large"><i>A</i> = 2π<i>rh</i></div>
       <div class="formula-meta" id="aMeta"></div>
       <div class="button-row">
         <button class="reveal-btn-small" id="hideA">Hide</button>
@@ -188,11 +244,11 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
     </div>
   </div>
 
-  <div class="calc-section">
+    <div class="calc-section">
     <div class="formula-header">
-      <div class="formula-label">Volume (V)</div>
+      <div class="formula-label">Volume (Vol)</div>
       <div class="formula-meta" id="vMetaWords"></div>
-      <div class="formula-large"><i>V</i> = <span class="frac"><span class="frac-num">4π<i>r</i>³</span><span class="frac-den">3</span></span></div>
+      <div class="formula-large"><i>V</i> = π<i>r</i>²<i>h</i></div>
       <div class="formula-meta" id="vMeta"></div>
       <div class="button-row">
         <button class="reveal-btn-small" id="hideV">Hide</button>
@@ -228,168 +284,222 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
       </div>
     </div>
   </div>
+  </div>
 </div>
 
 </section>
 </div>
 
 <script>
-let r = 7;
-let dp = 2;
-let unit = null;
-let piMode = 'exact';
-
 const units = [
-  {symbol:'u', name:'unit'},
-  {symbol:'mm', name:'millimetre'},
-  {symbol:'cm', name:'centimetre'},
-  {symbol:'m', name:'metre'},
-  {symbol:'km', name:'kilometre'}
+  {symbol:'u',name:'unit'},
+  {symbol:'mm',name:'millimetre'},
+  {symbol:'cm',name:'centimetre'},
+  {symbol:'m',name:'metre'},
+  {symbol:'km',name:'kilometre'},
+  {symbol:'in',name:'inch'},
+  {symbol:'ft',name:'foot'},
+  {symbol:'yd',name:'yard'},
+  {symbol:'mi',name:'mile'}
 ];
 
-const radiusInput = document.getElementById("radiusInput");
-const radiusUp = document.getElementById("radiusUp");
-const radiusDown = document.getElementById("radiusDown");
+let r = 2, h = 8;
+let unit = units[0];
+let rUnit = units[0], hUnit = units[0];
+let piMode = 'exact';
+let dp = 2;
+let useDifferentUnits = false;
 
-radiusUp.addEventListener("click", () => {
-  r = r + 1;
-  radiusInput.value = r;
-  update();
-});
+const piOpts = ['exact','22/7','3.14'];
+const dpOpts = [1,2,3];
 
-radiusDown.addEventListener("click", () => {
-  r = Math.max(0, r - 1);
-  radiusInput.value = r;
-  update();
-});
-
-radiusInput.addEventListener("input", () => {
-  let val = parseFloat(radiusInput.value);
-  if (!isNaN(val) && val >= 0) { r = val; update(); }
-});
-
-radiusInput.addEventListener("change", () => {
-  let val = parseFloat(radiusInput.value);
-  if (isNaN(val) || val < 0) val = 7;
-  r = val; radiusInput.value = r; update();
-});
-
-const dpWrap = document.getElementById("dpBtns");
-[1,2,3,4].forEach(v => {
+const piCont = document.getElementById("piBtns");
+piOpts.forEach(opt => {
   const b = document.createElement("button");
-  b.textContent = v;
-  if (v === 2) b.classList.add("active");
-  b.onclick = () => {
-    document.querySelectorAll("#dpBtns button").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    dp = v;
-    update();
-  };
-  dpWrap.appendChild(b);
-});
-
-const piWrap = document.getElementById("piBtns");
-[{mode:'exact', label:'π'}, {mode:'22/7', label:'²²⁄₇'}, {mode:'3.14', label:'3.14'}].forEach((p, idx) => {
-  const b = document.createElement("button");
-  b.textContent = p.label;
-  if (idx === 0) b.classList.add("active");
-  b.onclick = () => {
+  b.textContent = opt === 'exact' ? 'π' : opt;
+  if (opt === piMode) b.classList.add("active");
+  b.addEventListener("click", () => {
+    piMode = opt;
     document.querySelectorAll("#piBtns button").forEach(x => x.classList.remove("active"));
     b.classList.add("active");
-    piMode = p.mode;
     update();
-  };
-  piWrap.appendChild(b);
+  });
+  piCont.appendChild(b);
 });
 
-const unitWrap = document.getElementById("unitBtns");
-units.forEach((u, idx) => {
+const dpCont = document.getElementById("dpBtns");
+dpOpts.forEach(val => {
+  const b = document.createElement("button");
+  b.textContent = String(val);
+  if (val === dp) b.classList.add("active");
+  b.addEventListener("click", () => {
+    dp = val;
+    document.querySelectorAll("#dpBtns button").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    update();
+  });
+  dpCont.appendChild(b);
+});
+
+const uCont = document.getElementById("unitBtns");
+units.forEach(u => {
   const b = document.createElement("button");
   b.textContent = u.symbol;
-  b.title = u.name;
-  if (idx === 0) b.classList.add("active");
-  b.onclick = () => {
+  if (u.symbol === unit.symbol) b.classList.add("active");
+  b.addEventListener("click", () => {
+    unit = u;
+    rUnit = u;
+    hUnit = u;
     document.querySelectorAll("#unitBtns button").forEach(x => x.classList.remove("active"));
     b.classList.add("active");
-    unit = u;
+    populateUnitSelects();
     update();
-  };
-  unitWrap.appendChild(b);
+  });
+  uCont.appendChild(b);
 });
 
-// Button handlers
+function populateUnitSelects() {
+  const rSel = document.getElementById("radiusUnit");
+  const hSel = document.getElementById("heightUnit");
+  rSel.innerHTML = '';
+  hSel.innerHTML = '';
+  units.forEach(u => {
+    const opt1 = document.createElement("option");
+    opt1.value = u.symbol;
+    opt1.textContent = u.symbol;
+    if (u.symbol === rUnit.symbol) opt1.selected = true;
+    rSel.appendChild(opt1);
+    
+    const opt2 = document.createElement("option");
+    opt2.value = u.symbol;
+    opt2.textContent = u.symbol;
+    if (u.symbol === hUnit.symbol) opt2.selected = true;
+    hSel.appendChild(opt2);
+  });
+}
+populateUnitSelects();
+
+document.getElementById("differentUnits").addEventListener("change", (e) => {
+  useDifferentUnits = e.target.checked;
+  document.getElementById("radiusUnitBlock").style.display = useDifferentUnits ? 'flex' : 'none';
+  document.getElementById("heightUnitBlock").style.display = useDifferentUnits ? 'flex' : 'none';
+  update();
+});
+
+document.getElementById("radiusUnit").addEventListener("change", (e) => {
+  rUnit = units.find(u => u.symbol === e.target.value);
+  update();
+});
+
+document.getElementById("heightUnit").addEventListener("change", (e) => {
+  hUnit = units.find(u => u.symbol === e.target.value);
+  update();
+});
+
+document.getElementById("radiusInput").addEventListener("input", (e) => {
+  r = parseFloat(e.target.value) || 0;
+  update();
+});
+
+document.getElementById("heightInput").addEventListener("input", (e) => {
+  h = parseFloat(e.target.value) || 0;
+  update();
+});
+
+document.getElementById("radiusUp").addEventListener("click", () => {
+  r = Math.max(0, r + 1);
+  document.getElementById("radiusInput").value = r;
+  update();
+});
+
+document.getElementById("radiusDown").addEventListener("click", () => {
+  r = Math.max(0, r - 1);
+  document.getElementById("radiusInput").value = r;
+  update();
+});
+
+document.getElementById("heightUp").addEventListener("click", () => {
+  h = Math.max(0, h + 1);
+  document.getElementById("heightInput").value = h;
+  update();
+});
+
+document.getElementById("heightDown").addEventListener("click", () => {
+  h = Math.max(0, h - 1);
+  document.getElementById("heightInput").value = h;
+  update();
+});
+
 let aStage = 0;
 let vStage = 0;
 
 document.getElementById("hideA").addEventListener("click", () => {
-  document.getElementById("areaCalc").classList.add("blurred");
+  hideAllArea();
   document.getElementById("hideA").style.display = "none";
   document.getElementById("showA").style.display = "inline-block";
   document.getElementById("stepA").style.display = "inline-block";
 });
 
 document.getElementById("showA").addEventListener("click", () => {
-  document.getElementById("areaCalc").classList.remove("blurred");
   showAllArea();
+  aStage = 0;
   document.getElementById("hideA").style.display = "inline-block";
   document.getElementById("showA").style.display = "none";
   document.getElementById("stepA").style.display = "none";
   document.getElementById("nextA").style.display = "none";
-  aStage = 0;
 });
 
 document.getElementById("stepA").addEventListener("click", () => {
   aStage = 0;
   hideAllArea();
-  document.getElementById("areaCalc").classList.remove("blurred");
+  showAreaStage(aStage);
   document.getElementById("showA").style.display = "none";
   document.getElementById("stepA").style.display = "none";
-  document.getElementById("hideA").style.display = "inline-block";
   document.getElementById("nextA").style.display = "inline-block";
 });
 
 document.getElementById("nextA").addEventListener("click", () => {
   aStage++;
-  if (aStage > 5) {
+  if (aStage > 4) {
     showAllArea();
     document.getElementById("nextA").style.display = "none";
+    document.getElementById("hideA").style.display = "inline-block";
   } else {
     showAreaStage(aStage);
   }
 });
 
 document.getElementById("hideV").addEventListener("click", () => {
-  document.getElementById("volumeCalc").classList.add("blurred");
+  hideAllVolume();
   document.getElementById("hideV").style.display = "none";
   document.getElementById("showV").style.display = "inline-block";
   document.getElementById("stepV").style.display = "inline-block";
 });
 
 document.getElementById("showV").addEventListener("click", () => {
-  document.getElementById("volumeCalc").classList.remove("blurred");
   showAllVolume();
+  vStage = 0;
   document.getElementById("hideV").style.display = "inline-block";
   document.getElementById("showV").style.display = "none";
   document.getElementById("stepV").style.display = "none";
   document.getElementById("nextV").style.display = "none";
-  vStage = 0;
 });
 
 document.getElementById("stepV").addEventListener("click", () => {
   vStage = 0;
   hideAllVolume();
-  document.getElementById("volumeCalc").classList.remove("blurred");
+  showVolumeStage(vStage);
   document.getElementById("showV").style.display = "none";
   document.getElementById("stepV").style.display = "none";
-  document.getElementById("hideV").style.display = "inline-block";
   document.getElementById("nextV").style.display = "inline-block";
 });
 
 document.getElementById("nextV").addEventListener("click", () => {
   vStage++;
-  if (vStage > 5) {
+  if (vStage > 4) {
     showAllVolume();
     document.getElementById("nextV").style.display = "none";
+    document.getElementById("hideV").style.display = "inline-block";
   } else {
     showVolumeStage(vStage);
   }
@@ -410,7 +520,6 @@ function showAllArea() {
 }
 
 function showAreaStage(stage) {
-  // Unblur lines up to current stage
   for(let i=0; i<=stage; i++) {
     const el = document.getElementById("aLine"+i);
     if(el) el.classList.remove("blurred");
@@ -491,80 +600,77 @@ function mixedFrac(num, den) {
 }
 
 function update() {
-  const unitStr = unit && unit.symbol !== 'u' ? ' ' + unit.symbol : '';
-  const unitStr2 = unit && unit.symbol !== 'u' ? ' ' + unit.symbol + '²' : '';
-  const unitStr3 = unit && unit.symbol !== 'u' ? ' ' + unit.symbol + '³' : '';
-  
-  const unitDisplay = unit ? unit.symbol : 'u';
-  const unitName = unit && unit.name ? unit.name : 'unit';
-  const unitNamePlural = unitName + 's';
-
   const rDisp = fmtInput(r);
+  const hDisp = fmtInput(h);
   
-  document.getElementById("radiusDisplay").innerHTML = `<i>r</i> = ${rDisp} ${unitDisplay}`;
+  const rUnitSymbol = useDifferentUnits ? rUnit.symbol : (unit ? unit.symbol : 'u');
+  const hUnitSymbol = useDifferentUnits ? hUnit.symbol : (unit ? unit.symbol : 'u');
   
-  document.getElementById("aMetaWords").textContent = `in ${unitNamePlural} squared to ${dp} decimal places`;
-  document.getElementById("aMeta").textContent = `${unitDisplay}²    ${dp} dp`;
+  const rUnitName = useDifferentUnits ? (rUnit.name || 'unit') : (unit && unit.name ? unit.name : 'unit');
+  const hUnitName = useDifferentUnits ? (hUnit.name || 'unit') : (unit && unit.name ? unit.name : 'unit');
   
-  document.getElementById("vMetaWords").textContent = `in ${unitNamePlural} cubed to ${dp} decimal places`;
-  document.getElementById("vMeta").textContent = `${unitDisplay}³    ${dp} dp`;
+  const unitStr2 = useDifferentUnits ? ` ${rUnitSymbol} × ${hUnitSymbol}` : (unit && unit.symbol !== 'u' ? ' ' + unit.symbol + '²' : '');
+  const unitStr3 = useDifferentUnits ? ` ${rUnitSymbol}² × ${hUnitSymbol}` : (unit && unit.symbol !== 'u' ? ' ' + unit.symbol + '³' : '');
+  
+  document.getElementById("radiusDisplay").innerHTML = `<i>r</i> = ${rDisp} ${rUnitSymbol}`;
+  document.getElementById("heightDisplay").innerHTML = `<i>h</i> = ${hDisp} ${hUnitSymbol}`;
+  
+  const areaUnitName = useDifferentUnits ? `${rUnitName}s × ${hUnitName}s` : `${rUnitName}s squared`;
+  const volUnitName = useDifferentUnits ? `${rUnitName}s squared × ${hUnitName}s` : `${rUnitName}s cubed`;
+  
+  document.getElementById("aMetaWords").textContent = `in ${areaUnitName} to ${dp} decimal places`;
+  document.getElementById("aMeta").textContent = useDifferentUnits ? `${rUnitSymbol} × ${hUnitSymbol}    ${dp} dp` : `${unit.symbol}²    ${dp} dp`;
+  
+  document.getElementById("vMetaWords").textContent = `in ${volUnitName} to ${dp} decimal places`;
+  document.getElementById("vMeta").textContent = useDifferentUnits ? `${rUnitSymbol}² × ${hUnitSymbol}    ${dp} dp` : `${unit.symbol}³    ${dp} dp`;
 
-  const saCoef = 4 * r * r;
-  const volNumerator = 4 * r * r * r;
-  const volDenominator = 3;
-  const g = gcd(volNumerator, volDenominator);
-  const simplifiedNum = volNumerator / g;
-  const simplifiedDen = volDenominator / g;
+  const csaCoef = 2 * r * h;
+  const volCoef = r * r * h;
 
-  document.getElementById("aFormula").innerHTML = `<i>A</i> = 4 × π × <i>r</i>²`;
-  document.getElementById("aS1").innerHTML = `= 4 × π × ${rDisp}²`;
-  document.getElementById("aE").innerHTML = `<span class="label">A = </span>${fmt(saCoef, 2)}π${unitStr2} (exact)`;
+  document.getElementById("aFormula").innerHTML = `<i>A</i> = 2 × π × <i>r</i> × <i>h</i>`;
+  document.getElementById("aS1").innerHTML = `= 2 × π × ${rDisp} × ${hDisp}`;
+  document.getElementById("aE").innerHTML = `<span class="label">A = </span>${fmt(csaCoef, 2)}π${unitStr2} (exact)`;
   
-  document.getElementById("vFormula").innerHTML = `<i>V</i> = <span class="frac"><span class="frac-num">4 × π × <i>r</i>³</span><span class="frac-den">3</span></span>`;
-  document.getElementById("vS1").innerHTML = `= <span class="frac"><span class="frac-num">4 × π × ${rDisp}³</span><span class="frac-den">3</span></span>`;
-  
-  if (simplifiedDen === 1) {
-    document.getElementById("vE").innerHTML = `<span class="label">V = </span>${simplifiedNum}π${unitStr3} (exact)`;
-  } else {
-    document.getElementById("vE").innerHTML = `<span class="label">V = </span><span class="frac"><span class="frac-num">${simplifiedNum}π</span><span class="frac-den">${simplifiedDen}</span></span>${unitStr3} (exact)`;
-  }
+  document.getElementById("vFormula").innerHTML = `<i>V</i> = π × <i>r</i>² × <i>h</i>`;
+  document.getElementById("vS1").innerHTML = `= π × ${rDisp}² × ${hDisp}`;
+  document.getElementById("vE").innerHTML = `<span class="label">V = </span>${fmt(volCoef, 2)}π${unitStr3} (exact)`;
 
   if (piMode === 'exact') {
-    const sa = 4 * Math.PI * r * r;
-    const vol = (4/3) * Math.PI * r * r * r;
+    const csa = 2 * Math.PI * r * h;
+    const vol = Math.PI * r * r * h;
     
-    document.getElementById("aTrunc").innerHTML = getTruncatedWithRounding(sa, dp) + unitStr2;
-    document.getElementById("aRound").textContent = getRoundDir(sa, dp);
-    document.getElementById("aN").innerHTML = `<span class="label">A ≈ </span>${fmt(sa, dp)}${unitStr2} (${dp} dp)`;
+    document.getElementById("aTrunc").innerHTML = getTruncatedWithRounding(csa, dp) + unitStr2;
+    document.getElementById("aRound").textContent = getRoundDir(csa, dp);
+    document.getElementById("aN").innerHTML = `<span class="label">A ≈ </span>${fmt(csa, dp)}${unitStr2} (${dp} dp)`;
 
     document.getElementById("vTrunc").innerHTML = getTruncatedWithRounding(vol, dp) + unitStr3;
     document.getElementById("vRound").textContent = getRoundDir(vol, dp);
     document.getElementById("vN").innerHTML = `<span class="label">V ≈ </span>${fmt(vol, dp)}${unitStr3} (${dp} dp)`;
     
   } else if (piMode === '22/7') {
-    const saNum = 88 * r * r;
-    const saDen = 7;
+    const csaNum = 44 * r * h;
+    const csaDen = 7;
     
-    const volNum = 88 * r * r * r;
-    const volDen = 21;
+    const volNum = 22 * r * r * h;
+    const volDen = 7;
     
-    document.getElementById("aTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; A = <span class="frac"><span class="frac-num">4 × 22 × ${rDisp}²</span><span class="frac-den">7</span></span>`;
+    document.getElementById("aTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; A = <span class="frac"><span class="frac-num">2 × 22 × ${rDisp} × ${hDisp}</span><span class="frac-den">7</span></span>`;
     document.getElementById("aRound").textContent = "";
-    document.getElementById("aN").innerHTML = `<span class="label">A = </span><span class="frac"><span class="frac-num">${saNum}</span><span class="frac-den">${saDen}</span></span>${unitStr2} = ${mixedFrac(saNum, saDen)}${unitStr2}`;
+    document.getElementById("aN").innerHTML = `<span class="label">A = </span><span class="frac"><span class="frac-num">${csaNum}</span><span class="frac-den">${csaDen}</span></span>${unitStr2} = ${mixedFrac(csaNum, csaDen)}${unitStr2}`;
 
-    document.getElementById("vTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; V = <span class="frac"><span class="frac-num">4 × 22 × ${rDisp}³</span><span class="frac-den">3 × 7</span></span>`;
+    document.getElementById("vTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; V = <span class="frac"><span class="frac-num">22 × ${rDisp}² × ${hDisp}</span><span class="frac-den">7</span></span>`;
     document.getElementById("vRound").textContent = "";
     document.getElementById("vN").innerHTML = `<span class="label">V = </span><span class="frac"><span class="frac-num">${volNum}</span><span class="frac-den">${volDen}</span></span>${unitStr3} = ${mixedFrac(volNum, volDen)}${unitStr3}`;
     
   } else if (piMode === '3.14') {
-    const sa = 4 * 3.14 * r * r;
-    const vol = (4/3) * 3.14 * r * r * r;
+    const csa = 2 * 3.14 * r * h;
+    const vol = 3.14 * r * r * h;
     
-    document.getElementById("aTrunc").innerHTML = `π ≈ 3.14: &nbsp; A = 4 × 3.14 × ${rDisp}²`;
+    document.getElementById("aTrunc").innerHTML = `π ≈ 3.14: &nbsp; A = 2 × 3.14 × ${rDisp} × ${hDisp}`;
     document.getElementById("aRound").textContent = "";
-    document.getElementById("aN").innerHTML = `<span class="label">A = </span>${fmt(sa, dp)}${unitStr2}`;
+    document.getElementById("aN").innerHTML = `<span class="label">A = </span>${fmt(csa, dp)}${unitStr2}`;
 
-    document.getElementById("vTrunc").innerHTML = `π ≈ 3.14: &nbsp; V = <span class="frac"><span class="frac-num">4 × 3.14 × ${rDisp}³</span><span class="frac-den">3</span></span>`;
+    document.getElementById("vTrunc").innerHTML = `π ≈ 3.14: &nbsp; V = 3.14 × ${rDisp}² × ${hDisp}`;
     document.getElementById("vRound").textContent = "";
     document.getElementById("vN").innerHTML = `<span class="label">V = </span>${fmt(vol, dp)}${unitStr3}`;
   }

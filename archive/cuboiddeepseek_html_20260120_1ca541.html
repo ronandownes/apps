@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Sphere Calculator</title>
+<title>Cuboid Calculator</title>
 
 <style>
 :root{--ink:#000;--line:#cfcfcf;--muted:#666;--blue:#2563eb}
@@ -73,6 +73,15 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
 
 .blurred{filter:blur(5px)}
 
+.cuboid-info{font-size:12px;color:var(--muted);margin-top:4px;text-align:center}
+.cuboid-info span{font-weight:bold}
+
+.face-list{font-size:14px;margin-top:10px;padding-left:20px}
+.face-list div{margin:2px 0}
+
+.face-summary{margin-top:10px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:14px}
+.face-summary div{margin:4px 0}
+
 @media(max-width:700px){
   .main{grid-template-columns:1fr}
   .formula-large{font-size:28px}
@@ -85,11 +94,6 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
 <section class="card">
 
 <div class="controls-row">
-  <div class="block">
-    <h3>Value of π</h3>
-    <div class="dprow" id="piBtns"></div>
-  </div>
-  
   <div class="block">
     <h3>Decimal places</h3>
     <div class="dprow" id="dpBtns"></div>
@@ -105,43 +109,111 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
   <div style="display:flex;gap:40px;margin-bottom:20px;">
     <div class="diagram-area">
       <div class="diagram">
-        <svg viewBox="0 0 200 220" aria-label="Sphere diagram">
+        <svg viewBox="0 0 220 220" aria-label="Cuboid diagram">
           <defs>
-            <radialGradient id="sphereGrad">
-              <stop offset="0%" style="stop-color:#f9fafb"/>
-              <stop offset="70%" style="stop-color:#e5e7eb"/>
-              <stop offset="100%" style="stop-color:#d1d5db"/>
-            </radialGradient>
+            <linearGradient id="faceGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#e5e7eb"/>
+              <stop offset="100%" style="stop-color:#f9fafb"/>
+            </linearGradient>
+            <linearGradient id="faceGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#d1d5db"/>
+              <stop offset="100%" style="stop-color:#e5e7eb"/>
+            </linearGradient>
+            <linearGradient id="faceGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#f3f4f6"/>
+              <stop offset="100%" style="stop-color:#e5e7eb"/>
+            </linearGradient>
             <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#000"/>
             </marker>
           </defs>
           
-          <circle cx="100" cy="110" r="70" fill="url(#sphereGrad)" stroke="#000" stroke-width="2"/>
-          <path d="M 30 110 A 70 20 0 0 1 170 110" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <path d="M 170 110 A 70 20 0 0 1 30 110" fill="none" stroke="#000" stroke-width="1.5"/>
-          <line x1="100" y1="110" x2="168" y2="110" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
-          <text id="rLabel" x="130" y="100" font-size="16" font-family="Times New Roman" font-style="italic">r</text>
+          <!-- Back face (partially visible) -->
+          <polygon points="40,60 40,150 120,120 120,30" fill="url(#faceGrad3)" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Bottom face -->
+          <polygon points="40,150 120,120 180,160 100,190" fill="url(#faceGrad2)" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Front face -->
+          <polygon points="100,30 180,60 180,160 100,130" fill="url(#faceGrad1)" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Left face -->
+          <polygon points="40,60 100,30 100,130 40,150" fill="url(#faceGrad2)" stroke="#000" stroke-width="1.5"/>
+          
+          <!-- Dimension lines -->
+          <!-- Width (W) -->
+          <line x1="100" y1="30" x2="180" y2="60" stroke="#000" stroke-width="2" stroke-dasharray="4,3"/>
+          <text x="140" y="50" font-size="14" font-family="Times New Roman" font-style="italic" fill="#000">W</text>
+          
+          <!-- Height (H) -->
+          <line x1="180" y1="60" x2="180" y2="160" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="190" y="110" font-size="14" font-family="Times New Roman" font-style="italic" fill="#000">H</text>
+          
+          <!-- Depth (D) -->
+          <line x1="180" y1="160" x2="100" y2="190" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="150" y="185" font-size="14" font-family="Times New Roman" font-style="italic" fill="#000">D</text>
+          
+          <!-- Labels for clarity -->
+          <text x="70" y="100" font-size="12" font-family="Segoe UI" fill="#666">Front</text>
+          <text x="55" y="50" font-size="12" font-family="Segoe UI" fill="#666">Back</text>
+          <text x="170" y="140" font-size="12" font-family="Segoe UI" fill="#666">Right side</text>
         </svg>
       </div>
     </div>
     
     <div style="margin-top:20px;">
       <div class="block shape-block" style="margin-bottom:12px;">
-        <div class="shape-title">Sphere</div>
-        <div class="shape-sub">3D solid (ball)</div>
+        <div class="shape-title">Cuboid</div>
+        <div class="shape-sub">3D rectangular solid</div>
+        <div class="cuboid-info">A cuboid has <span>6 faces</span>, <span>12 edges</span>, and <span>8 vertices</span> (corners)</div>
       </div>
       
-      <div class="block input-block">
-        <h3>Radius</h3>
-        <div class="input-container">
-          <input type="number" class="value-input" id="radiusInput" min="0" step="1" value="7">
-          <div class="arrow-buttons">
-            <button class="arrow-btn" id="radiusUp">▲</button>
-            <button class="arrow-btn" id="radiusDown">▼</button>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+        <div class="block input-block">
+          <h3>Width (W)</h3>
+          <div class="input-container">
+            <input type="number" class="value-input" id="widthInput" min="0" step="1" value="6">
+            <div class="arrow-buttons">
+              <button class="arrow-btn" id="widthUp">▲</button>
+              <button class="arrow-btn" id="widthDown">▼</button>
+            </div>
           </div>
+          <div class="input-display" id="widthDisplay"><i>W</i> = 6</div>
         </div>
-        <div class="input-display" id="radiusDisplay"><i>r</i> = 7</div>
+        
+        <div class="block input-block">
+          <h3>Height (H)</h3>
+          <div class="input-container">
+            <input type="number" class="value-input" id="heightInput" min="0" step="1" value="5">
+            <div class="arrow-buttons">
+              <button class="arrow-btn" id="heightUp">▲</button>
+              <button class="arrow-btn" id="heightDown">▼</button>
+            </div>
+          </div>
+          <div class="input-display" id="heightDisplay"><i>H</i> = 5</div>
+        </div>
+        
+        <div class="block input-block">
+          <h3>Depth (D)</h3>
+          <div class="input-container">
+            <input type="number" class="value-input" id="depthInput" min="0" step="1" value="8">
+            <div class="arrow-buttons">
+              <button class="arrow-btn" id="depthUp">▲</button>
+              <button class="arrow-btn" id="depthDown">▼</button>
+            </div>
+          </div>
+          <div class="input-display" id="depthDisplay"><i>D</i> = 8</div>
+        </div>
+      </div>
+      
+      <div class="face-summary">
+        <div><strong>Faces of a cuboid:</strong></div>
+        <div class="face-list">
+          <div>• Front & Back: W × H</div>
+          <div>• Top & Bottom: W × D</div>
+          <div>• Left & Right: H × D</div>
+        </div>
+        <div style="margin-top:6px;"><strong>Surface Area = 2(W×H + W×D + H×D)</strong></div>
       </div>
     </div>
   </div>
@@ -151,7 +223,7 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
     <div class="formula-header">
       <div class="formula-label">Surface Area (SA)</div>
       <div class="formula-meta" id="aMetaWords"></div>
-      <div class="formula-large"><i>A</i> = 4π<i>r</i>²</div>
+      <div class="formula-large"><i>A</i> = 2(<i>WH</i> + <i>WD</i> + <i>HD</i>)</div>
       <div class="formula-meta" id="aMeta"></div>
       <div class="button-row">
         <button class="reveal-btn-small" id="hideA">Hide</button>
@@ -167,19 +239,21 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
       </div>
       <div class="work-line" id="aLine1">
         <div class="math-content" id="aS1"></div>
-        <div class="logic-hint">Substitution</div>
+        <div class="logic-hint">Front & Back: 2(W×H)</div>
       </div>
       <div class="work-line" id="aLine2">
-        <div class="answer-container" style="margin:0;">
-          <div class="answer-box" id="aE"></div>
-        </div>
-        <div class="logic-hint">Simplify</div>
+        <div class="math-content" id="aS2"></div>
+        <div class="logic-hint">Top & Bottom: 2(W×D)</div>
       </div>
       <div class="work-line" id="aLine3">
-        <div class="math-content" id="aTrunc"></div>
-        <div class="logic-hint" id="aTruncHint">Truncate (dp+1)</div>
+        <div class="math-content" id="aS3"></div>
+        <div class="logic-hint">Left & Right: 2(H×D)</div>
       </div>
       <div class="work-line" id="aLine4">
+        <div class="math-content" id="aS4"></div>
+        <div class="logic-hint">Sum of all faces</div>
+      </div>
+      <div class="work-line" id="aLine5">
         <div class="answer-container" style="margin:0;">
           <div class="answer-box" id="aN"></div>
         </div>
@@ -192,7 +266,7 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
     <div class="formula-header">
       <div class="formula-label">Volume (V)</div>
       <div class="formula-meta" id="vMetaWords"></div>
-      <div class="formula-large"><i>V</i> = <span class="frac"><span class="frac-num">4π<i>r</i>³</span><span class="frac-den">3</span></span></div>
+      <div class="formula-large"><i>V</i> = <i>W</i> × <i>H</i> × <i>D</i></div>
       <div class="formula-meta" id="vMeta"></div>
       <div class="button-row">
         <button class="reveal-btn-small" id="hideV">Hide</button>
@@ -211,14 +285,12 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
         <div class="logic-hint">Substitution</div>
       </div>
       <div class="work-line" id="vLine2">
-        <div class="answer-container" style="margin:0;">
-          <div class="answer-box" id="vE"></div>
-        </div>
-        <div class="logic-hint">Simplify</div>
+        <div class="math-content" id="vS2"></div>
+        <div class="logic-hint">Multiply W × H</div>
       </div>
       <div class="work-line" id="vLine3">
-        <div class="math-content" id="vTrunc"></div>
-        <div class="logic-hint" id="vTruncHint">Truncate (dp+1)</div>
+        <div class="math-content" id="vS3"></div>
+        <div class="logic-hint">Multiply by D</div>
       </div>
       <div class="work-line" id="vLine4">
         <div class="answer-container" style="margin:0;">
@@ -234,10 +306,11 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
 </div>
 
 <script>
-let r = 7;
+let W = 6;
+let H = 5;
+let D = 8;
 let dp = 2;
 let unit = null;
-let piMode = 'exact';
 
 const units = [
   {symbol:'u', name:'unit'},
@@ -247,31 +320,88 @@ const units = [
   {symbol:'km', name:'kilometre'}
 ];
 
-const radiusInput = document.getElementById("radiusInput");
-const radiusUp = document.getElementById("radiusUp");
-const radiusDown = document.getElementById("radiusDown");
+// Width controls
+const widthInput = document.getElementById("widthInput");
+const widthUp = document.getElementById("widthUp");
+const widthDown = document.getElementById("widthDown");
 
-radiusUp.addEventListener("click", () => {
-  r = r + 1;
-  radiusInput.value = r;
+widthUp.addEventListener("click", () => {
+  W = W + 1;
+  widthInput.value = W;
   update();
 });
 
-radiusDown.addEventListener("click", () => {
-  r = Math.max(0, r - 1);
-  radiusInput.value = r;
+widthDown.addEventListener("click", () => {
+  W = Math.max(0, W - 1);
+  widthInput.value = W;
   update();
 });
 
-radiusInput.addEventListener("input", () => {
-  let val = parseFloat(radiusInput.value);
-  if (!isNaN(val) && val >= 0) { r = val; update(); }
+widthInput.addEventListener("input", () => {
+  let val = parseFloat(widthInput.value);
+  if (!isNaN(val) && val >= 0) { W = val; update(); }
 });
 
-radiusInput.addEventListener("change", () => {
-  let val = parseFloat(radiusInput.value);
-  if (isNaN(val) || val < 0) val = 7;
-  r = val; radiusInput.value = r; update();
+widthInput.addEventListener("change", () => {
+  let val = parseFloat(widthInput.value);
+  if (isNaN(val) || val < 0) val = 6;
+  W = val; widthInput.value = W; update();
+});
+
+// Height controls
+const heightInput = document.getElementById("heightInput");
+const heightUp = document.getElementById("heightUp");
+const heightDown = document.getElementById("heightDown");
+
+heightUp.addEventListener("click", () => {
+  H = H + 1;
+  heightInput.value = H;
+  update();
+});
+
+heightDown.addEventListener("click", () => {
+  H = Math.max(0, H - 1);
+  heightInput.value = H;
+  update();
+});
+
+heightInput.addEventListener("input", () => {
+  let val = parseFloat(heightInput.value);
+  if (!isNaN(val) && val >= 0) { H = val; update(); }
+});
+
+heightInput.addEventListener("change", () => {
+  let val = parseFloat(heightInput.value);
+  if (isNaN(val) || val < 0) val = 5;
+  H = val; heightInput.value = H; update();
+});
+
+// Depth controls
+const depthInput = document.getElementById("depthInput");
+const depthUp = document.getElementById("depthUp");
+const depthDown = document.getElementById("depthDown");
+
+depthUp.addEventListener("click", () => {
+  D = D + 1;
+  depthInput.value = D;
+  update();
+});
+
+depthDown.addEventListener("click", () => {
+  D = Math.max(0, D - 1);
+  depthInput.value = D;
+  update();
+});
+
+depthInput.addEventListener("input", () => {
+  let val = parseFloat(depthInput.value);
+  if (!isNaN(val) && val >= 0) { D = val; update(); }
+});
+
+depthInput.addEventListener("change", () => {
+  let val = parseFloat(depthInput.value);
+  if (isNaN(val) || val < 0) val = 8;
+  D = val; depthInput.value = D; update();
 });
 
 const dpWrap = document.getElementById("dpBtns");
@@ -286,20 +416,6 @@ const dpWrap = document.getElementById("dpBtns");
     update();
   };
   dpWrap.appendChild(b);
-});
-
-const piWrap = document.getElementById("piBtns");
-[{mode:'exact', label:'π'}, {mode:'22/7', label:'²²⁄₇'}, {mode:'3.14', label:'3.14'}].forEach((p, idx) => {
-  const b = document.createElement("button");
-  b.textContent = p.label;
-  if (idx === 0) b.classList.add("active");
-  b.onclick = () => {
-    document.querySelectorAll("#piBtns button").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    piMode = p.mode;
-    update();
-  };
-  piWrap.appendChild(b);
 });
 
 const unitWrap = document.getElementById("unitBtns");
@@ -387,7 +503,7 @@ document.getElementById("stepV").addEventListener("click", () => {
 
 document.getElementById("nextV").addEventListener("click", () => {
   vStage++;
-  if (vStage > 5) {
+  if (vStage > 4) {
     showAllVolume();
     document.getElementById("nextV").style.display = "none";
   } else {
@@ -396,14 +512,14 @@ document.getElementById("nextV").addEventListener("click", () => {
 });
 
 function hideAllArea() {
-  for(let i=0; i<=4; i++) {
+  for(let i=0; i<=5; i++) {
     const el = document.getElementById("aLine"+i);
     if(el) el.classList.add("blurred");
   }
 }
 
 function showAllArea() {
-  for(let i=0; i<=4; i++) {
+  for(let i=0; i<=5; i++) {
     const el = document.getElementById("aLine"+i);
     if(el) el.classList.remove("blurred");
   }
@@ -469,27 +585,6 @@ function getRoundDir(n, places) {
   return nextDigit >= 5 ? "Round up" : "Round down";
 }
 
-function gcd(a, b) {
-  a = Math.abs(Math.round(a));
-  b = Math.abs(Math.round(b));
-  while (b) { let t = b; b = a % b; a = t; }
-  return a;
-}
-
-function mixedFrac(num, den) {
-  if (den === 1) return String(num);
-  const g = gcd(num, den);
-  num = num / g;
-  den = den / g;
-  const whole = Math.floor(num / den);
-  const remainder = num % den;
-  if (remainder === 0) return String(whole);
-  if (whole > 0) {
-    return `${whole}<span class="frac"><span class="frac-num">${remainder}</span><span class="frac-den">${den}</span></span>`;
-  }
-  return `<span class="frac"><span class="frac-num">${num}</span><span class="frac-den">${den}</span></span>`;
-}
-
 function update() {
   const unitStr = unit && unit.symbol !== 'u' ? ' ' + unit.symbol : '';
   const unitStr2 = unit && unit.symbol !== 'u' ? ' ' + unit.symbol + '²' : '';
@@ -499,9 +594,13 @@ function update() {
   const unitName = unit && unit.name ? unit.name : 'unit';
   const unitNamePlural = unitName + 's';
 
-  const rDisp = fmtInput(r);
+  const wDisp = fmtInput(W);
+  const hDisp = fmtInput(H);
+  const dDisp = fmtInput(D);
   
-  document.getElementById("radiusDisplay").innerHTML = `<i>r</i> = ${rDisp} ${unitDisplay}`;
+  document.getElementById("widthDisplay").innerHTML = `<i>W</i> = ${wDisp} ${unitDisplay}`;
+  document.getElementById("heightDisplay").innerHTML = `<i>H</i> = ${hDisp} ${unitDisplay}`;
+  document.getElementById("depthDisplay").innerHTML = `<i>D</i> = ${dDisp} ${unitDisplay}`;
   
   document.getElementById("aMetaWords").textContent = `in ${unitNamePlural} squared to ${dp} decimal places`;
   document.getElementById("aMeta").textContent = `${unitDisplay}²    ${dp} dp`;
@@ -509,65 +608,32 @@ function update() {
   document.getElementById("vMetaWords").textContent = `in ${unitNamePlural} cubed to ${dp} decimal places`;
   document.getElementById("vMeta").textContent = `${unitDisplay}³    ${dp} dp`;
 
-  const saCoef = 4 * r * r;
-  const volNumerator = 4 * r * r * r;
-  const volDenominator = 3;
-  const g = gcd(volNumerator, volDenominator);
-  const simplifiedNum = volNumerator / g;
-  const simplifiedDen = volDenominator / g;
-
-  document.getElementById("aFormula").innerHTML = `<i>A</i> = 4 × π × <i>r</i>²`;
-  document.getElementById("aS1").innerHTML = `= 4 × π × ${rDisp}²`;
-  document.getElementById("aE").innerHTML = `<span class="label">A = </span>${fmt(saCoef, 2)}π${unitStr2} (exact)`;
+  // Surface Area calculations
+  const frontBack = W * H;
+  const topBottom = W * D;
+  const leftRight = H * D;
+  const surfaceArea = 2 * (frontBack + topBottom + leftRight);
   
-  document.getElementById("vFormula").innerHTML = `<i>V</i> = <span class="frac"><span class="frac-num">4 × π × <i>r</i>³</span><span class="frac-den">3</span></span>`;
-  document.getElementById("vS1").innerHTML = `= <span class="frac"><span class="frac-num">4 × π × ${rDisp}³</span><span class="frac-den">3</span></span>`;
+  // Volume calculations
+  const volume = W * H * D;
+  const whProduct = W * H;
   
-  if (simplifiedDen === 1) {
-    document.getElementById("vE").innerHTML = `<span class="label">V = </span>${simplifiedNum}π${unitStr3} (exact)`;
-  } else {
-    document.getElementById("vE").innerHTML = `<span class="label">V = </span><span class="frac"><span class="frac-num">${simplifiedNum}π</span><span class="frac-den">${simplifiedDen}</span></span>${unitStr3} (exact)`;
-  }
-
-  if (piMode === 'exact') {
-    const sa = 4 * Math.PI * r * r;
-    const vol = (4/3) * Math.PI * r * r * r;
-    
-    document.getElementById("aTrunc").innerHTML = getTruncatedWithRounding(sa, dp) + unitStr2;
-    document.getElementById("aRound").textContent = getRoundDir(sa, dp);
-    document.getElementById("aN").innerHTML = `<span class="label">A ≈ </span>${fmt(sa, dp)}${unitStr2} (${dp} dp)`;
-
-    document.getElementById("vTrunc").innerHTML = getTruncatedWithRounding(vol, dp) + unitStr3;
-    document.getElementById("vRound").textContent = getRoundDir(vol, dp);
-    document.getElementById("vN").innerHTML = `<span class="label">V ≈ </span>${fmt(vol, dp)}${unitStr3} (${dp} dp)`;
-    
-  } else if (piMode === '22/7') {
-    const saNum = 88 * r * r;
-    const saDen = 7;
-    
-    const volNum = 88 * r * r * r;
-    const volDen = 21;
-    
-    document.getElementById("aTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; A = <span class="frac"><span class="frac-num">4 × 22 × ${rDisp}²</span><span class="frac-den">7</span></span>`;
-    document.getElementById("aRound").textContent = "";
-    document.getElementById("aN").innerHTML = `<span class="label">A = </span><span class="frac"><span class="frac-num">${saNum}</span><span class="frac-den">${saDen}</span></span>${unitStr2} = ${mixedFrac(saNum, saDen)}${unitStr2}`;
-
-    document.getElementById("vTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; V = <span class="frac"><span class="frac-num">4 × 22 × ${rDisp}³</span><span class="frac-den">3 × 7</span></span>`;
-    document.getElementById("vRound").textContent = "";
-    document.getElementById("vN").innerHTML = `<span class="label">V = </span><span class="frac"><span class="frac-num">${volNum}</span><span class="frac-den">${volDen}</span></span>${unitStr3} = ${mixedFrac(volNum, volDen)}${unitStr3}`;
-    
-  } else if (piMode === '3.14') {
-    const sa = 4 * 3.14 * r * r;
-    const vol = (4/3) * 3.14 * r * r * r;
-    
-    document.getElementById("aTrunc").innerHTML = `π ≈ 3.14: &nbsp; A = 4 × 3.14 × ${rDisp}²`;
-    document.getElementById("aRound").textContent = "";
-    document.getElementById("aN").innerHTML = `<span class="label">A = </span>${fmt(sa, dp)}${unitStr2}`;
-
-    document.getElementById("vTrunc").innerHTML = `π ≈ 3.14: &nbsp; V = <span class="frac"><span class="frac-num">4 × 3.14 × ${rDisp}³</span><span class="frac-den">3</span></span>`;
-    document.getElementById("vRound").textContent = "";
-    document.getElementById("vN").innerHTML = `<span class="label">V = </span>${fmt(vol, dp)}${unitStr3}`;
-  }
+  // Update Surface Area display
+  document.getElementById("aFormula").innerHTML = `<i>A</i> = 2(<i>W</i>×<i>H</i> + <i>W</i>×<i>D</i> + <i>H</i>×<i>D</i>)`;
+  document.getElementById("aS1").innerHTML = `= 2(${wDisp}×${hDisp} + <i>W</i>×<i>D</i> + <i>H</i>×<i>D</i>) = 2(${fmt(frontBack, 2)} + <i>W</i>×<i>D</i> + <i>H</i>×<i>D</i>)`;
+  document.getElementById("aS2").innerHTML = `= 2(${fmt(frontBack, 2)} + ${wDisp}×${dDisp} + <i>H</i>×<i>D</i>) = 2(${fmt(frontBack, 2)} + ${fmt(topBottom, 2)} + <i>H</i>×<i>D</i>)`;
+  document.getElementById("aS3").innerHTML = `= 2(${fmt(frontBack, 2)} + ${fmt(topBottom, 2)} + ${hDisp}×${dDisp}) = 2(${fmt(frontBack, 2)} + ${fmt(topBottom, 2)} + ${fmt(leftRight, 2)})`;
+  document.getElementById("aS4").innerHTML = `= 2(${fmt(frontBack + topBottom + leftRight, 2)})`;
+  document.getElementById("aN").innerHTML = `<span class="label">A = </span>${fmt(surfaceArea, dp)}${unitStr2} (${dp} dp)`;
+  document.getElementById("aRound").textContent = "";
+  
+  // Update Volume display
+  document.getElementById("vFormula").innerHTML = `<i>V</i> = <i>W</i> × <i>H</i> × <i>D</i>`;
+  document.getElementById("vS1").innerHTML = `= ${wDisp} × ${hDisp} × ${dDisp}`;
+  document.getElementById("vS2").innerHTML = `= ${fmt(whProduct, 2)} × ${dDisp}`;
+  document.getElementById("vS3").innerHTML = `= ${fmt(whProduct, 2)} × ${dDisp}`;
+  document.getElementById("vN").innerHTML = `<span class="label">V = </span>${fmt(volume, dp)}${unitStr3} (${dp} dp)`;
+  document.getElementById("vRound").textContent = "";
 }
 
 unit = units[0];

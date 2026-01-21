@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cuboid Calculator</title>
+
+<style>
+:root{--ink:#000;--line:#cfcfcf;--muted:#666;--blue:#2563eb}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--ink)}
+.wrap{max-width:960px;margin:6px auto;padding:0 6px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px}
+
+.controls-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:12px
+}
+
+.block{border:1px solid var(--line);border-radius:8px;padding:8px}
+.block h3{margin:0 0 4px;font-size:12px}
+
+.input-row{display:flex;gap:6px;align-items:center}
+.value-input{
+  width:70px;
+  border:2px solid var(--blue);
+  border-radius:6px;
+  padding:6px;
+  font-size:18px;
+  text-align:center;
+  font-family:"Times New Roman",Times,serif;
+  font-weight:bold
+}
+.arrow-buttons{display:flex;flex-direction:column;gap:2px}
+.arrow-btn{
+  width:28px;height:22px;
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:#fff;
+  cursor:pointer;
+  font-weight:bold
+}
+
+.dprow{display:flex;gap:4px}
+.dprow button,
+.btnrow button{
+  flex:1;
+  border:1px solid var(--line);
+  border-radius:6px;
+  background:#fff;
+  font-size:12px;
+  padding:6px;
+  cursor:pointer
+}
+button.active{background:#000;color:#fff}
+
+.main{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+.diagram svg{width:100%;height:auto}
+
+.shape-title{
+  font-family:"Times New Roman",Times,serif;
+  font-size:22px;
+  font-weight:700
+}
+.shape-sub{font-size:11px;color:var(--muted)}
+
+.formula-header{text-align:center;margin-bottom:8px}
+.formula-large{
+  font-family:"Times New Roman",Times,serif;
+  font-size:30px;
+  font-weight:bold
+}
+.formula-meta{font-size:14px;color:var(--muted)}
+
+.calc{border:1px solid var(--line);border-radius:8px;padding:12px}
+.work-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:8px 0
+}
+.math-content{
+  font-family:"Times New Roman",Times,serif;
+  font-size:22px;
+  font-weight:bold
+}
+.logic-hint{
+  font-size:14px;
+  color:var(--blue);
+  font-style:italic
+}
+.answer-box{
+  border:2px solid #000;
+  padding:8px 14px;
+  font-family:"Times New Roman",Times,serif;
+  font-size:22px;
+  font-weight:bold
+}
+
+.small-note{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:6px;
+  text-align:center
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<section class="card">
+
+<div class="controls-row">
+
+  <div class="block">
+    <h3>Dimensions</h3>
+    <div class="input-row">
+      <strong>W</strong>
+      <input class="value-input" id="w" type="number" value="4">
+      <div class="arrow-buttons">
+        <button class="arrow-btn" onclick="step('w',1)">▲</button>
+        <button class="arrow-btn" onclick="step('w',-1)">▼</button>
+      </div>
+    </div>
+    <div class="input-row">
+      <strong>H</strong>
+      <input class="value-input" id="h" type="number" value="3">
+      <div class="arrow-buttons">
+        <button class="arrow-btn" onclick="step('h',1)">▲</button>
+        <button class="arrow-btn" onclick="step('h',-1)">▼</button>
+      </div>
+    </div>
+    <div class="input-row">
+      <strong>D</strong>
+      <input class="value-input" id="d" type="number" value="5">
+      <div class="arrow-buttons">
+        <button class="arrow-btn" onclick="step('d',1)">▲</button>
+        <button class="arrow-btn" onclick="step('d',-1)">▼</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Decimal places</h3>
+    <div class="dprow" id="dpBtns"></div>
+  </div>
+
+  <div class="block">
+    <h3>Units</h3>
+    <div class="btnrow" id="unitBtns"></div>
+  </div>
+
+</div>
+
+<div class="main">
+
+  <div>
+    <div class="shape-title">Cuboid</div>
+    <div class="shape-sub">3D rectangular solid</div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 220 180">
+        <polygon points="40,60 140,60 180,30 80,30" fill="#f3f4f6" stroke="#000"/>
+        <polygon points="40,60 40,130 140,130 140,60" fill="#e5e7eb" stroke="#000"/>
+        <polygon points="140,60 180,30 180,100 140,130" fill="#d1d5db" stroke="#000"/>
+
+        <text x="90" y="25" font-style="italic">W</text>
+        <text x="20" y="100" font-style="italic">H</text>
+        <text x="175" y="80" font-style="italic">D</text>
+      </svg>
+    </div>
+
+    <div class="small-note">
+      6 faces &nbsp;•&nbsp; 12 edges &nbsp;•&nbsp; 8 corners
+    </div>
+  </div>
+
+  <div>
+
+    <div class="calc">
+      <div class="formula-header">
+        <div class="formula-large">Surface Area</div>
+        <div class="formula-meta">All faces counted in pairs</div>
+      </div>
+
+      <div class="work-line">
+        <div class="math-content">A = 2(WD + WH + HD)</div>
+        <div class="logic-hint">Formula</div>
+      </div>
+
+      <div class="work-line">
+        <div class="math-content" id="saSub"></div>
+        <div class="logic-hint">Substitution</div>
+      </div>
+
+      <div class="work-line">
+        <div class="answer-box" id="saAns"></div>
+        <div class="logic-hint">Result</div>
+      </div>
+    </div>
+
+    <div class="calc" style="margin-top:12px">
+      <div class="formula-header">
+        <div class="formula-large">Volume</div>
+        <div class="formula-meta">Space inside the cuboid</div>
+      </div>
+
+      <div class="work-line">
+        <div class="math-content">V = W × H × D</div>
+        <div class="logic-hint">Formula</div>
+      </div>
+
+      <div class="work-line">
+        <div class="math-content" id="vSub"></div>
+        <div class="logic-hint">Substitution</div>
+      </div>
+
+      <div class="work-line">
+        <div class="answer-box" id="vAns"></div>
+        <div class="logic-hint">Result</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</section>
+</div>
+
+<script>
+let dp = 2;
+let unit = {s:'u',n:'unit'};
+
+const units = [
+  {s:'u',n:'unit'},
+  {s:'cm',n:'centimetre'},
+  {s:'m',n:'metre'},
+  {s:'mm',n:'millimetre'},
+  {s:'km',n:'kilometre'}
+];
+
+function step(id,delta){
+  const el=document.getElementById(id);
+  el.value=Math.max(0,Number(el.value)+delta);
+  update();
+}
+
+function fmt(x){return Number(x).toFixed(dp).replace(/\.?0+$/,'')}
+
+const dpBtns=document.getElementById("dpBtns");
+[1,2,3,4].forEach(v=>{
+  const b=document.createElement("button");
+  b.textContent=v;
+  if(v===2)b.classList.add("active");
+  b.onclick=()=>{
+    dp=v;
+    document.querySelectorAll("#dpBtns button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    update();
+  };
+  dpBtns.appendChild(b);
+});
+
+const unitBtns=document.getElementById("unitBtns");
+units.forEach(u=>{
+  const b=document.createElement("button");
+  b.textContent=u.s;
+  if(u.s==='u')b.classList.add("active");
+  b.onclick=()=>{
+    unit=u;
+    document.querySelectorAll("#unitBtns button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    update();
+  };
+  unitBtns.appendChild(b);
+});
+
+function update(){
+  const W=+w.value,H=+h.value,D=+d.value;
+  const SA=2*(W*D+W*H+H*D);
+  const V=W*H*D;
+
+  saSub.innerHTML=`= 2(${W}×${D} + ${W}×${H} + ${H}×${D})`;
+  saAns.innerHTML=`A = ${fmt(SA)} ${unit.s}²`;
+
+  vSub.innerHTML=`= ${W}×${H}×${D}`;
+  vAns.innerHTML=`V = ${fmt(V)} ${unit.s}³`;
+}
+
+update();
+</script>
+</body>
+</html>

@@ -44,7 +44,7 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
 
 .button-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 
-.main{display:block}
+.main{display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:start}
 
 .diagram svg{width:100%;height:auto;display:block}
 
@@ -85,6 +85,23 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
 <section class="card">
 
 <div class="controls-row">
+  <div class="block shape-block">
+    <div class="shape-title">Sphere</div>
+    <div class="shape-sub">3D solid (ball)</div>
+  </div>
+  
+  <div class="block input-block">
+    <h3>Radius</h3>
+    <div class="input-container">
+      <input type="number" class="value-input" id="radiusInput" min="0" step="1" value="7">
+      <div class="arrow-buttons">
+        <button class="arrow-btn" id="radiusUp">▲</button>
+        <button class="arrow-btn" id="radiusDown">▼</button>
+      </div>
+    </div>
+    <div class="input-display" id="radiusDisplay"><i>r</i> = 7</div>
+  </div>
+  
   <div class="block">
     <h3>Value of π</h3>
     <div class="dprow" id="piBtns"></div>
@@ -102,51 +119,30 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
 </div>
 
 <div class="main">
-  <div style="display:flex;gap:40px;margin-bottom:20px;">
-    <div class="diagram-area">
-      <div class="diagram">
-        <svg viewBox="0 0 200 220" aria-label="Sphere diagram">
-          <defs>
-            <radialGradient id="sphereGrad">
-              <stop offset="0%" style="stop-color:#f9fafb"/>
-              <stop offset="70%" style="stop-color:#e5e7eb"/>
-              <stop offset="100%" style="stop-color:#d1d5db"/>
-            </radialGradient>
-            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#000"/>
-            </marker>
-          </defs>
-          
-          <circle cx="100" cy="110" r="70" fill="url(#sphereGrad)" stroke="#000" stroke-width="2"/>
-          <path d="M 30 110 A 70 20 0 0 1 170 110" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <path d="M 170 110 A 70 20 0 0 1 30 110" fill="none" stroke="#000" stroke-width="1.5"/>
-          <line x1="100" y1="110" x2="168" y2="110" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
-          <text id="rLabel" x="130" y="100" font-size="16" font-family="Times New Roman" font-style="italic">r</text>
-        </svg>
-      </div>
-    </div>
-    
-    <div style="margin-top:20px;">
-      <div class="block shape-block" style="margin-bottom:12px;">
-        <div class="shape-title">Sphere</div>
-        <div class="shape-sub">3D solid (ball)</div>
-      </div>
-      
-      <div class="block input-block">
-        <h3>Radius</h3>
-        <div class="input-container">
-          <input type="number" class="value-input" id="radiusInput" min="0" step="1" value="7">
-          <div class="arrow-buttons">
-            <button class="arrow-btn" id="radiusUp">▲</button>
-            <button class="arrow-btn" id="radiusDown">▼</button>
-          </div>
-        </div>
-        <div class="input-display" id="radiusDisplay"><i>r</i> = 7</div>
-      </div>
+  <div class="diagram-area">
+    <div class="diagram">
+      <svg viewBox="0 0 200 220" aria-label="Sphere diagram">
+        <defs>
+          <radialGradient id="sphereGrad">
+            <stop offset="0%" style="stop-color:#f9fafb"/>
+            <stop offset="70%" style="stop-color:#e5e7eb"/>
+            <stop offset="100%" style="stop-color:#d1d5db"/>
+          </radialGradient>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#000"/>
+          </marker>
+        </defs>
+        
+        <circle cx="100" cy="110" r="70" fill="url(#sphereGrad)" stroke="#000" stroke-width="2"/>
+        <path d="M 30 110 A 70 20 0 0 1 170 110" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <path d="M 170 110 A 70 20 0 0 1 30 110" fill="none" stroke="#000" stroke-width="1.5"/>
+        <line x1="100" y1="110" x2="168" y2="110" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
+        <text id="rLabel" x="130" y="100" font-size="16" font-family="Times New Roman" font-style="italic">r</text>
+      </svg>
     </div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
     <div class="calc-section">
     <div class="formula-header">
       <div class="formula-label">Surface Area (SA)</div>
@@ -517,11 +513,11 @@ function update() {
   const simplifiedDen = volDenominator / g;
 
   document.getElementById("aFormula").innerHTML = `<i>A</i> = 4 × π × <i>r</i>²`;
-  document.getElementById("aS1").innerHTML = `= 4 × π × ${rDisp}²`;
+  document.getElementById("aS1").innerHTML = `= 4 × π × (${rDisp})²`;
   document.getElementById("aE").innerHTML = `<span class="label">A = </span>${fmt(saCoef, 2)}π${unitStr2} (exact)`;
   
   document.getElementById("vFormula").innerHTML = `<i>V</i> = <span class="frac"><span class="frac-num">4 × π × <i>r</i>³</span><span class="frac-den">3</span></span>`;
-  document.getElementById("vS1").innerHTML = `= <span class="frac"><span class="frac-num">4 × π × ${rDisp}³</span><span class="frac-den">3</span></span>`;
+  document.getElementById("vS1").innerHTML = `= <span class="frac"><span class="frac-num">4 × π × (${rDisp})³</span><span class="frac-den">3</span></span>`;
   
   if (simplifiedDen === 1) {
     document.getElementById("vE").innerHTML = `<span class="label">V = </span>${simplifiedNum}π${unitStr3} (exact)`;
@@ -548,11 +544,11 @@ function update() {
     const volNum = 88 * r * r * r;
     const volDen = 21;
     
-    document.getElementById("aTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; A = <span class="frac"><span class="frac-num">4 × 22 × ${rDisp}²</span><span class="frac-den">7</span></span>`;
+    document.getElementById("aTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; A = 4 × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × (${rDisp})²`;
     document.getElementById("aRound").textContent = "";
     document.getElementById("aN").innerHTML = `<span class="label">A = </span><span class="frac"><span class="frac-num">${saNum}</span><span class="frac-den">${saDen}</span></span>${unitStr2} = ${mixedFrac(saNum, saDen)}${unitStr2}`;
 
-    document.getElementById("vTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; V = <span class="frac"><span class="frac-num">4 × 22 × ${rDisp}³</span><span class="frac-den">3 × 7</span></span>`;
+    document.getElementById("vTrunc").innerHTML = `π ≈ <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>: &nbsp; V = <span class="frac"><span class="frac-num">4</span><span class="frac-den">3</span></span> × <span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span> × (${rDisp})³`;
     document.getElementById("vRound").textContent = "";
     document.getElementById("vN").innerHTML = `<span class="label">V = </span><span class="frac"><span class="frac-num">${volNum}</span><span class="frac-den">${volDen}</span></span>${unitStr3} = ${mixedFrac(volNum, volDen)}${unitStr3}`;
     
@@ -560,11 +556,11 @@ function update() {
     const sa = 4 * 3.14 * r * r;
     const vol = (4/3) * 3.14 * r * r * r;
     
-    document.getElementById("aTrunc").innerHTML = `π ≈ 3.14: &nbsp; A = 4 × 3.14 × ${rDisp}²`;
+    document.getElementById("aTrunc").innerHTML = `π ≈ 3.14: &nbsp; A = 4 × 3.14 × (${rDisp})²`;
     document.getElementById("aRound").textContent = "";
     document.getElementById("aN").innerHTML = `<span class="label">A = </span>${fmt(sa, dp)}${unitStr2}`;
 
-    document.getElementById("vTrunc").innerHTML = `π ≈ 3.14: &nbsp; V = <span class="frac"><span class="frac-num">4 × 3.14 × ${rDisp}³</span><span class="frac-den">3</span></span>`;
+    document.getElementById("vTrunc").innerHTML = `π ≈ 3.14: &nbsp; V = <span class="frac"><span class="frac-num">4 × 3.14 × (${rDisp})³</span><span class="frac-den">3</span></span>`;
     document.getElementById("vRound").textContent = "";
     document.getElementById("vN").innerHTML = `<span class="label">V = </span>${fmt(vol, dp)}${unitStr3}`;
   }
