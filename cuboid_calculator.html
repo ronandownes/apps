@@ -49,33 +49,37 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
 
 .input-display{font-family:"Times New Roman",Times,serif;font-size:16px;margin-top:4px}
 
-.diagram-container{display:flex;justify-content:center;padding:10px;margin:10px 0}
+.diagram-container{display:flex;justify-content:center;padding:5px;margin:5px 0}
 .diagram-container svg{max-width:600px;width:100%;height:auto}
 
-.not-to-scale{text-align:center;font-size:11px;color:#888;font-style:italic;margin-top:-5px;margin-bottom:10px}
+.not-to-scale{text-align:center;font-size:11px;color:#888;font-style:italic;margin-top:0;margin-bottom:8px}
 
 .calcs-container{max-width:750px;margin:0 auto}
 
-.calc-section{margin-top:20px}
+.calc-section{margin-top:16px}
 
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:10px}
 .section-title{font-size:22px;font-weight:bold}
 .section-buttons{display:flex;gap:6px}
 
-.concept-box{background:#f0f7ff;border:1px solid #d0e0f0;border-radius:8px;padding:14px 18px;margin-bottom:12px}
-.concept-text{font-size:17px;color:#1a4d8c;margin-bottom:10px;line-height:1.5}
-.concept-text .pair{display:block;margin:4px 0;font-size:16px}
-.formula-large{font-family:"Times New Roman",Times,serif;font-size:34px;font-weight:bold}
-
 .calc{border:2px solid var(--line);border-radius:8px;padding:18px;margin-top:8px;background:#fff}
-.work-line{display:flex;justify-content:space-between;align-items:center;margin:14px 0;min-height:40px}
-.math-content{font-family:"Times New Roman",Times,serif;font-size:28px;font-weight:bold;flex:1}
-.logic-hint{font-family:Segoe UI,Arial,sans-serif;font-size:16px;color:var(--blue);font-style:italic;font-weight:600;margin-left:24px;white-space:nowrap;text-align:right}
+.work-line{display:flex;justify-content:space-between;align-items:center;margin:14px 0;min-height:44px}
+.line-num{font-family:"Times New Roman",Times,serif;font-size:18px;color:#888;min-width:36px;text-align:right;margin-right:14px}
+.math-content{font-family:"Times New Roman",Times,serif;font-size:32px;font-weight:bold;flex:1}
+.logic-hint{font-family:Segoe UI,Arial,sans-serif;font-size:17px;color:var(--blue);font-style:italic;font-weight:600;margin-left:24px;white-space:nowrap;text-align:right}
 
-.answer-box{display:inline-block;border:3px solid #000;padding:12px 18px;font-family:"Times New Roman",Times,serif;font-size:30px;font-weight:bold}
+.calc-note{font-size:13px;color:#666;font-style:italic;margin-top:12px;padding-top:10px;border-top:1px dashed #ddd}
+.calc-note strong{color:#333}
+
+.concept-box{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:12px 16px;margin-top:12px}
+.concept-text{font-size:15px;color:#555;line-height:1.6}
+.concept-text .pair{display:inline;margin:0 8px}
+.concept-text strong{color:#1a4d8c}
+
+.answer-box{display:inline-block;border:3px solid #000;padding:12px 18px;font-family:"Times New Roman",Times,serif;font-size:34px;font-weight:bold}
 .answer-box .label{font-style:italic}
 
-.blurred{filter:blur(3px)}
+.blurred{filter:blur(4px)}
 
 .reveal-btn{border:2px solid var(--line);border-radius:6px;background:#fff;font-size:14px;padding:6px 16px;cursor:pointer;font-weight:600}
 .reveal-btn:hover{background:#f5f5f5}
@@ -207,23 +211,19 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
       </div>
     </div>
     
-    <div class="concept-box" id="conceptBoxA">
-      <div class="concept-text" id="conceptText">
-        <strong>Three pairs of congruent faces:</strong>
-        <span class="pair">Top ≅ Bottom</span>
-        <span class="pair">Front ≅ Back</span>
-        <span class="pair">Left ≅ Right</span>
-        <div style="margin-top:8px;font-weight:600;">Double the semi-surface area</div>
-      </div>
-      <div class="formula-large" id="formulaDisplay"><i>A</i> = 2(<i>wh</i> + <i>wd</i> + <i>hd</i>)</div>
+    <div class="calc" id="areaCalc">
+      <div class="work-line" id="aLine0"><span class="line-num">(1)</span><div class="math-content" id="aFormula"></div><div class="logic-hint">Formula</div></div>
+      <div class="work-line" id="aLine1"><span class="line-num">(2)</span><div class="math-content" id="aS1"></div><div class="logic-hint">Substitute</div></div>
+      <div class="work-line" id="aLine2"><span class="line-num">(3)</span><div class="math-content" id="aS2"></div><div class="logic-hint" id="aHint2">Simplified</div></div>
+      <div class="work-line" id="aLine3"><span class="line-num">(4)</span><div class="math-content" id="aS3"></div><div class="logic-hint" id="aHint3">Double half-cuboid</div></div>
+      <div class="work-line" id="aLine4"><span class="line-num">(5)</span><div class="answer-box" id="aN"></div><div class="logic-hint">Answer</div></div>
+      <div class="calc-note">💡 <strong>Calculator shortcut:</strong> Type line (2) exactly into your calculator to skip to line (5)</div>
     </div>
     
-    <div class="calc" id="areaCalc">
-      <div class="work-line" id="aLine0"><div class="math-content" id="aFormula"></div><div class="logic-hint">Formula</div></div>
-      <div class="work-line" id="aLine1"><div class="math-content" id="aS1"></div><div class="logic-hint">Substitute</div></div>
-      <div class="work-line" id="aLine2"><div class="math-content" id="aS2"></div><div class="logic-hint" id="aHint2">Simplified</div></div>
-      <div class="work-line" id="aLine3"><div class="math-content" id="aS3"></div><div class="logic-hint" id="aHint3">Double half-cuboid</div></div>
-      <div class="work-line" id="aLine4"><div class="answer-box" id="aN"></div><div class="logic-hint">Answer</div></div>
+    <div class="concept-box" id="conceptBoxA">
+      <div class="concept-text" id="conceptText">
+        <strong>Understanding:</strong> Three pairs of congruent faces — <span class="pair">Top ≅ Bottom</span> <span class="pair">Front ≅ Back</span> <span class="pair">Left ≅ Right</span> — so we double the semi-surface area.
+      </div>
     </div>
   </div>
 
@@ -239,16 +239,16 @@ body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--
       </div>
     </div>
     
-    <div class="concept-box" id="conceptBoxV">
-      <div class="concept-text" id="volConceptText">Width × Height × Depth</div>
-      <div class="formula-large" id="volFormulaDisplay"><i>V</i> = <i>w</i> × <i>h</i> × <i>d</i></div>
+    <div class="calc" id="volumeCalc">
+      <div class="work-line" id="vLine0"><span class="line-num">(1)</span><div class="math-content" id="vFormula"></div><div class="logic-hint">Formula</div></div>
+      <div class="work-line" id="vLine1"><span class="line-num">(2)</span><div class="math-content" id="vS1"></div><div class="logic-hint">Substitute</div></div>
+      <div class="work-line" id="vLine2"><span class="line-num">(3)</span><div class="math-content" id="vS2"></div><div class="logic-hint">Calculate</div></div>
+      <div class="work-line" id="vLine3"><span class="line-num">(4)</span><div class="answer-box" id="vN"></div><div class="logic-hint">Answer</div></div>
+      <div class="calc-note">💡 <strong>Calculator shortcut:</strong> Type line (2) exactly into your calculator to skip to line (4)</div>
     </div>
     
-    <div class="calc" id="volumeCalc">
-      <div class="work-line" id="vLine0"><div class="math-content" id="vFormula"></div><div class="logic-hint">Formula</div></div>
-      <div class="work-line" id="vLine1"><div class="math-content" id="vS1"></div><div class="logic-hint">Substitute</div></div>
-      <div class="work-line" id="vLine2"><div class="math-content" id="vS2"></div><div class="logic-hint">Calculate</div></div>
-      <div class="work-line" id="vLine3"><div class="answer-box" id="vN"></div><div class="logic-hint">Answer</div></div>
+    <div class="concept-box" id="conceptBoxV">
+      <div class="concept-text" id="volConceptText"><strong>Understanding:</strong> Volume = Width × Height × Depth (the space inside the cuboid)</div>
     </div>
   </div>
 </div>
@@ -265,18 +265,18 @@ let mode = 'closed';
 let aStage = -1, vStage = -1;
 
 function makeCuboidSVG(wVal, hVal, dVal, wU, hU, dU, isCube, isOpen) {
-  const svgW = 580, svgH = 320;
+  const svgW = 580, svgH = 260;
   
   let wPx, hPx, dPx;
   
   if(isCube) {
-    wPx = 140;
-    hPx = 140;
-    dPx = 100;
+    wPx = 130;
+    hPx = 130;
+    dPx = 90;
   } else {
     wPx = 280;
-    hPx = 120;
-    dPx = 100;
+    hPx = 90;  // shorter height
+    dPx = 90;
   }
   
   const angle = 30;
@@ -285,7 +285,7 @@ function makeCuboidSVG(wVal, hVal, dVal, wU, hU, dU, isCube, isOpen) {
   const dy = dPx * Math.sin(rad);
   
   const baseX = isCube ? 160 : 100;
-  const baseY = svgH - 70;
+  const baseY = svgH - 55;
   
   const p1 = {x: baseX, y: baseY};
   const p2 = {x: baseX + wPx, y: baseY};
@@ -303,20 +303,20 @@ function makeCuboidSVG(wVal, hVal, dVal, wU, hU, dU, isCube, isOpen) {
   svg += `<line x1="${p5.x}" y1="${p5.y}" x2="${p1.x}" y2="${p1.y}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="6,4"/>`;
   svg += `<line x1="${p5.x}" y1="${p5.y}" x2="${p6.x}" y2="${p6.y}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="6,4"/>`;
   
-  // Front face
-  svg += `<polygon points="${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y} ${p4.x},${p4.y}" fill="#f0f0f0" stroke="#000" stroke-width="2"/>`;
+  // Front face - lightest
+  svg += `<polygon points="${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y} ${p4.x},${p4.y}" fill="#f5f5f5" stroke="#000" stroke-width="2"/>`;
   
-  // Side face
-  svg += `<polygon points="${p2.x},${p2.y} ${p6.x},${p6.y} ${p7.x},${p7.y} ${p3.x},${p3.y}" fill="#d8d8d8" stroke="#000" stroke-width="2"/>`;
+  // Side face - medium
+  svg += `<polygon points="${p2.x},${p2.y} ${p6.x},${p6.y} ${p7.x},${p7.y} ${p3.x},${p3.y}" fill="#d0d0d0" stroke="#000" stroke-width="2"/>`;
   
-  // Top face
+  // Top face - darker than front
   if(isOpen) {
     svg += `<polygon points="${p4.x},${p4.y} ${p3.x},${p3.y} ${p7.x},${p7.y} ${p8.x},${p8.y}" fill="none" stroke="#c00" stroke-width="2.5" stroke-dasharray="8,5"/>`;
     const topCX = (p4.x + p3.x + p7.x + p8.x) / 4;
     const topCY = (p4.y + p3.y + p7.y + p8.y) / 4;
     svg += `<text x="${topCX}" y="${topCY + 5}" font-size="16" font-family="Segoe UI" fill="#c00" text-anchor="middle" font-weight="bold">OPEN</text>`;
   } else {
-    svg += `<polygon points="${p4.x},${p4.y} ${p3.x},${p3.y} ${p7.x},${p7.y} ${p8.x},${p8.y}" fill="#e8e8e8" stroke="#000" stroke-width="2"/>`;
+    svg += `<polygon points="${p4.x},${p4.y} ${p3.x},${p3.y} ${p7.x},${p7.y} ${p8.x},${p8.y}" fill="#dcdcdc" stroke="#000" stroke-width="2"/>`;
   }
   
   // DIMENSION LABELS
@@ -433,39 +433,18 @@ function setMode(newMode) {
 
 function updateFormulas() {
   if(mode === 'cube') {
-    document.getElementById("conceptText").innerHTML = `
-      <strong>Six identical square faces</strong>
-      <div style="margin-top:8px;font-weight:600;">6 × (one face area)</div>
-    `;
-    document.getElementById("formulaDisplay").innerHTML = "<i>A</i> = 6<i>s</i>²";
-    document.getElementById("volConceptText").textContent = "Side × Side × Side";
-    document.getElementById("volFormulaDisplay").innerHTML = "<i>V</i> = <i>s</i>³";
+    document.getElementById("conceptText").innerHTML = `<strong>Understanding:</strong> Six identical square faces — so we multiply one face area by 6.`;
+    document.getElementById("volConceptText").innerHTML = `<strong>Understanding:</strong> Volume = Side × Side × Side (the space inside the cube)`;
     document.querySelector(".section-title").textContent = "Surface Area of Cube";
     document.querySelectorAll(".section-title")[1].textContent = "Volume of Cube";
   } else if(mode === 'open') {
-    document.getElementById("conceptText").innerHTML = `
-      <strong>Two pairs + one base:</strong>
-      <span class="pair">Front ≅ Back</span>
-      <span class="pair">Left ≅ Right</span>
-      <span class="pair">+ Bottom (no top)</span>
-      <div style="margin-top:8px;font-weight:600;">Double the pairs + single base</div>
-    `;
-    document.getElementById("formulaDisplay").innerHTML = "<i>A</i> = 2<i>wh</i> + 2<i>hd</i> + <i>wd</i>";
-    document.getElementById("volConceptText").textContent = "Width × Height × Depth";
-    document.getElementById("volFormulaDisplay").innerHTML = "<i>V</i> = <i>w</i> × <i>h</i> × <i>d</i>";
+    document.getElementById("conceptText").innerHTML = `<strong>Understanding:</strong> Two pairs of congruent faces + one base — <span class="pair">Front ≅ Back</span> <span class="pair">Left ≅ Right</span> <span class="pair">+ Bottom</span>`;
+    document.getElementById("volConceptText").innerHTML = `<strong>Understanding:</strong> Volume = Width × Height × Depth (the space inside)`;
     document.querySelector(".section-title").textContent = "Surface Area of Open-top Cuboid";
     document.querySelectorAll(".section-title")[1].textContent = "Volume of Cuboid";
   } else {
-    document.getElementById("conceptText").innerHTML = `
-      <strong>Three pairs of congruent faces:</strong>
-      <span class="pair">Top ≅ Bottom</span>
-      <span class="pair">Front ≅ Back</span>
-      <span class="pair">Left ≅ Right</span>
-      <div style="margin-top:8px;font-weight:600;">Double the semi-surface area</div>
-    `;
-    document.getElementById("formulaDisplay").innerHTML = "<i>A</i> = 2(<i>wh</i> + <i>wd</i> + <i>hd</i>)";
-    document.getElementById("volConceptText").textContent = "Width × Height × Depth";
-    document.getElementById("volFormulaDisplay").innerHTML = "<i>V</i> = <i>w</i> × <i>h</i> × <i>d</i>";
+    document.getElementById("conceptText").innerHTML = `<strong>Understanding:</strong> Three pairs of congruent faces — <span class="pair">Top ≅ Bottom</span> <span class="pair">Front ≅ Back</span> <span class="pair">Left ≅ Right</span> — so we double the semi-surface area.`;
+    document.getElementById("volConceptText").innerHTML = `<strong>Understanding:</strong> Volume = Width × Height × Depth (the space inside the cuboid)`;
     document.querySelector(".section-title").textContent = "Surface Area of Cuboid";
     document.querySelectorAll(".section-title")[1].textContent = "Volume of Cuboid";
   }
@@ -631,48 +610,59 @@ function update() {
     document.getElementById("depthDisplay").innerHTML = `<i>d</i> = ${d} ${du}`;
   }
 
-  const front = w*h, top = w*d, side = h*d, vol = w*h*d;
+  // Helper to round and clean up floating point
+  function r(n) {
+    return Math.round(n * 10000) / 10000; // Round to 4 decimal places then clean
+  }
+  function fmt(n) {
+    const rounded = r(n);
+    // Remove trailing zeros after decimal point
+    if(Number.isInteger(rounded)) return rounded.toString();
+    return parseFloat(rounded.toFixed(4)).toString();
+  }
+
+  const front = r(w*h), top = r(w*d), side = r(h*d), vol = r(w*h*d);
   let area;
   
   if(isCube) {
-    const s2 = w*w;
-    area = 6*s2;
+    const s2 = r(w*w);
+    area = r(6*s2);
     document.getElementById("aFormula").innerHTML = `<i>A</i> = 6<i>s</i>²`;
     document.getElementById("aS1").innerHTML = `<i>A</i> = 6 × ${w}²`;
-    document.getElementById("aS2").innerHTML = `<i>A</i> = 6 × ${s2}`;
+    document.getElementById("aS2").innerHTML = `<i>A</i> = 6 × ${fmt(s2)}`;
     document.getElementById("aHint2").textContent = "One face area";
-    document.getElementById("aS3").innerHTML = `<i>A</i> = ${area}`;
+    document.getElementById("aS3").innerHTML = `<i>A</i> = ${fmt(area)}`;
     document.getElementById("aHint3").textContent = "× 6 faces";
     document.getElementById("vFormula").innerHTML = `<i>V</i> = <i>s</i>³`;
     document.getElementById("vS1").innerHTML = `<i>V</i> = ${w}³`;
-    document.getElementById("vS2").innerHTML = `<i>V</i> = ${vol}`;
+    document.getElementById("vS2").innerHTML = `<i>V</i> = ${fmt(vol)}`;
   } else if(isOpen) {
-    area = 2*front + 2*side + top;
+    area = r(2*front + 2*side + top);
     document.getElementById("aFormula").innerHTML = `<i>A</i> = 2<i>wh</i> + 2<i>hd</i> + <i>wd</i>`;
     document.getElementById("aS1").innerHTML = `<i>A</i> = 2(${w}×${h}) + 2(${h}×${d}) + (${w}×${d})`;
-    document.getElementById("aS2").innerHTML = `<i>A</i> = 2(${front}) + 2(${side}) + ${top}`;
+    document.getElementById("aS2").innerHTML = `<i>A</i> = 2(${fmt(front)}) + 2(${fmt(side)}) + ${fmt(top)}`;
     document.getElementById("aHint2").textContent = "Face areas";
-    document.getElementById("aS3").innerHTML = `<i>A</i> = ${2*front} + ${2*side} + ${top} = ${area}`;
+    document.getElementById("aS3").innerHTML = `<i>A</i> = ${fmt(r(2*front))} + ${fmt(r(2*side))} + ${fmt(top)} = ${fmt(area)}`;
     document.getElementById("aHint3").textContent = "5 faces total";
     document.getElementById("vFormula").innerHTML = `<i>V</i> = <i>w</i> × <i>h</i> × <i>d</i>`;
     document.getElementById("vS1").innerHTML = `<i>V</i> = ${w} × ${h} × ${d}`;
-    document.getElementById("vS2").innerHTML = `<i>V</i> = ${vol}`;
+    document.getElementById("vS2").innerHTML = `<i>V</i> = ${fmt(vol)}`;
   } else {
-    const sum = front + top + side;
-    area = 2*sum;
+    const sum = r(front + top + side);
+    area = r(2*sum);
     document.getElementById("aFormula").innerHTML = `<i>A</i> = 2(<i>wh</i> + <i>wd</i> + <i>hd</i>)`;
     document.getElementById("aS1").innerHTML = `<i>A</i> = 2(${w}×${h} + ${w}×${d} + ${h}×${d})`;
-    document.getElementById("aS2").innerHTML = `<i>A</i> = 2(${front} + ${top} + ${side})`;
+    document.getElementById("aS2").innerHTML = `<i>A</i> = 2(${fmt(front)} + ${fmt(top)} + ${fmt(side)})`;
     document.getElementById("aHint2").textContent = "Simplified";
-    document.getElementById("aS3").innerHTML = `<i>A</i> = 2(${sum}) = ${area}`;
+    document.getElementById("aS3").innerHTML = `<i>A</i> = 2(${fmt(sum)}) = ${fmt(area)}`;
     document.getElementById("aHint3").textContent = "Double half-cuboid";
     document.getElementById("vFormula").innerHTML = `<i>V</i> = <i>w</i> × <i>h</i> × <i>d</i>`;
     document.getElementById("vS1").innerHTML = `<i>V</i> = ${w} × ${h} × ${d}`;
-    document.getElementById("vS2").innerHTML = `<i>V</i> = ${vol}`;
+    document.getElementById("vS2").innerHTML = `<i>V</i> = ${fmt(vol)}`;
   }
   
-  document.getElementById("aN").innerHTML = `<span class="label">A = </span>${area} ${u2}`;
-  document.getElementById("vN").innerHTML = `<span class="label">V = </span>${vol} ${u3}`;
+  document.getElementById("aN").innerHTML = `<span class="label">A = </span>${fmt(area)} ${u2}`;
+  document.getElementById("vN").innerHTML = `<span class="label">V = </span>${fmt(vol)} ${u3}`;
 }
 
 // KEYBOARD / CLICKER SUPPORT
