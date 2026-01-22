@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sphere & Hemisphere Calculator</title>
+
+<style>
+:root{--ink:#000;--line:#cfcfcf;--muted:#666;--blue:#2563eb}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--ink)}
+.wrap{max-width:1100px;margin:6px auto;padding:0 6px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px}
+
+.block{border:1px solid var(--line);border-radius:8px;padding:8px}
+
+.top-controls{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.mode-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f9f9f9;border-radius:8px;flex-wrap:wrap}
+.mode-label{font-size:14px;font-weight:600;margin-right:8px}
+.mode-btn{border:2px solid var(--line);border-radius:6px;background:#fff;padding:8px 16px;font-size:15px;cursor:pointer;font-weight:700;transition:all 0.2s}
+.mode-btn:hover{background:#f0f0f0}
+.mode-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+.unit-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f9f9f9;border-radius:8px}
+.unit-label{font-size:16px;font-weight:600}
+.unit-select{border:2px solid var(--line);border-radius:6px;padding:8px 12px;font-size:15px;background:#fff;cursor:pointer}
+.unit-select:focus{outline:none;border-color:var(--blue)}
+
+.pi-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f9f9f9;border-radius:8px}
+.pi-label{font-size:16px;font-weight:600}
+.pi-select{border:2px solid var(--line);border-radius:6px;padding:8px 12px;font-size:15px;background:#fff;cursor:pointer;font-family:"Times New Roman",Times,serif}
+.pi-select:focus{outline:none;border-color:var(--blue)}
+
+.dp-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f9f9f9;border-radius:8px}
+.dp-label{font-size:16px;font-weight:600}
+.dp-controls{display:flex;align-items:center;gap:4px}
+.dp-select{border:2px solid var(--line);border-radius:6px;padding:8px 12px;font-size:15px;background:#fff;cursor:pointer;font-family:"Times New Roman",Times,serif;text-align:center;min-width:70px}
+.dp-select:focus{outline:none;border-color:var(--blue)}
+.dp-btn{width:36px;height:36px;border:2px solid var(--line);border-radius:4px;background:#fff;cursor:pointer;font-size:18px;font-weight:bold;display:flex;align-items:center;justify-content:center;user-select:none}
+.dp-btn:hover{background:#f0f0f0}
+
+.input-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.input-block{flex:1;min-width:200px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 14px}
+.input-block h3{margin:0;font-size:15px;font-weight:600}
+.input-controls{display:flex;align-items:center;gap:4px;position:relative}
+.value-input{width:100px;border:2px solid var(--blue);border-radius:6px;padding:8px 10px;font-size:24px;text-align:center;font-family:"Times New Roman",Times,serif;font-weight:bold}
+.value-input:focus{outline:none;border-color:#000}
+.arrow-buttons{display:flex;flex-direction:column;gap:2px}
+.arrow-btn{width:34px;height:28px;border:2px solid var(--line);border-radius:4px;background:#fff;cursor:pointer;font-size:16px;font-weight:bold;display:flex;align-items:center;justify-content:center;user-select:none}
+.arrow-btn:hover{background:#f0f0f0}
+.arrow-btn:active{background:#e0e0e0}
+
+.radius-dropdown{position:absolute;top:100%;left:0;background:#fff;border:2px solid var(--line);border-radius:6px;box-shadow:0 4px 8px rgba(0,0,0,0.15);z-index:10;display:none;min-width:220px;margin-top:4px}
+.radius-dropdown.show{display:block}
+.radius-option{padding:10px 14px;cursor:pointer;font-size:14px;border-bottom:1px solid var(--line);transition:background 0.15s}
+.radius-option:last-child{border-bottom:none}
+.radius-option:hover{background:#f0f0f0}
+
+.input-display{font-family:"Times New Roman",Times,serif;font-size:20px;margin-top:4px}
+
+.diagram-container{display:flex;justify-content:center;padding:5px;margin:5px 0}
+.diagram-container svg{width:300px;height:300px}
+
+.not-to-scale{text-align:center;font-size:11px;color:#888;font-style:italic;margin-top:0;margin-bottom:8px}
+
+.calcs-container{max-width:750px;margin:0 auto}
+
+.calc-section{margin-top:16px}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:10px}
+.section-title{font-size:22px;font-weight:bold}
+.section-buttons{display:flex;gap:6px}
+
+.calc{border:2px solid var(--line);border-radius:8px;padding:18px;margin-top:8px;background:#fff}
+.work-line{display:flex;justify-content:space-between;align-items:center;margin:14px 0;min-height:44px}
+.line-num{font-family:"Times New Roman",Times,serif;font-size:18px;color:#888;min-width:36px;text-align:right;margin-right:14px}
+.math-content{font-family:"Times New Roman",Times,serif;font-size:32px;font-weight:bold;flex:1}
+.logic-hint{font-family:Segoe UI,Arial,sans-serif;font-size:17px;color:var(--blue);font-style:italic;font-weight:600;margin-left:24px;white-space:nowrap;text-align:right}
+
+.answer-box{display:inline-block;border:3px solid #000;padding:12px 18px;font-family:"Times New Roman",Times,serif;font-size:34px;font-weight:bold}
+.answer-box .label{font-style:italic}
+
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px}
+.frac-num{border-bottom:2px solid #000;padding:0 4px 2px;font-size:1em}
+.frac-den{padding:2px 4px 0;font-size:1em}
+
+.blurred{filter:blur(4px)}
+
+.reveal-btn{border:2px solid var(--line);border-radius:6px;background:#fff;font-size:14px;padding:6px 16px;cursor:pointer;font-weight:600}
+.reveal-btn:hover{background:#f5f5f5}
+
+@media(max-width:700px){
+  .input-row{flex-direction:column}
+  .input-block{width:100%;max-width:none}
+  .math-content{font-size:20px}
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<section class="card">
+
+<div class="top-controls">
+  <div class="mode-row">
+    <span class="mode-label">Solid:</span>
+    <button class="mode-btn active" id="modeSphereBtn">Sphere</button>
+    <button class="mode-btn" id="modeHemiBtn">Hemisphere</button>
+  </div>
+  
+  <div class="unit-row">
+    <span class="unit-label">Unit:</span>
+    <select class="unit-select" id="unitSelect">
+      <option value="km">km</option>
+      <option value="m" selected>m</option>
+      <option value="cm">cm</option>
+      <option value="mm">mm</option>
+      <option value="μm">μm</option>
+      <option value="nm">nm</option>
+      <option value="ft">ft</option>
+      <option value="yd">yd</option>
+      <option value="mi">mi</option>
+    </select>
+  </div>
+  
+  <div class="pi-row">
+    <span class="pi-label">π:</span>
+    <select class="pi-select" id="piSelect">
+      <option value="pi" selected>π</option>
+      <option value="22/7">22/7</option>
+      <option value="3.14">3.14</option>
+      <option value="3.142">3.142</option>
+      <option value="3.1416">3.1416</option>
+    </select>
+  </div>
+  
+  <div class="dp-row">
+    <span class="dp-label">Decimal places:</span>
+    <div class="dp-controls">
+      <button class="dp-btn" id="dpDown">−</button>
+      <select class="dp-select" id="dpSelect">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3" selected>3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+      </select>
+      <button class="dp-btn" id="dpUp">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="input-row">
+  <div class="block input-block" id="radiusBlock">
+    <h3 id="radiusLabel">Sphere radius (r)</h3>
+    <div class="input-controls">
+      <input type="number" class="value-input" id="radiusInput" min="0.1" step="0.1" value="7">
+      <div class="arrow-buttons">
+        <button class="arrow-btn" id="radiusUp">▲</button>
+        <button class="arrow-btn" id="radiusDown">▼</button>
+      </div>
+      <div class="radius-dropdown" id="radiusDropdown">
+        <div class="radius-option" data-action="random-single">Random single digit (1-9)</div>
+        <div class="radius-option" data-action="random-double">Random double digit (10-99)</div>
+        <div class="radius-option" data-action="random-decimal">Random decimal (1.0-9.9)</div>
+      </div>
+    </div>
+    <div class="input-display" id="radiusDisplay"><i>r</i> = 7 m</div>
+  </div>
+</div>
+
+<div class="diagram-container" id="diagramContainer"></div>
+<div class="not-to-scale">Not to scale</div>
+
+<div class="calcs-container">
+  <div class="calc-section">
+    <div class="section-header">
+      <div class="section-title" id="areaTitle">Surface Area</div>
+      <div class="section-buttons">
+        <button class="reveal-btn" id="hideA">Hide All</button>
+        <button class="reveal-btn" id="showA">Show All</button>
+        <button class="reveal-btn" id="stepA">Step Through</button>
+        <button class="reveal-btn" id="nextA" style="display:none">Next Step</button>
+      </div>
+    </div>
+    <div class="calc" id="areaCalc"></div>
+  </div>
+
+  <div class="calc-section" id="totalAreaSection" style="display:none">
+    <div class="section-header">
+      <div class="section-title">Total Surface Area</div>
+      <div class="section-buttons">
+        <button class="reveal-btn" id="hideT">Hide All</button>
+        <button class="reveal-btn" id="showT">Show All</button>
+        <button class="reveal-btn" id="stepT">Step Through</button>
+        <button class="reveal-btn" id="nextT" style="display:none">Next Step</button>
+      </div>
+    </div>
+    <div class="calc" id="totalAreaCalc"></div>
+  </div>
+
+  <div class="calc-section">
+    <div class="section-header">
+      <div class="section-title">Volume</div>
+      <div class="section-buttons">
+        <button class="reveal-btn" id="hideV">Hide All</button>
+        <button class="reveal-btn" id="showV">Show All</button>
+        <button class="reveal-btn" id="stepV">Step Through</button>
+        <button class="reveal-btn" id="nextV" style="display:none">Next Step</button>
+      </div>
+    </div>
+    <div class="calc" id="volumeCalc"></div>
+  </div>
+</div>
+
+</section>
+</div>
+
+<script>
+let r = 7;
+let unit = 'm';
+let mode = 'sphere';
+let piValue = 'pi';
+let dp = 3;
+let aStage = -1;
+let tStage = -1;
+let vStage = -1;
+
+function makeSphereSVG(isHemi) {
+  // Fixed size diagram - always same visual size
+  const cr = 120;
+  const cx = 150;
+  const cy = 150;
+  
+  if (isHemi) {
+    return `<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="${cx}" cy="50" rx="${cr}" ry="${cr*0.2}" fill="none" stroke="#000" stroke-width="2.5"/>
+      <path d="M ${cx-cr} 50 Q ${cx} ${50 + cr*1.1} ${cx+cr} 50" fill="none" stroke="#000" stroke-width="2.5"/>
+      <line x1="${cx-cr}" y1="50" x2="${cx-cr}" y2="${50 + cr*0.08}" stroke="#000" stroke-width="2.5"/>
+      <line x1="${cx+cr}" y1="50" x2="${cx+cr}" y2="${50 + cr*0.08}" stroke="#000" stroke-width="2.5"/>
+      <line x1="${cx}" y1="50" x2="${cx+cr}" y2="50" stroke="#000" stroke-width="2.5"/>
+      <circle cx="${cx+cr}" cy="50" r="3.5" fill="#000"/>
+      <text x="${cx+cr/2}" y="40" font-family="Times New Roman,serif" font-size="18" font-style="italic" fill="#000" text-anchor="middle">r</text>
+      <text x="${cx+cr/2}" y="68" font-family="Times New Roman,serif" font-size="14" fill="#000" text-anchor="middle">≈ ${r.toFixed(3)} ${unit}</text>
+    </svg>`;
+  } else {
+    return `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="${cx}" cy="${cy}" r="${cr}" fill="none" stroke="#000" stroke-width="2.5"/>
+      <path d="M ${cx-cr} ${cy} Q ${cx} ${cy - cr*0.2} ${cx+cr} ${cy}" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="5,5"/>
+      <path d="M ${cx-cr} ${cy} Q ${cx} ${cy + cr*0.2} ${cx+cr} ${cy}" fill="none" stroke="#000" stroke-width="2"/>
+      <line x1="${cx}" y1="${cy}" x2="${cx+cr}" y2="${cy}" stroke="#000" stroke-width="2.5"/>
+      <circle cx="${cx+cr}" cy="${cy}" r="3.5" fill="#000"/>
+      <text x="${cx+cr/2}" y="${cy-10}" font-family="Times New Roman,serif" font-size="18" font-style="italic" fill="#000" text-anchor="middle">r</text>
+      <text x="${cx+cr/2}" y="${cy+22}" font-family="Times New Roman,serif" font-size="14" fill="#000" text-anchor="middle">≈ ${r.toFixed(3)} ${unit}</text>
+    </svg>`;
+  }
+}
+
+document.getElementById("modeSphereBtn").onclick = () => {
+  mode = 'sphere';
+  document.getElementById("modeSphereBtn").classList.add("active");
+  document.getElementById("modeHemiBtn").classList.remove("active");
+  document.getElementById("radiusLabel").textContent = "Sphere radius (r)";
+  document.getElementById("totalAreaSection").style.display = "none";
+  update();
+};
+
+document.getElementById("modeHemiBtn").onclick = () => {
+  mode = 'hemi';
+  document.getElementById("modeHemiBtn").classList.add("active");
+  document.getElementById("modeSphereBtn").classList.remove("active");
+  document.getElementById("radiusLabel").textContent = "Hemisphere radius (r)";
+  document.getElementById("totalAreaSection").style.display = "block";
+  update();
+};
+
+document.getElementById("unitSelect").onchange = () => {
+  unit = document.getElementById("unitSelect").value;
+  update();
+};
+
+document.getElementById("piSelect").onchange = () => {
+  piValue = document.getElementById("piSelect").value;
+  update();
+};
+
+document.getElementById("dpSelect").onchange = () => {
+  dp = parseInt(document.getElementById("dpSelect").value);
+  update();
+};
+
+document.getElementById("dpUp").onclick = () => {
+  if(dp < 10) {
+    dp++;
+    document.getElementById("dpSelect").value = dp;
+    update();
+  }
+};
+
+document.getElementById("dpDown").onclick = () => {
+  if(dp > 0) {
+    dp--;
+    document.getElementById("dpSelect").value = dp;
+    update();
+  }
+};
+
+document.getElementById("radiusInput").oninput = () => {
+  const val = parseFloat(document.getElementById("radiusInput").value);
+  if(val > 0 && !isNaN(val)) {
+    r = val;
+    update();
+  }
+};
+
+document.getElementById("radiusInput").onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById("radiusDropdown").classList.toggle("show");
+};
+
+document.addEventListener("click", () => {
+  document.getElementById("radiusDropdown").classList.remove("show");
+});
+
+document.querySelectorAll(".radius-option").forEach(option => {
+  option.onclick = (e) => {
+    e.stopPropagation();
+    const action = option.getAttribute("data-action");
+    
+    if (action === "random-single") {
+      r = Math.floor(Math.random() * 9) + 1;
+    } else if (action === "random-double") {
+      r = Math.floor(Math.random() * 90) + 10;
+    } else if (action === "random-decimal") {
+      r = parseFloat((Math.random() * 8.9 + 1).toFixed(1));
+    }
+    
+    document.getElementById("radiusInput").value = r;
+    document.getElementById("radiusDropdown").classList.remove("show");
+    update();
+  };
+});
+
+document.getElementById("radiusUp").onclick = () => {
+  r = parseFloat((r + 0.1).toFixed(1));
+  document.getElementById("radiusInput").value = r;
+  update();
+};
+
+document.getElementById("radiusDown").onclick = () => {
+  if(r > 0.1) {
+    r = parseFloat((r - 0.1).toFixed(1));
+    document.getElementById("radiusInput").value = r;
+    update();
+  }
+};
+
+function setupRevealButtons(prefix, maxStage) {
+  document.getElementById("hide" + prefix).onclick = () => {
+    hideAll(prefix, maxStage);
+    let calcId = prefix === 'A' ? 'areaCalc' : prefix === 'T' ? 'totalAreaCalc' : 'volumeCalc';
+    document.getElementById(calcId).classList.add("blurred");
+    document.getElementById("hide" + prefix).style.display = "none";
+    document.getElementById("show" + prefix).style.display = "inline-block";
+    document.getElementById("step" + prefix).style.display = "inline-block";
+    document.getElementById("next" + prefix).style.display = "none";
+    if(prefix === 'A') aStage = -1;
+    else if(prefix === 'T') tStage = -1;
+    else vStage = -1;
+  };
+
+  document.getElementById("show" + prefix).onclick = () => {
+    let calcId = prefix === 'A' ? 'areaCalc' : prefix === 'T' ? 'totalAreaCalc' : 'volumeCalc';
+    document.getElementById(calcId).classList.remove("blurred");
+    showAll(prefix, maxStage);
+    document.getElementById("hide" + prefix).style.display = "inline-block";
+    document.getElementById("show" + prefix).style.display = "none";
+    document.getElementById("step" + prefix).style.display = "none";
+    document.getElementById("next" + prefix).style.display = "none";
+  };
+
+  document.getElementById("step" + prefix).onclick = () => {
+    hideAll(prefix, maxStage);
+    let calcId = prefix === 'A' ? 'areaCalc' : prefix === 'T' ? 'totalAreaCalc' : 'volumeCalc';
+    document.getElementById(calcId).classList.remove("blurred");
+    document.getElementById("show" + prefix).style.display = "none";
+    document.getElementById("step" + prefix).style.display = "none";
+    document.getElementById("hide" + prefix).style.display = "inline-block";
+    document.getElementById("next" + prefix).style.display = "inline-block";
+  };
+
+  document.getElementById("next" + prefix).onclick = () => {
+    if(prefix === 'A') {
+      aStage++;
+      if(aStage > maxStage) {
+        showAll('A', maxStage);
+        document.getElementById("nextA").style.display = "none";
+      } else showStage('A', aStage);
+    } else if(prefix === 'T') {
+      tStage++;
+      if(tStage > maxStage) {
+        showAll('T', maxStage);
+        document.getElementById("nextT").style.display = "none";
+      } else showStage('T', tStage);
+    } else {
+      vStage++;
+      if(vStage > maxStage) {
+        showAll('V', maxStage);
+        document.getElementById("nextV").style.display = "none";
+      } else showStage('V', vStage);
+    }
+  };
+}
+
+function hideAll(prefix, maxStage) {
+  let id = prefix === 'A' ? 'a' : prefix === 'T' ? 't' : 'v';
+  for(let i=0;i<=maxStage;i++) {
+    let el = document.getElementById(id+"Line"+i);
+    if(el) el.classList.add("blurred");
+  }
+}
+
+function showAll(prefix, maxStage) {
+  let id = prefix === 'A' ? 'a' : prefix === 'T' ? 't' : 'v';
+  for(let i=0;i<=maxStage;i++) {
+    let el = document.getElementById(id+"Line"+i);
+    if(el) el.classList.remove("blurred");
+  }
+}
+
+function showStage(prefix, stage) {
+  let id = prefix === 'A' ? 'a' : prefix === 'T' ? 't' : 'v';
+  let maxStage = prefix === 'V' ? 5 : 4;
+  for(let i=0;i<=maxStage;i++) {
+    let el = document.getElementById(id+"Line"+i);
+    if(el) {
+      if(i <= stage) el.classList.remove("blurred");
+      else el.classList.add("blurred");
+    }
+  }
+}
+
+function getPiValue() {
+  switch(piValue) {
+    case 'pi': return Math.PI;
+    case '22/7': return 22/7;
+    case '3.14': return 3.14;
+    case '3.142': return 3.142;
+    case '3.1416': return 3.1416;
+    default: return Math.PI;
+  }
+}
+
+function getPiSymbol() {
+  if(piValue === 'pi') return 'π';
+  if(piValue === '22/7') return '<span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>';
+  return piValue;
+}
+
+function cleanFloat(n) {
+  return parseFloat(n.toPrecision(12));
+}
+
+function formatInt(n) {
+  n = cleanFloat(n);
+  return Number.isInteger(n) ? n.toString() : n.toString();
+}
+
+function fmt(n, places) {
+  n = cleanFloat(n);
+  if (places === 0) return Math.round(n).toString();
+  return n.toFixed(places);
+}
+
+function update() {
+  const isHemisphere = (mode === 'hemi');
+  const pi = getPiValue();
+  const piSymbol = getPiSymbol();
+  const isExact = (piValue === 'pi');
+  
+  document.getElementById("diagramContainer").innerHTML = makeSphereSVG(isHemisphere);
+  document.getElementById("radiusDisplay").innerHTML = `<i>r</i> = ${r} ${unit}`;
+
+  const rSquared = cleanFloat(r * r);
+  const rCubed = cleanFloat(r * r * r);
+  
+  if (isHemisphere) {
+    document.getElementById("areaTitle").textContent = "Curved Surface Area";
+    
+    const curvedArea = 2 * pi * rSquared;
+    const areaHTML = `
+      <div class="work-line" id="aLine0">
+        <span class="line-num">1</span>
+        <div class="math-content"><i>A</i> = 2π<i>r</i>²</div>
+        <span class="logic-hint">Formula</span>
+      </div>
+      <div class="work-line blurred" id="aLine1">
+        <span class="line-num">2</span>
+        <div class="math-content"><i>A</i> = 2${piSymbol}(${formatInt(r)})²</div>
+        <span class="logic-hint">Substitute</span>
+      </div>
+      <div class="work-line blurred" id="aLine2">
+        <span class="line-num">3</span>
+        <div class="math-content"><i>A</i> = 2${piSymbol}(${formatInt(rSquared)})</div>
+        <span class="logic-hint">Square</span>
+      </div>
+      <div class="work-line blurred" id="aLine3">
+        <span class="line-num">4</span>
+        <div class="math-content"><i>A</i> = ${formatInt(2 * rSquared)}${piSymbol}</div>
+        <span class="logic-hint">Multiply</span>
+      </div>
+      <div class="work-line blurred" id="aLine4">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">A = </span>${formatInt(2 * rSquared)}π ${unit}²</div>
+        </div>
+        <span class="logic-hint">Exact Answer</span>
+      </div>
+      <div class="work-line blurred" id="aLine5">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">A ≈ </span>${fmt(curvedArea, dp+1)} ${unit}²</div>
+        </div>
+        <span class="logic-hint">to ${dp+1} d.p.</span>
+      </div>`;
+    document.getElementById("areaCalc").innerHTML = areaHTML;
+    
+    const totalArea = 3 * pi * rSquared;
+    const totalHTML = `
+      <div class="work-line" id="tLine0">
+        <span class="line-num">1</span>
+        <div class="math-content"><i>A</i> = 3π<i>r</i>²</div>
+        <span class="logic-hint">Formula</span>
+      </div>
+      <div class="work-line blurred" id="tLine1">
+        <span class="line-num">2</span>
+        <div class="math-content"><i>A</i> = 3${piSymbol}(${formatInt(r)})²</div>
+        <span class="logic-hint">Substitute</span>
+      </div>
+      <div class="work-line blurred" id="tLine2">
+        <span class="line-num">3</span>
+        <div class="math-content"><i>A</i> = 3${piSymbol}(${formatInt(rSquared)})</div>
+        <span class="logic-hint">Square</span>
+      </div>
+      <div class="work-line blurred" id="tLine3">
+        <span class="line-num">4</span>
+        <div class="math-content"><i>A</i> = ${formatInt(3 * rSquared)}${piSymbol}</div>
+        <span class="logic-hint">Multiply</span>
+      </div>
+      <div class="work-line blurred" id="tLine4">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">A = </span>${formatInt(3 * rSquared)}π ${unit}²</div>
+        </div>
+        <span class="logic-hint">Exact Answer</span>
+      </div>
+      <div class="work-line blurred" id="tLine5">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">A ≈ </span>${fmt(totalArea, dp+1)} ${unit}²</div>
+        </div>
+        <span class="logic-hint">to ${dp+1} d.p.</span>
+      </div>`;
+    document.getElementById("totalAreaCalc").innerHTML = totalHTML;
+    
+    const volume = (2 * pi * rCubed) / 3;
+    const volHTML = `
+      <div class="work-line" id="vLine0">
+        <span class="line-num">1</span>
+        <div class="math-content"><i>V</i> = <span class="frac"><span class="frac-num">2π<i>r</i>³</span><span class="frac-den">3</span></span></div>
+        <span class="logic-hint">Formula</span>
+      </div>
+      <div class="work-line blurred" id="vLine1">
+        <span class="line-num">2</span>
+        <div class="math-content"><i>V</i> = <span class="frac"><span class="frac-num">2${piSymbol}(${formatInt(r)})³</span><span class="frac-den">3</span></span></div>
+        <span class="logic-hint">Substitute</span>
+      </div>
+      <div class="work-line blurred" id="vLine2">
+        <span class="line-num">3</span>
+        <div class="math-content"><i>V</i> = <span class="frac"><span class="frac-num">2${piSymbol}(${formatInt(rCubed)})</span><span class="frac-den">3</span></span></div>
+        <span class="logic-hint">Cube</span>
+      </div>
+      <div class="work-line blurred" id="vLine3">
+        <span class="line-num">4</span>
+        <div class="math-content"><i>V</i> = <span class="frac"><span class="frac-num">${formatInt(2 * rCubed)}π</span><span class="frac-den">3</span></span></div>
+        <span class="logic-hint">Multiply</span>
+      </div>
+      <div class="work-line blurred" id="vLine4">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">V = </span><span class="frac"><span class="frac-num">${formatInt(2 * rCubed)}π</span><span class="frac-den">3</span></span> ${unit}³</div>
+        </div>
+        <span class="logic-hint">Exact Answer</span>
+      </div>
+      <div class="work-line blurred" id="vLine5">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">V ≈ </span>${fmt(volume, dp+1)} ${unit}³</div>
+        </div>
+        <span class="logic-hint">to ${dp+1} d.p.</span>
+      </div>`;
+    document.getElementById("volumeCalc").innerHTML = volHTML;
+    
+    setupRevealButtons('A', 5);
+    setupRevealButtons('T', 5);
+    setupRevealButtons('V', 5);
+    
+  } else {
+    document.getElementById("areaTitle").textContent = "Surface Area";
+    
+    const area = 4 * pi * rSquared;
+    const areaHTML = `
+      <div class="work-line" id="aLine0">
+        <span class="line-num">1</span>
+        <div class="math-content"><i>A</i> = 4π<i>r</i>²</div>
+        <span class="logic-hint">Formula</span>
+      </div>
+      <div class="work-line blurred" id="aLine1">
+        <span class="line-num">2</span>
+        <div class="math-content"><i>A</i> = 4${piSymbol}(${formatInt(r)})²</div>
+        <span class="logic-hint">Substitute</span>
+      </div>
+      <div class="work-line blurred" id="aLine2">
+        <span class="line-num">3</span>
+        <div class="math-content"><i>A</i> = 4${piSymbol}(${formatInt(rSquared)})</div>
+        <span class="logic-hint">Square</span>
+      </div>
+      <div class="work-line blurred" id="aLine3">
+        <span class="line-num">4</span>
+        <div class="math-content"><i>A</i> = ${formatInt(4 * rSquared)}${piSymbol}</div>
+        <span class="logic-hint">Multiply</span>
+      </div>
+      <div class="work-line blurred" id="aLine4">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">A = </span>${formatInt(4 * rSquared)}π ${unit}²</div>
+        </div>
+        <span class="logic-hint">Exact Answer</span>
+      </div>
+      <div class="work-line blurred" id="aLine5">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">A ≈ </span>${fmt(area, dp+1)} ${unit}²</div>
+        </div>
+        <span class="logic-hint">to ${dp+1} d.p.</span>
+      </div>`;
+    document.getElementById("areaCalc").innerHTML = areaHTML;
+    
+    const volume = (4 * pi * rCubed) / 3;
+    const volHTML = `
+      <div class="work-line" id="vLine0">
+        <span class="line-num">1</span>
+        <div class="math-content"><i>V</i> = <span class="frac"><span class="frac-num">4π<i>r</i>³</span><span class="frac-den">3</span></span></div>
+        <span class="logic-hint">Formula</span>
+      </div>
+      <div class="work-line blurred" id="vLine1">
+        <span class="line-num">2</span>
+        <div class="math-content"><i>V</i> = <span class="frac"><span class="frac-num">4${piSymbol}(${formatInt(r)})³</span><span class="frac-den">3</span></span></div>
+        <span class="logic-hint">Substitute</span>
+      </div>
+      <div class="work-line blurred" id="vLine2">
+        <span class="line-num">3</span>
+        <div class="math-content"><i>V</i> = <span class="frac"><span class="frac-num">4${piSymbol}(${formatInt(rCubed)})</span><span class="frac-den">3</span></span></div>
+        <span class="logic-hint">Cube</span>
+      </div>
+      <div class="work-line blurred" id="vLine3">
+        <span class="line-num">4</span>
+        <div class="math-content"><i>V</i> = <span class="frac"><span class="frac-num">${formatInt(4 * rCubed)}π</span><span class="frac-den">3</span></span></div>
+        <span class="logic-hint">Multiply</span>
+      </div>
+      <div class="work-line blurred" id="vLine4">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">V = </span><span class="frac"><span class="frac-num">${formatInt(4 * rCubed)}π</span><span class="frac-den">3</span></span> ${unit}³</div>
+        </div>
+        <span class="logic-hint">Exact Answer</span>
+      </div>
+      <div class="work-line blurred" id="vLine5">
+        <span class="line-num"></span>
+        <div class="math-content">
+          <div class="answer-box"><span class="label">V ≈ </span>${fmt(volume, dp+1)} ${unit}³</div>
+        </div>
+        <span class="logic-hint">to ${dp+1} d.p.</span>
+      </div>`;
+    document.getElementById("volumeCalc").innerHTML = volHTML;
+    
+    setupRevealButtons('A', 5);
+    setupRevealButtons('V', 5);
+  }
+}
+
+update();
+</script>
+</body>
+</html>

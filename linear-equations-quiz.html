@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Equations Quiz</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: 300;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .level-title {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.75);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.5;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .level-nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid transparent;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .level-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .level-btn.active {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.12);
+            border: none;
+            color: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.22);
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .equation-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .equation-row:last-child {
+            border-bottom: none;
+        }
+
+        .equation {
+            font-size: 1.6rem;
+            flex: 1;
+            color: #333;
+        }
+
+        .answer-container {
+            position: relative;
+            width: 70px;
+            height: 70px;
+        }
+
+        .answer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .disk {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            cursor: grab;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .disk:active { cursor: grabbing; }
+        .disk:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .disk.dragging {
+            transition: none;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+            transform: scale(1.12);
+        }
+        .disk.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .color-1 { background: linear-gradient(135deg, #6B5B95 0%, #8B7BA5 100%); }
+        .color-2 { background: linear-gradient(135deg, #009B77 0%, #20B090 100%); }
+        .color-3 { background: linear-gradient(135deg, #DD4132 0%, #E86050 100%); }
+        .color-4 { background: linear-gradient(135deg, #D65076 0%, #E67090 100%); }
+        .color-5 { background: linear-gradient(135deg, #45B8AC 0%, #60C8BC 100%); }
+        .color-6 { background: linear-gradient(135deg, #5B5EA6 0%, #7B7EC6 100%); }
+        .color-7 { background: linear-gradient(135deg, #9B2335 0%, #BB4355 100%); }
+        .color-8 { background: linear-gradient(135deg, #88786D 0%, #A89888 100%); }
+
+        .score-display {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .hint {
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 12px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 35px 40px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+        .modal h2 {
+            color: #444;
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 1.2rem;
+        }
+        .working-step {
+            font-size: 1.2rem;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .working-step:last-child {
+            border-bottom: none;
+            color: #009B77;
+            font-weight: 600;
+        }
+        .working-step.hint-step {
+            color: #6B5B95;
+            font-style: italic;
+            font-size: 1rem;
+        }
+        .step-number {
+            background: #555;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .working-step:last-child .step-number {
+            background: #009B77;
+        }
+        .working-step.hint-step .step-number {
+            background: #6B5B95;
+            font-size: 0.7rem;
+        }
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Linear Equations</h1>
+        <div class="level-title" id="level-title">Level 1: One-Step Problems</div>
+        <p class="subtitle" id="subtitle">Transpose or use inverse operations to isolate the variable.</p>
+        
+        <div class="level-nav">
+            <button class="level-btn active" onclick="setLevel(1)">1</button>
+            <button class="level-btn" onclick="setLevel(2)">2</button>
+            <button class="level-btn" onclick="setLevel(3)">3</button>
+            <button class="level-btn" onclick="setLevel(4)">4</button>
+            <button class="level-btn" onclick="setLevel(5)">5</button>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn" onclick="toggleAnswers()">👁 Show/Hide All</button>
+            <button class="control-btn" onclick="generateNew()">🔄 New Questions</button>
+            <button class="control-btn" onclick="resetDisks()">↩ Reset</button>
+        </div>
+
+        <div class="quiz-card" id="quiz-card"></div>
+
+        <div class="score-display">
+            Revealed: <span id="score">0</span> / <span id="total">8</span>
+        </div>
+        <p class="hint">Double-click a disk to see the working</p>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2>Working</h2>
+            <div id="working-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let equations = [];
+        let revealed = 0;
+        let allHidden = true;
+        let currentLevel = 1;
+
+        const levelInfo = {
+            1: { title: "Level 1: One-Step Problems", subtitle: "Transpose or use inverse operations to isolate the variable." },
+            2: { title: "Level 2: Two-Step Problems", subtitle: "Collect x terms on one side, numbers on the other." },
+            3: { title: "Level 3: Simplify Sides First", subtitle: "Combine like terms on each side before solving." },
+            4: { title: "Level 4: Brackets", subtitle: "Expand brackets—or divide by a common factor first when possible." },
+            5: { title: "Level 5: Brackets & Fractions", subtitle: "Clear fractions by multiplying through, then solve." }
+        };
+
+        function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function randNonZero(min, max) { let n; do { n = randInt(min, max); } while (n === 0); return n; }
+        function sign(n) { return n >= 0 ? '+' : '-'; }
+        function absStr(n) { return Math.abs(n).toString(); }
+        function pm(n) { return n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`; }
+
+        // Level 1: One-step
+        function genLevel1() {
+            equations = [];
+            let a, x, c, q, nr;
+
+            a = randInt(5, 25); x = randInt(2, 20);
+            equations.push({ eq: `x + ${a} = ${x + a}`, ans: x,
+                steps: [`x + ${a} = ${x + a}`, `x = ${x + a} - ${a}`, `x = ${x}`] });
+
+            a = randInt(5, 20); x = randInt(15, 35);
+            equations.push({ eq: `x - ${a} = ${x - a}`, ans: x,
+                steps: [`x - ${a} = ${x - a}`, `x = ${x - a} + ${a}`, `x = ${x}`] });
+
+            a = randInt(10, 30); let y = randInt(-12, 12);
+            equations.push({ eq: `${a} + y = ${a + y}`, ans: y,
+                steps: [`${a} + y = ${a + y}`, `y = ${a + y} - ${a}`, `y = ${y}`] });
+
+            c = randInt(2, 9); x = randInt(2, 12);
+            equations.push({ eq: `${c}x = ${c * x}`, ans: x,
+                steps: [`${c}x = ${c * x}`, `x = \\dfrac{${c * x}}{${c}}`, `x = ${x}`] });
+
+            a = randInt(2, 7); q = randInt(2, 9); x = a * q;
+            equations.push({ eq: `\\dfrac{x}{${a}} = ${q}`, ans: x,
+                steps: [`\\dfrac{x}{${a}} = ${q}`, `x = ${q} \\times ${a}`, `x = ${x}`] });
+
+            a = randInt(20, 35); x = randInt(5, 15);
+            equations.push({ eq: `${a} - x = ${a - x}`, ans: x,
+                steps: [`${a} - x = ${a - x}`, `-x = ${a - x} - ${a}`, `-x = ${-x}`, `x = ${x}`] });
+
+            a = randInt(2, 5); nr = randInt(-7, -2); x = nr * (-a);
+            equations.push({ eq: `\\dfrac{x}{-${a}} = ${nr}`, ans: x,
+                steps: [`\\dfrac{x}{-${a}} = ${nr}`, `x = (${nr}) \\times (-${a})`, `x = ${x}`] });
+
+            c = randInt(2, 6); x = randInt(2, 9);
+            equations.push({ eq: `-${c}x = ${-c * x}`, ans: x,
+                steps: [`-${c}x = ${-c * x}`, `x = \\dfrac{${-c * x}}{-${c}}`, `x = ${x}`] });
+        }
+
+        // Level 2: Two-step
+        function genLevel2() {
+            equations = [];
+            for (let i = 0; i < 4; i++) {
+                let a = randInt(2, 7), b = randNonZero(-12, 12), x = randInt(-8, 8);
+                let rhs = a * x + b;
+                let eq = `${a}x ${pm(b)} = ${rhs}`;
+                equations.push({ eq, ans: x, steps: [
+                    eq, `${a}x = ${rhs} ${pm(-b)}`, `${a}x = ${rhs - b}`,
+                    `x = \\dfrac{${rhs - b}}{${a}}`, `x = ${x}`
+                ]});
+            }
+            for (let i = 0; i < 4; i++) {
+                let a = randInt(3, 6), c = randInt(1, a - 1);
+                let b = randNonZero(-10, 10), d = randNonZero(-10, 10);
+                let x = randInt(-6, 6);
+                d = a * x + b - c * x;
+                let eq = `${a}x ${pm(b)} = ${c}x ${pm(d)}`;
+                equations.push({ eq, ans: x, steps: [
+                    eq, `${a}x - ${c}x = ${d} ${pm(-b)}`, `${a - c}x = ${d - b}`,
+                    `x = \\dfrac{${d - b}}{${a - c}}`, `x = ${x}`
+                ]});
+            }
+        }
+
+        // Level 3: Simplify sides
+        function genLevel3() {
+            equations = [];
+            for (let i = 0; i < 8; i++) {
+                let x = randInt(-6, 6);
+                let a1 = randInt(1, 5), a2 = randNonZero(-4, 4);
+                let b1 = randNonZero(-10, 10), b2 = randNonZero(-10, 10);
+                let aT = a1 + a2, bT = b1 + b2;
+                if (aT === 0) { a2 = 1; aT = a1 + 1; }
+                let rhs = aT * x + bT;
+                let lhs = `${a1 === 1 ? '' : a1}x ${pm(b1)} ${a2 > 0 ? '+' : '-'} ${Math.abs(a2) === 1 ? '' : Math.abs(a2)}x ${pm(b2)}`;
+                equations.push({ eq: `${lhs} = ${rhs}`, ans: x, steps: [
+                    `${lhs} = ${rhs}`,
+                    `${aT === 1 ? '' : aT}x ${pm(bT)} = ${rhs}`,
+                    `${aT === 1 ? '' : aT}x = ${rhs - bT}`,
+                    aT === 1 ? `x = ${x}` : `x = \\dfrac{${rhs - bT}}{${aT}}`,
+                    `x = ${x}`
+                ].filter((s, i, arr) => i === arr.length - 1 || s !== arr[i + 1]) });
+            }
+        }
+
+        // Level 4: Brackets
+        function genLevel4() {
+            equations = [];
+            for (let i = 0; i < 8; i++) {
+                let a = randInt(2, 5), b = randNonZero(-6, 6), c = randNonZero(-10, 10);
+                let x = randInt(-5, 5);
+                let rhs = a * (x + b) + c;
+                let canDiv = c % a === 0;
+                let eq = `${a}(x ${pm(b)}) ${pm(c)} = ${rhs}`;
+                let steps;
+                if (canDiv && i % 2 === 0) {
+                    let r2 = (rhs - c) / a;
+                    steps = [eq, { hint: `Tip: All terms divisible by ${a}—divide first!` },
+                        `${a}(x ${pm(b)}) = ${rhs - c}`, `x ${pm(b)} = ${r2}`,
+                        `x = ${r2} ${pm(-b)}`, `x = ${x}`];
+                } else {
+                    let exp = a * b;
+                    steps = [eq, `${a}x ${pm(exp)} ${pm(c)} = ${rhs}`,
+                        `${a}x ${pm(exp + c)} = ${rhs}`, `${a}x = ${rhs - exp - c}`,
+                        `x = \\dfrac{${rhs - exp - c}}{${a}}`, `x = ${x}`];
+                }
+                equations.push({ eq, ans: x, steps });
+            }
+        }
+
+        // Level 5: Brackets & Fractions
+        function genLevel5() {
+            equations = [];
+            for (let i = 0; i < 8; i++) {
+                let d = randInt(2, 4), a = randInt(2, 4), b = randNonZero(-5, 5);
+                let x = randInt(-5, 5);
+                let num = a * x + b;
+                while (num % d !== 0) { b++; num = a * x + b; }
+                let c = randNonZero(-6, 6);
+                let rhs = num / d + c;
+                let eq = `\\dfrac{${a}x ${pm(b)}}{${d}} ${pm(c)} = ${rhs}`;
+                equations.push({ eq, ans: x, steps: [
+                    eq, { hint: `Multiply everything by ${d}` },
+                    `${a}x ${pm(b)} ${pm(c * d)} = ${rhs * d}`,
+                    `${a}x ${pm(b + c * d)} = ${rhs * d}`,
+                    `${a}x = ${rhs * d - b - c * d}`,
+                    `x = \\dfrac{${rhs * d - b - c * d}}{${a}}`, `x = ${x}`
+                ]});
+            }
+        }
+
+        function generateEquations() {
+            switch (currentLevel) {
+                case 1: genLevel1(); break;
+                case 2: genLevel2(); break;
+                case 3: genLevel3(); break;
+                case 4: genLevel4(); break;
+                case 5: genLevel5(); break;
+            }
+        }
+
+        function setLevel(n) {
+            currentLevel = n;
+            document.querySelectorAll('.level-btn').forEach((btn, i) => btn.classList.toggle('active', i + 1 === n));
+            document.getElementById('level-title').textContent = levelInfo[n].title;
+            document.getElementById('subtitle').textContent = levelInfo[n].subtitle;
+            generateEquations();
+            renderQuiz();
+        }
+
+        function renderQuiz() {
+            const card = document.getElementById('quiz-card');
+            card.innerHTML = '';
+            revealed = 0;
+            allHidden = true;
+            updateScore();
+
+            equations.forEach((item, i) => {
+                const row = document.createElement('div');
+                row.className = 'equation-row';
+                const eqDiv = document.createElement('div');
+                eqDiv.className = 'equation';
+                katex.render(item.eq, eqDiv, { displayMode: false });
+                const ansContainer = document.createElement('div');
+                ansContainer.className = 'answer-container';
+                const ansDiv = document.createElement('div');
+                ansDiv.className = 'answer';
+                ansDiv.textContent = item.ans;
+                const disk = document.createElement('div');
+                disk.className = `disk color-${(i % 8) + 1}`;
+                disk.textContent = i + 1;
+                disk.dataset.index = i;
+                makeDraggable(disk);
+                disk.addEventListener('dblclick', (e) => { e.preventDefault(); showWorkings(i); });
+                ansContainer.appendChild(ansDiv);
+                ansContainer.appendChild(disk);
+                row.appendChild(eqDiv);
+                row.appendChild(ansContainer);
+                card.appendChild(row);
+            });
+            document.getElementById('total').textContent = equations.length;
+        }
+
+        function showWorkings(index) {
+            const eq = equations[index];
+            const content = document.getElementById('working-content');
+            content.innerHTML = '';
+            let stepNum = 1;
+            eq.steps.forEach((step) => {
+                const stepDiv = document.createElement('div');
+                if (typeof step === 'object' && step.hint) {
+                    stepDiv.className = 'working-step hint-step';
+                    stepDiv.innerHTML = `<span class="step-number">💡</span><span>${step.hint}</span>`;
+                } else {
+                    stepDiv.className = 'working-step';
+                    const numSpan = document.createElement('span');
+                    numSpan.className = 'step-number';
+                    numSpan.textContent = stepNum++;
+                    const mathSpan = document.createElement('span');
+                    katex.render(step, mathSpan, { displayMode: false });
+                    stepDiv.appendChild(numSpan);
+                    stepDiv.appendChild(mathSpan);
+                }
+                content.appendChild(stepDiv);
+            });
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (!event || event.target === document.getElementById('modal-overlay'))
+                document.getElementById('modal-overlay').classList.remove('active');
+        }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+        function makeDraggable(el) {
+            let offsetX, offsetY, isDragging = false;
+            el.addEventListener('mousedown', dragStart);
+            el.addEventListener('touchstart', dragStart, { passive: false });
+
+            function dragStart(e) {
+                e.preventDefault();
+                isDragging = true;
+                el.classList.add('dragging');
+                const rect = el.getBoundingClientRect();
+                offsetX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                offsetY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', drag, { passive: false });
+                document.addEventListener('mouseup', dragEnd);
+                document.addEventListener('touchend', dragEnd);
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                const container = el.parentElement.getBoundingClientRect();
+                const cX = e.touches ? e.touches[0].clientX : e.clientX;
+                const cY = e.touches ? e.touches[0].clientY : e.clientY;
+                const x = cX - container.left - offsetX;
+                const y = cY - container.top - offsetY;
+                el.style.transform = `translate(${x}px, ${y}px) scale(1.12)`;
+                el.dataset.currentX = x;
+                el.dataset.currentY = y;
+            }
+
+            function dragEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+                el.classList.remove('dragging');
+                const x = parseFloat(el.dataset.currentX) || 0;
+                const y = parseFloat(el.dataset.currentY) || 0;
+                if (Math.sqrt(x * x + y * y) > 40) {
+                    el.style.transform = `translate(${x}px, ${y}px)`;
+                    if (!el.dataset.revealed) { el.dataset.revealed = 'true'; revealed++; updateScore(); }
+                } else {
+                    el.style.transform = 'translate(0, 0)';
+                }
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('touchmove', drag);
+                document.removeEventListener('mouseup', dragEnd);
+                document.removeEventListener('touchend', dragEnd);
+            }
+        }
+
+        function updateScore() { document.getElementById('score').textContent = revealed; }
+
+        function toggleAnswers() {
+            const disks = document.querySelectorAll('.disk');
+            allHidden = !allHidden;
+            disks.forEach(disk => {
+                if (allHidden) {
+                    disk.style.transform = 'translate(0, 0)';
+                    disk.classList.remove('hidden');
+                    disk.dataset.revealed = '';
+                } else {
+                    disk.classList.add('hidden');
+                    if (!disk.dataset.revealed) disk.dataset.revealed = 'true';
+                }
+            });
+            revealed = allHidden ? 0 : equations.length;
+            updateScore();
+        }
+
+        function resetDisks() {
+            document.querySelectorAll('.disk').forEach(disk => {
+                disk.style.transform = 'translate(0, 0)';
+                disk.classList.remove('hidden');
+                disk.dataset.revealed = '';
+            });
+            revealed = 0;
+            allHidden = true;
+            updateScore();
+        }
+
+        function generateNew() { generateEquations(); renderQuiz(); }
+
+        generateEquations();
+        renderQuiz();
+    </script>
+</body>
+</html>

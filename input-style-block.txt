@@ -1,0 +1,21 @@
+ml<div class="input-row">
+  <div class="block input-block" id="widthBlock">
+    <h3 id="widthLabel">Width (w)</h3>
+    <div class="input-controls">
+      <input type="number" class="value-input" id="widthInput" min="0.1" step="0.1" value="2">
+      <div class="arrow-buttons">
+        <button class="arrow-btn" id="widthUp">▲</button>
+        <button class="arrow-btn" id="widthDown">▼</button>
+      </div>
+      <select class="dim-unit-select" id="wUnitSelect" disabled>
+        <option value="km">km</option>
+        <option value="m" selected>m</option>
+        <option value="cm">cm</option>
+        <option value="mm">mm</option>
+      </select>
+    </div>
+    <div class="input-display" id="widthDisplay"><i>w</i> = 2 m</div>
+  </div>
+  
+  <!-- Repeat for height, depth, etc. -->
+</div>

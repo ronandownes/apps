@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Test Tube Calculator (Cylinder + Hemisphere)</title>
+
+<style>
+:root{
+  --ink:#000;
+  --line:#cfcfcf;
+  --muted:#666;
+  --blue:#2563eb;
+  --green:#16a34a;
+  --red:#dc2626;
+  --purple:#7c3aed
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Segoe UI,Arial,sans-serif;
+  background:#fff;
+  color:var(--ink)
+}
+.wrap{
+  max-width:1000px;
+  margin:6px auto;
+  padding:0 12px
+}
+.card{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:16px;
+  margin-bottom:20px
+}
+
+.controls-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:start;
+  margin-bottom:16px
+}
+.block{
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px;
+  background:#f9fafb
+}
+.block h3{
+  margin:0 0 6px;
+  font-size:13px;
+  color:var(--muted);
+  font-weight:600
+}
+
+.shape-block{
+  min-width:160px;
+  text-align:center
+}
+.shape-title{
+  font-family:"Times New Roman",Times,serif;
+  font-size:28px;
+  font-weight:700;
+  color:#1e40af
+}
+.shape-sub{
+  font-size:13px;
+  color:var(--muted);
+  margin-top:4px
+}
+
+.input-block{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 16px
+}
+.input-block h3{
+  margin:0;
+  font-size:14px;
+  min-width:80px
+}
+.input-container{
+  display:flex;
+  align-items:center;
+  gap:6px
+}
+.value-input{
+  width:90px;
+  border:2px solid var(--blue);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:24px;
+  text-align:center;
+  font-family:"Times New Roman",Times,serif;
+  font-weight:bold
+}
+.value-input:focus{
+  outline:none;
+  border-color:var(--purple)
+}
+.arrow-buttons{
+  display:flex;
+  flex-direction:column;
+  gap:3px
+}
+.arrow-btn{
+  width:36px;
+  height:28px;
+  border:2px solid var(--line);
+  border-radius:6px;
+  background:#fff;
+  cursor:pointer;
+  font-size:18px;
+  font-weight:bold;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  user-select:none
+}
+.arrow-btn:hover{
+  background:#f0f0f0
+}
+.arrow-btn:active{
+  background:#e0e0e0
+}
+.input-display{
+  font-family:"Times New Roman",Times,serif;
+  font-size:20px;
+  margin-left:10px
+}
+
+.unit-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap
+}
+.unit-select{
+  padding:6px 10px;
+  border:1px solid var(--line);
+  border-radius:6px;
+  font-size:14px;
+  background:#fff;
+  cursor:pointer
+}
+
+.dprow{
+  display:flex;
+  gap:6px
+}
+.dprow button{
+  flex:1;
+  border:1px solid var(--line);
+  border-radius:6px;
+  background:#fff;
+  font-size:13px;
+  padding:8px 12px;
+  cursor:pointer
+}
+.dprow button.active{
+  background:#000;
+  color:#fff
+}
+
+.pi-row{
+  display:flex;
+  gap:6px
+}
+.pi-row button{
+  flex:1;
+  border:1px solid var(--line);
+  border-radius:6px;
+  background:#fff;
+  font-size:13px;
+  padding:8px 12px;
+  cursor:pointer
+}
+.pi-row button.active{
+  background:var(--blue);
+  color:#fff;
+  border-color:var(--blue)
+}
+
+.container{
+  display:flex;
+  flex-wrap:wrap;
+  gap:30px;
+  margin:20px 0
+}
+.diagram-container{
+  flex:1;
+  min-width:300px
+}
+.calcs-container{
+  flex:1;
+  min-width:300px
+}
+
+.diagram{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px;
+  background:#f9fafb
+}
+.diagram svg{
+  width:100%;
+  height:auto;
+  display:block
+}
+
+.solid-info{
+  background:#f0f9ff;
+  border:1px solid #bae6fd;
+  border-radius:8px;
+  padding:12px 16px;
+  margin:16px 0;
+  font-size:15px;
+  line-height:1.6
+}
+.solid-info strong{
+  color:#0369a1
+}
+
+.calc-section{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:16px;
+  margin-bottom:16px;
+  background:#fff
+}
+.calc-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+  gap:10px
+}
+.calc-title{
+  font-size:22px;
+  font-weight:bold;
+  color:#1e3a8a
+}
+.calc-buttons{
+  display:flex;
+  gap:8px
+}
+
+.btn{
+  border:2px solid var(--line);
+  border-radius:6px;
+  background:#fff;
+  font-size:14px;
+  padding:8px 16px;
+  cursor:pointer;
+  font-weight:600;
+  transition:all 0.2s
+}
+.btn:hover{
+  background:#f5f5f5
+}
+.btn.hide-btn{
+  border-color:#fecaca;
+  color:#991b1b;
+  background:#fef2f2
+}
+.btn.show-btn{
+  border-color:#bbf7d0;
+  color:#166534;
+  background:#f0fdf4
+}
+.btn.step-btn{
+  border-color:#bfdbfe;
+  color:#1e40af;
+  background:#eff6ff
+}
+
+.work-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:12px 0;
+  min-height:38px;
+  padding:8px 0
+}
+.math-content{
+  font-family:"Times New Roman",Times,serif;
+  font-size:26px;
+  font-weight:bold;
+  flex:1
+}
+.logic-hint{
+  font-family:Segoe UI,Arial,sans-serif;
+  font-size:16px;
+  color:var(--blue);
+  font-style:italic;
+  font-weight:600;
+  margin-left:20px;
+  white-space:nowrap
+}
+
+.answer-container{
+  margin:15px 0
+}
+.answer-box{
+  display:inline-block;
+  border:3px solid #000;
+  padding:12px 20px;
+  font-family:"Times New Roman",Times,serif;
+  font-size:28px;
+  font-weight:bold;
+  background:#fefce8;
+  border-radius:8px
+}
+.answer-box .label{
+  font-style:italic;
+  color:#854d0e
+}
+
+.blurred{
+  filter:blur(5px);
+  transition:filter 0.3s
+}
+
+.frac{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  vertical-align:middle;
+  margin:0 2px
+}
+.frac-num{
+  border-bottom:2px solid #000;
+  padding:0 3px 1px;
+  font-size:0.85em
+}
+.frac-den{
+  padding:1px 3px 0;
+  font-size:0.85em
+}
+
+.formula-note{
+  font-size:14px;
+  color:var(--muted);
+  font-style:italic;
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px dashed #ddd
+}
+
+.compound-breakdown{
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:8px;
+  padding:14px;
+  margin-top:20px
+}
+.breakdown-title{
+  font-size:16px;
+  font-weight:bold;
+  color:#334155;
+  margin-bottom:10px
+}
+.breakdown-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px dashed #e2e8f0
+}
+.breakdown-row:last-child{
+  border-bottom:none
+}
+.breakdown-label{
+  font-size:15px
+}
+.breakdown-value{
+  font-family:"Times New Roman",Times,serif;
+  font-size:18px;
+  font-weight:bold
+}
+.breakdown-total{
+  font-weight:bold;
+  color:#1e40af
+}
+
+@media(max-width:800px){
+  .container{
+    flex-direction:column
+  }
+  .math-content{
+    font-size:22px
+  }
+  .answer-box{
+    font-size:24px
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<section class="card">
+
+<div class="controls-row">
+  <div class="block">
+    <h3>Value of π</h3>
+    <div class="pi-row" id="piBtns"></div>
+  </div>
+  
+  <div class="block">
+    <h3>Decimal places</h3>
+    <div class="dprow" id="dpBtns"></div>
+  </div>
+  
+  <div class="block">
+    <h3>Units</h3>
+    <div class="unit-row">
+      <select class="unit-select" id="unitSelect">
+        <option value="mm">Millimetres (mm)</option>
+        <option value="cm" selected>Centimetres (cm)</option>
+        <option value="m">Metres (m)</option>
+        <option value="in">Inches (in)</option>
+        <option value="ft">Feet (ft)</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="diagram-container">
+    <div class="block shape-block">
+      <div class="shape-title">Test Tube</div>
+      <div class="shape-sub">Cylinder + Hemisphere (closed bottom)</div>
+    </div>
+    
+    <div class="diagram">
+      <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" aria-label="Test tube diagram showing cylinder with hemispherical bottom">
+        <defs>
+          <linearGradient id="tubeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#dbeafe"/>
+            <stop offset="100%" style="stop-color:#bfdbfe"/>
+          </linearGradient>
+          <linearGradient id="liquidGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#e0f2fe"/>
+            <stop offset="100%" style="stop-color:#7dd3fc"/>
+          </linearGradient>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#000"/>
+          </marker>
+        </defs>
+        
+        <!-- Hemisphere (bottom) -->
+        <path d="M 100 250 A 50 50 0 0 0 200 250" fill="url(#tubeGrad)" stroke="#000" stroke-width="2"/>
+        
+        <!-- Cylinder body -->
+        <rect x="100" y="100" width="100" height="150" fill="url(#tubeGrad)" stroke="#000" stroke-width="2"/>
+        
+        <!-- Top of cylinder -->
+        <line x1="100" y1="100" x2="200" y2="100" stroke="#000" stroke-width="2"/>
+        
+        <!-- Liquid fill (for visualization) -->
+        <rect x="100" y="150" width="100" height="100" fill="url(#liquidGrad)" opacity="0.6"/>
+        <line x1="100" y1="150" x2="200" y2="150" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="5,5"/>
+        
+        <!-- Dimension lines and labels -->
+        <!-- Total height (H) -->
+        <line x1="220" y1="100" x2="220" y2="250" stroke="#000" stroke-width="1.5"/>
+        <line x1="215" y1="100" x2="225" y2="100" stroke="#000" stroke-width="1.5"/>
+        <line x1="215" y1="250" x2="225" y2="250" stroke="#000" stroke-width="1.5"/>
+        <text x="235" y="175" font-size="18" font-family="Times New Roman" font-style="italic" fill="#000">H</text>
+        
+        <!-- Cylinder height (h_cyl) -->
+        <line x1="220" y1="100" x2="220" y2="250" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,4"/>
+        <line x1="215" y1="100" x2="225" y2="100" stroke="#dc2626" stroke-width="1.5"/>
+        <line x1="215" y1="250" x2="225" y2="250" stroke="#dc2626" stroke-width="1.5"/>
+        <text x="235" y="175" font-size="18" font-family="Times New Roman" font-style="italic" fill="#dc2626">h_cyl</text>
+        
+        <!-- Radius (r) -->
+        <line x1="150" y1="250" x2="150" y2="100" stroke="#000" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="150" y1="250" x2="200" y2="250" stroke="#000" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="175" y="270" font-size="18" font-family="Times New Roman" font-style="italic" fill="#000">r</text>
+        
+        <!-- Labels -->
+        <text x="150" y="90" font-size="16" font-family="Segoe UI" fill="#1e40af" text-anchor="middle" font-weight="bold">Cylinder</text>
+        <text x="150" y="280" font-size="16" font-family="Segoe UI" fill="#7c3aed" text-anchor="middle" font-weight="bold">Hemisphere</text>
+        
+        <!-- Dashed line for hemisphere center -->
+        <line x1="100" y1="250" x2="200" y2="250" stroke="#7c3aed" stroke-width="1" stroke-dasharray="5,5"/>
+      </svg>
+    </div>
+    
+    <div class="solid-info">
+      <strong>Test Tube Structure:</strong> A cylindrical tube with a hemispherical closed bottom. 
+      Total height <i>H</i> = cylinder height <i>h</i> + hemisphere radius <i>r</i>.
+      The cylinder and hemisphere share the same radius <i>r</i>.
+    </div>
+  </div>
+  
+  <div class="calcs-container">
+    <div class="block input-block">
+      <h3>Total Height (H)</h3>
+      <div class="input-container">
+        <input type="number" class="value-input" id="totalHeightInput" min="1" step="0.5" value="15">
+        <div class="arrow-buttons">
+          <button class="arrow-btn" id="totalHeightUp">▲</button>
+          <button class="arrow-btn" id="totalHeightDown">▼</button>
+        </div>
+      </div>
+      <div class="input-display" id="totalHeightDisplay"></div>
+    </div>
+    
+    <div class="block input-block">
+      <h3>Cylinder Height (h)</h3>
+      <div class="input-container">
+        <input type="number" class="value-input" id="cylinderHeightInput" min="1" step="0.5" value="10">
+        <div class="arrow-buttons">
+          <button class="arrow-btn" id="cylinderHeightUp">▲</button>
+          <button class="arrow-btn" id="cylinderHeightDown">▼</button>
+        </div>
+      </div>
+      <div class="input-display" id="cylinderHeightDisplay"></div>
+    </div>
+    
+    <div class="block input-block">
+      <h3>Radius (r)</h3>
+      <div class="input-container">
+        <input type="number" class="value-input" id="radiusInput" min="0.5" step="0.5" value="5">
+        <div class="arrow-buttons">
+          <button class="arrow-btn" id="radiusUp">▲</button>
+          <button class="arrow-btn" id="radiusDown">▼</button>
+        </div>
+      </div>
+      <div class="input-display" id="radiusDisplay"></div>
+    </div>
+    
+    <!-- Volume Calculation -->
+    <div class="calc-section">
+      <div class="calc-header">
+        <span class="calc-title">Total Volume</span>
+        <div class="calc-buttons">
+          <button class="btn hide-btn" id="hideVolume">Hide</button>
+          <button class="btn show-btn" id="showVolume" style="display:none">Show</button>
+          <button class="btn step-btn" id="stepVolume" style="display:none">Step by Step</button>
+          <button class="btn" id="nextVolume" style="display:none">Next</button>
+        </div>
+      </div>
+      
+      <div class="calc" id="volumeCalc">
+        <div class="work-line" id="vLine0">
+          <div class="math-content" id="vFormula">V = V_cyl + V_hemi</div>
+          <div class="logic-hint">Total Volume</div>
+        </div>
+        <div class="work-line" id="vLine1">
+          <div class="math-content" id="vCylFormula">V_cyl = πr²h</div>
+          <div class="logic-hint">Cylinder Volume</div>
+        </div>
+        <div class="work-line" id="vLine2">
+          <div class="math-content" id="vHemiFormula">V_hemi = ⅔πr³</div>
+          <div class="logic-hint">Hemisphere Volume</div>
+        </div>
+        <div class="work-line" id="vLine3">
+          <div class="math-content" id="vSubstitute"></div>
+          <div class="logic-hint">Substitute Values</div>
+        </div>
+        <div class="work-line" id="vLine4">
+          <div class="math-content" id="vCalculate"></div>
+          <div class="logic-hint">Calculate</div>
+        </div>
+        <div class="work-line" id="vLine5">
+          <div class="answer-container">
+            <div class="answer-box" id="vAnswer"></div>
+          </div>
+          <div class="logic-hint">Final Answer</div>
+        </div>
+      </div>
+      
+      <div class="formula-note">
+        Hemisphere volume is half of a sphere volume: V_sphere = ⁴⁄₃πr³, so V_hemi = ½ × ⁴⁄₃πr³ = ⅔πr³
+      </div>
+    </div>
+    
+    <!-- Surface Area Calculation -->
+    <div class="calc-section">
+      <div class="calc-header">
+        <span class="calc-title">Total Surface Area</span>
+        <div class="calc-buttons">
+          <button class="btn hide-btn" id="hideArea">Hide</button>
+          <button class="btn show-btn" id="showArea" style="display:none">Show</button>
+          <button class="btn step-btn" id="stepArea" style="display:none">Step by Step</button>
+          <button class="btn" id="nextArea" style="display:none">Next</button>
+        </div>
+      </div>
+      
+      <div class="calc" id="areaCalc">
+        <div class="work-line" id="aLine0">
+          <div class="math-content" id="aFormula">A = A_cyl + A_hemi</div>
+          <div class="logic-hint">Total Surface Area</div>
+        </div>
+        <div class="work-line" id="aLine1">
+          <div class="math-content" id="aCylFormula">A_cyl = 2πrh + πr²</div>
+          <div class="logic-hint">Cylinder Area</div>
+        </div>
+        <div class="work-line" id="aLine2">
+          <div class="math-content" id="aHemiFormula">A_hemi = 2πr²</div>
+          <div class="logic-hint">Hemisphere Area</div>
+        </div>
+        <div class="work-line" id="aLine3">
+          <div class="math-content" id="aSubstitute"></div>
+          <div class="logic-hint">Substitute Values</div>
+        </div>
+        <div class="work-line" id="aLine4">
+          <div class="math-content" id="aCalculate"></div>
+          <div class="logic-hint">Calculate</div>
+        </div>
+        <div class="work-line" id="aLine5">
+          <div class="answer-container">
+            <div class="answer-box" id="aAnswer"></div>
+          </div>
+          <div class="logic-hint">Final Answer</div>
+        </div>
+      </div>
+      
+      <div class="formula-note">
+        Cylinder area includes curved surface (2πrh) plus top circle (πr²). Hemisphere area is half of sphere area: A_sphere = 4πr², so A_hemi = 2πr².
+      </div>
+    </div>
+    
+    <div class="compound-breakdown">
+      <div class="breakdown-title">Volume & Area Breakdown</div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Cylinder Volume:</span>
+        <span class="breakdown-value" id="breakdownCylVol">0</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Hemisphere Volume:</span>
+        <span class="breakdown-value" id="breakdownHemiVol">0</span>
+      </div>
+      <div class="breakdown-row breakdown-total">
+        <span class="breakdown-label">Total Volume:</span>
+        <span class="breakdown-value" id="breakdownTotalVol">0</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Cylinder Area:</span>
+        <span class="breakdown-value" id="breakdownCylArea">0</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Hemisphere Area:</span>
+        <span class="breakdown-value" id="breakdownHemiArea">0</span>
+      </div>
+      <div class="breakdown-row breakdown-total">
+        <span class="breakdown-label">Total Surface Area:</span>
+        <span class="breakdown-value" id="breakdownTotalArea">0</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</section>
+</div>
+
+<script>
+// Initial values
+let H = 15;  // Total height
+let h_cyl = 10;  // Cylinder height
+let r = 5;   // Radius
+let dp = 2;  // Decimal places
+let piMode = 'exact';  // 'exact', '22/7', '3.14'
+let unit = 'cm';  // Default unit
+
+// DOM elements
+const totalHeightInput = document.getElementById('totalHeightInput');
+const cylinderHeightInput = document.getElementById('cylinderHeightInput');
+const radiusInput = document.getElementById('radiusInput');
+
+const totalHeightDisplay = document.getElementById('totalHeightDisplay');
+const cylinderHeightDisplay = document.getElementById('cylinderHeightDisplay');
+const radiusDisplay = document.getElementById('radiusDisplay');
+
+// Setup π buttons
+const piBtns = document.getElementById('piBtns');
+[
+  {mode: 'exact', label: 'π (exact)'},
+  {mode: '22/7', label: '²²⁄₇ (approx)'},
+  {mode: '3.14', label: '3.14 (approx)'}
+].forEach(pi => {
+  const btn = document.createElement('button');
+  btn.textContent = pi.label;
+  btn.className = pi.mode === piMode ? 'active' : '';
+  btn.addEventListener('click', () => {
+    piMode = pi.mode;
+    document.querySelectorAll('#piBtns button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    update();
+  });
+  piBtns.appendChild(btn);
+});
+
+// Setup decimal places buttons
+const dpBtns = document.getElementById('dpBtns');
+[1, 2, 3, 4].forEach(val => {
+  const btn = document.createElement('button');
+  btn.textContent = val;
+  btn.className = val === dp ? 'active' : '';
+  btn.addEventListener('click', () => {
+    dp = val;
+    document.querySelectorAll('#dpBtns button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    update();
+  });
+  dpBtns.appendChild(btn);
+});
+
+// Unit select
+const unitSelect = document.getElementById('unitSelect');
+unitSelect.value = unit;
+unitSelect.addEventListener('change', () => {
+  unit = unitSelect.value;
+  update();
+});
+
+// Input controls
+document.getElementById('totalHeightUp').addEventListener('click', () => {
+  H += 0.5;
+  totalHeightInput.value = H;
+  update();
+});
+
+document.getElementById('totalHeightDown').addEventListener('click', () => {
+  H = Math.max(1, H - 0.5);
+  totalHeightInput.value = H;
+  update();
+});
+
+totalHeightInput.addEventListener('input', () => {
+  const val = parseFloat(totalHeightInput.value);
+  if (!isNaN(val) && val >= 1) {
+    H = val;
+    update();
+  }
+});
+
+document.getElementById('cylinderHeightUp').addEventListener('click', () => {
+  h_cyl += 0.5;
+  cylinderHeightInput.value = h_cyl;
+  update();
+});
+
+document.getElementById('cylinderHeightDown').addEventListener('click', () => {
+  h_cyl = Math.max(0.5, h_cyl - 0.5);
+  cylinderHeightInput.value = h_cyl;
+  update();
+});
+
+cylinderHeightInput.addEventListener('input', () => {
+  const val = parseFloat(cylinderHeightInput.value);
+  if (!isNaN(val) && val >= 0.5) {
+    h_cyl = val;
+    update();
+  }
+});
+
+document.getElementById('radiusUp').addEventListener('click', () => {
+  r += 0.5;
+  radiusInput.value = r;
+  update();
+});
+
+document.getElementById('radiusDown').addEventListener('click', () => {
+  r = Math.max(0.5, r - 0.5);
+  radiusInput.value = r;
+  update();
+});
+
+radiusInput.addEventListener('input', () => {
+  const val = parseFloat(radiusInput.value);
+  if (!isNaN(val) && val >= 0.5) {
+    r = val;
+    update();
+  }
+});
+
+// Volume reveal/hide controls
+let vStage = -1;
+const volumeCalc = document.getElementById('volumeCalc');
+
+document.getElementById('hideVolume').addEventListener('click', () => {
+  volumeCalc.classList.add('blurred');
+  document.getElementById('hideVolume').style.display = 'none';
+  document.getElementById('showVolume').style.display = 'inline-block';
+  document.getElementById('stepVolume').style.display = 'inline-block';
+  vStage = -1;
+});
+
+document.getElementById('showVolume').addEventListener('click', () => {
+  volumeCalc.classList.remove('blurred');
+  showAllVolume();
+  document.getElementById('hideVolume').style.display = 'inline-block';
+  document.getElementById('showVolume').style.display = 'none';
+  document.getElementById('stepVolume').style.display = 'none';
+  document.getElementById('nextVolume').style.display = 'none';
+  vStage = -1;
+});
+
+document.getElementById('stepVolume').addEventListener('click', () => {
+  vStage = -1;
+  hideAllVolume();
+  volumeCalc.classList.remove('blurred');
+  document.getElementById('showVolume').style.display = 'none';
+  document.getElementById('stepVolume').style.display = 'none';
+  document.getElementById('hideVolume').style.display = 'inline-block';
+  document.getElementById('nextVolume').style.display = 'inline-block';
+});
+
+document.getElementById('nextVolume').addEventListener('click', () => {
+  vStage++;
+  if (vStage > 5) {
+    showAllVolume();
+    document.getElementById('nextVolume').style.display = 'none';
+  } else {
+    showVolumeStage(vStage);
+  }
+});
+
+// Area reveal/hide controls
+let aStage = -1;
+const areaCalc = document.getElementById('areaCalc');
+
+document.getElementById('hideArea').addEventListener('click', () => {
+  areaCalc.classList.add('blurred');
+  document.getElementById('hideArea').style.display = 'none';
+  document.getElementById('showArea').style.display = 'inline-block';
+  document.getElementById('stepArea').style.display = 'inline-block';
+  aStage = -1;
+});
+
+document.getElementById('showArea').addEventListener('click', () => {
+  areaCalc.classList.remove('blurred');
+  showAllArea();
+  document.getElementById('hideArea').style.display = 'inline-block';
+  document.getElementById('showArea').style.display = 'none';
+  document.getElementById('stepArea').style.display = 'none';
+  document.getElementById('nextArea').style.display = 'none';
+  aStage = -1;
+});
+
+document.getElementById('stepArea').addEventListener('click', () => {
+  aStage = -1;
+  hideAllArea();
+  areaCalc.classList.remove('blurred');
+  document.getElementById('showArea').style.display = 'none';
+  document.getElementById('stepArea').style.display = 'none';
+  document.getElementById('hideArea').style.display = 'inline-block';
+  document.getElementById('nextArea').style.display = 'inline-block';
+});
+
+document.getElementById('nextArea').addEventListener('click', () => {
+  aStage++;
+  if (aStage > 5) {
+    showAllArea();
+    document.getElementById('nextArea').style.display = 'none';
+  } else {
+    showAreaStage(aStage);
+  }
+});
+
+// Helper functions for reveal/show functionality
+function hideAllVolume() {
+  for (let i = 0; i <= 5; i++) {
+    const el = document.getElementById('vLine' + i);
+    if (el) el.classList.add('blurred');
+  }
+}
+
+function showAllVolume() {
+  for (let i = 0; i <= 5; i++) {
+    const el = document.getElementById('vLine' + i);
+    if (el) el.classList.remove('blurred');
+  }
+}
+
+function showVolumeStage(stage) {
+  for (let i = 0; i <= 5; i++) {
+    const el = document.getElementById('vLine' + i);
+    if (el) {
+      if (i <= stage) {
+        el.classList.remove('blurred');
+      } else {
+        el.classList.add('blurred');
+      }
+    }
+  }
+}
+
+function hideAllArea() {
+  for (let i = 0; i <= 5; i++) {
+    const el = document.getElementById('aLine' + i);
+    if (el) el.classList.add('blurred');
+  }
+}
+
+function showAllArea() {
+  for (let i = 0; i <= 5; i++) {
+    const el = document.getElementById('aLine' + i);
+    if (el) el.classList.remove('blurred');
+  }
+}
+
+function showAreaStage(stage) {
+  for (let i = 0; i <= 5; i++) {
+    const el = document.getElementById('aLine' + i);
+    if (el) {
+      if (i <= stage) {
+        el.classList.remove('blurred');
+      } else {
+        el.classList.add('blurred');
+      }
+    }
+  }
+}
+
+// Formatting functions
+function fmt(n, places) {
+  if (Number.isInteger(n)) return n.toString();
+  const rounded = Math.round(n * Math.pow(10, places)) / Math.pow(10, places);
+  return rounded.toFixed(places);
+}
+
+function getPiValue() {
+  if (piMode === 'exact') return Math.PI;
+  if (piMode === '22/7') return 22/7;
+  return 3.14;
+}
+
+function getPiSymbol() {
+  if (piMode === 'exact') return 'π';
+  if (piMode === '22/7') return '<span class="frac"><span class="frac-num">22</span><span class="frac-den">7</span></span>';
+  return '3.14';
+}
+
+// Main update function
+function update() {
+  // Update displays
+  totalHeightDisplay.innerHTML = `<i>H</i> = ${fmt(H, 1)} ${unit}`;
+  cylinderHeightDisplay.innerHTML = `<i>h</i> = ${fmt(h_cyl, 1)} ${unit}`;
+  radiusDisplay.innerHTML = `<i>r</i> = ${fmt(r, 1)} ${unit}`;
+  
+  // Calculate values
+  const pi = getPiValue();
+  const piSym = getPiSymbol();
+  const unit2 = unit === 'in' || unit === 'ft' ? ` ${unit}²` : ` ${unit}<sup>2</sup>`;
+  const unit3 = unit === 'in' || unit === 'ft' ? ` ${unit}³` : ` ${unit}<sup>3</sup>`;
+  
+  // Cylinder volume: πr²h
+  const cylVol = pi * r * r * h_cyl;
+  
+  // Hemisphere volume: ⅔πr³
+  const hemiVol = (2/3) * pi * r * r * r;
+  
+  // Total volume
+  const totalVol = cylVol + hemiVol;
+  
+  // Cylinder surface area: 2πrh (curved) + πr² (top circle)
+  const cylArea = 2 * pi * r * h_cyl + pi * r * r;
+  
+  // Hemisphere surface area: 2πr² (half of sphere surface area)
+  const hemiArea = 2 * pi * r * r;
+  
+  // Total surface area
+  const totalArea = cylArea + hemiArea;
+  
+  // Update volume calculation display
+  document.getElementById('vSubstitute').innerHTML = 
+    `V = ${piSym} × ${r}² × ${h_cyl} + ⅔ × ${piSym} × ${r}³`;
+  
+  if (piMode === 'exact') {
+    document.getElementById('vCalculate').innerHTML = 
+      `V = ${fmt(pi * r * r * h_cyl, 4)} + ${fmt((2/3) * pi * r * r * r, 4)}`;
+  } else {
+    document.getElementById('vCalculate').innerHTML = 
+      `V = ${fmt(cylVol, 4)} + ${fmt(hemiVol, 4)}`;
+  }
+  
+  document.getElementById('vAnswer').innerHTML = 
+    `<span class="label">V ≈ </span>${fmt(totalVol, dp)}${unit3}`;
+  
+  // Update area calculation display
+  document.getElementById('aSubstitute').innerHTML = 
+    `A = 2 × ${piSym} × ${r} × ${h_cyl} + ${piSym} × ${r}² + 2 × ${piSym} × ${r}²`;
+  
+  if (piMode === 'exact') {
+    document.getElementById('aCalculate').innerHTML = 
+      `A = ${fmt(2 * pi * r * h_cyl, 4)} + ${fmt(pi * r * r, 4)} + ${fmt(2 * pi * r * r, 4)}`;
+  } else {
+    document.getElementById('aCalculate').innerHTML = 
+      `A = ${fmt(2 * pi * r * h_cyl, 4)} + ${fmt(pi * r * r, 4)} + ${fmt(2 * pi * r * r, 4)}`;
+  }
+  
+  document.getElementById('aAnswer').innerHTML = 
+    `<span class="label">A ≈ </span>${fmt(totalArea, dp)}${unit2}`;
+  
+  // Update breakdown
+  document.getElementById('breakdownCylVol').textContent = `${fmt(cylVol, dp)}${unit3}`;
+  document.getElementById('breakdownHemiVol').textContent = `${fmt(hemiVol, dp)}${unit3}`;
+  document.getElementById('breakdownTotalVol').textContent = `${fmt(totalVol, dp)}${unit3}`;
+  document.getElementById('breakdownCylArea').textContent = `${fmt(cylArea, dp)}${unit2}`;
+  document.getElementById('breakdownHemiArea').textContent = `${fmt(hemiArea, dp)}${unit2}`;
+  document.getElementById('breakdownTotalArea').textContent = `${fmt(totalArea, dp)}${unit2}`;
+  
+  // Check if cylinder height exceeds total height
+  if (h_cyl + r > H) {
+    // Adjust cylinder height to fit within total height
+    h_cyl = Math.max(0.5, H - r);
+    cylinderHeightInput.value = h_cyl;
+    update();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  // Right arrow or space for next step
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    const nextVolume = document.getElementById('nextVolume');
+    const nextArea = document.getElementById('nextArea');
+    
+    if (nextVolume.style.display !== 'none') {
+      nextVolume.click();
+    } else if (nextArea.style.display !== 'none') {
+      nextArea.click();
+    }
+  }
+  
+  // Left arrow for previous step
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    if (vStage > -1) {
+      vStage--;
+      if (vStage < 0) hideAllVolume();
+      else showVolumeStage(vStage);
+    } else if (aStage > -1) {
+      aStage--;
+      if (aStage < 0) hideAllArea();
+      else showAreaStage(aStage);
+    }
+  }
+});
+
+// Initialize
+update();
+</script>
+</body>
+</html>

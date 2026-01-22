@@ -1,0 +1,99 @@
+﻿Junior Cycle Maths Learning Outcomes
+________________
+
+
+Strand 1: Unifying Strand
+Building Blocks Elements
+* U.1 Recall and understand concepts and procedures of each strand.
+
+* U.2 Apply procedures accurately, effectively, and appropriately.
+
+* U.3 Understand that equality means two expressions have the same value, either in specific cases (as in equations) or in all cases (as in identities).
+
+Representation Element
+   * U.4 Represent a mathematical situation in different ways—using numbers, algebra, graphs,  physical models, or words—and be able to interpret, analyse, and compare these representations.
+
+Connections Elements
+      * U.5 Make connections within and between strands.
+
+      * U.6 Make connections between maths and real-world situations.
+
+Problem Solving Elements
+         * U.7 Make sense of a given problem and, if needed, rewrite it in mathematical terms.
+
+         * U.8 Apply your knowledge and skills to solve the problem, including decomposing it into manageable parts and/or simplifying it using reasonable assumptions.
+
+         * U.9 Interpret your solution in the context of the original problem.
+
+         * U.10 Consider all your solutions and decide which ones make sense. Discuss any improvements or limitations in your model if needed.
+
+Generalisation and Proof Elements
+            * U.11 Use inductive reasoning to generate mathematical conjectures based on specific examples, and understand that a single counterexample disproves a conjecture.
+
+            * U.12 Use deductive reasoning to develop and evaluate mathematical arguments and proofs, based on the foundational building blocks of geometry: axioms and primitive terms.
+
+Communication Element
+               * U.13 Communicate mathematics effectively: justify reasoning, interpret results, explain conclusions, and use mathematical language and notation clearly and precisely.
+
+________________
+
+
+Strand 2: Number Strand (5)
+                  * N.1 Investigate representation of numbers and arithmetic operations (models, properties, index laws, factors, multiples, accuracy, scientific notation).
+
+                  * N.2 Convert between fractions, decimals, percentages; solve ratio, proportion, and money-related problems.
+
+                  * N.3 Solve problems involving proportionality, e.g., currency conversion, speed-distance-time.
+
+                  * N.4 Analyse and continue numerical patterns using tables, graphs.
+
+                  * N.5 Explore sets (notation, Venn diagrams, operations, commutative/associative properties).
+
+________________
+
+
+Strand 3: Geometry and Trigonometry
+                     * GT.1 Calculate, interpret, and apply units of measure and time.
+
+                     * GT.2 Investigate 2D/3D shapes: drawings, nets, perimeter, area, volume, surface area.
+
+                     * GT.3 Engage with proof: constructions, axioms, theorems, corollaries, terminology, propositions.
+
+                     * GT.4 Use trigonometric ratios and inverses (angles 0°–90°).
+
+                     * GT.5 Investigate coordinate geometry: distance, midpoint, slope, equations of lines.
+
+                     * GT.6 Recognise/draw transformations (translation, symmetry, rotation).
+
+________________
+
+
+Strand 4: Algebra and Functions
+                        * AF.1 Investigate patterns and relationships (linear, quadratic, exponential).
+
+                        * AF.2 Generate and interpret algebraic expressions.
+
+                        * AF.3 Operate on algebraic expressions (simplify, multiply, divide, factorise).
+
+                        * AF.4 Solve linear, quadratic, simultaneous equations, inequalities.
+
+                        * AF.5 Generate quadratic equations given integer roots.
+
+                        * AF.6 Change the subject of a formula.
+
+                        * AF.7 Investigate functions (concept, representations, graphical solutions, interpretations).
+
+________________
+
+
+Strand 5: Statistics and Probability
+                           * SP.1 Generate sample spaces, use counting principles.
+
+                           * SP.2 Understand and apply probability (scale 0–1, relative frequency, likelihood).
+
+                           * SP.3 Conduct statistical investigations: question generation, data collection, classification, graphical representation, summary statistics, evaluation, discussion of limitations.
+
+________________
+
+
+If you'd like, I can create and share an actual Google Doc link (if you provide permissions details) or help you format this text directly for pasting into Google Docs. Let me know!
