@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Grinds - Complete Paper</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff; color: #1e293b; overflow: hidden; }
+        .slide-container { width: 100vw; height: 100vh; display: flex; transition: transform 0.5s ease; }
+        .slide { min-width: 100vw; height: 100vh; padding: 75px 60px 60px; display: flex; flex-direction: column; justify-content: flex-start; background: #fff; overflow-y: auto; }
+        .header { position: fixed; top: 0; left: 0; right: 0; padding: 12px 30px; background: #2563eb; color: white; font-size: 1rem; font-weight: 600; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 2.2rem; color: #2563eb; margin-bottom: 15px; text-align: center; }
+        h2 { font-size: 1.5rem; color: #2563eb; margin-bottom: 10px; border-bottom: 3px solid #2563eb; padding-bottom: 5px; display: inline-block; }
+        p, li { font-size: 1rem; line-height: 1.5; color: #334155; }
+        .context-box { background: #f8fafc; border-left: 4px solid #2563eb; padding: 12px; border-radius: 0 8px 8px 0; margin: 8px 0; font-size: 0.95rem; }
+        table { width: 100%; max-width: 800px; margin: 10px auto; border-collapse: collapse; font-size: 0.95rem; }
+        th, td { padding: 8px 12px; text-align: center; border: 2px solid #e2e8f0; }
+        th { background: #2563eb; color: white; font-weight: 600; }
+        .question-item { margin: 6px 0; padding: 8px 12px; background: #f8fafc; border-radius: 6px; border-left: 4px solid #2563eb; }
+        .question-item strong { color: #2563eb; }
+        .marks { float: right; color: #dc2626; font-weight: bold; font-size: 0.85rem; }
+        .answer-btn { margin-top: 5px; padding: 4px 10px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+        .answer-btn:hover { background: #059669; }
+        .answer-box { display: none; margin-top: 6px; padding: 8px; background: #ecfdf5; border: 2px solid #10b981; border-radius: 6px; }
+        .answer-box.show { display: block; }
+        .answer-box p { margin: 3px 0; font-size: 0.88rem; }
+        .calc-step { background: #f0f9ff; padding: 3px 6px; margin: 2px 0; border-radius: 3px; font-family: monospace; font-size: 0.82rem; }
+        .nav { position: fixed; bottom: 25px; right: 30px; display: flex; gap: 10px; z-index: 100; }
+        .nav button { padding: 10px 20px; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; background: #2563eb; color: white; }
+        .nav button:hover { background: #1d4ed8; }
+        .nav button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .slide-counter { position: fixed; bottom: 30px; left: 30px; font-size: 1rem; color: #64748b; }
+        .center-content { text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .title-badge { display: inline-block; background: #2563eb; color: white; padding: 6px 16px; border-radius: 15px; font-size: 0.9rem; margin-bottom: 12px; }
+        .option-badge { display: inline-block; background: #dc2626; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 8px; }
+        .section-badge { display: inline-block; background: #7c3aed; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 8px; }
+        .subtitle { font-size: 1.1rem; color: #64748b; text-align: center; }
+        .total-marks { text-align: center; font-size: 0.95rem; color: #dc2626; margin-top: 10px; font-weight: bold; }
+        svg { max-width: 260px; margin: 8px auto; display: block; }
+        .sub-q { margin-left: 20px; font-size: 0.95rem; margin-top: 4px; }
+        .data-box { background: #fef3c7; padding: 8px 12px; border-radius: 6px; margin: 8px 0; font-size: 0.9rem; }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 20px; }
+        .toc-item { background: #f8fafc; padding: 12px; border-radius: 8px; border-left: 4px solid #2563eb; cursor: pointer; transition: all 0.2s; }
+        .toc-item:hover { background: #e0f2fe; transform: translateX(5px); }
+        .toc-item strong { color: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span>📘 Physics Grinds</span>
+        <span>Leaving Certificate Physics — Complete Paper</span>
+    </div>
+
+    <div class="slide-container" id="slideContainer">
+        
+        <!-- SLIDE 0: Title & Contents -->
+        <div class="slide">
+            <div class="center-content">
+                <h1>Physics Grinds</h1>
+                <p class="subtitle">Complete Exam Paper with Model Answers</p>
+                <p class="subtitle" style="margin-top: 10px; font-size: 0.95rem;">Leaving Certificate Physics — Higher Level</p>
+                
+                <div class="toc-grid" style="max-width: 800px; margin: 30px auto;">
+                    <div class="toc-item" onclick="goToSlide(1)"><strong>Q1</strong> Acceleration Due to Gravity</div>
+                    <div class="toc-item" onclick="goToSlide(4)"><strong>Q2</strong> Diffraction Grating</div>
+                    <div class="toc-item" onclick="goToSlide(8)"><strong>Q3</strong> Sonometer</div>
+                    <div class="toc-item" onclick="goToSlide(13)"><strong>Q4</strong> Latent Heat</div>
+                    <div class="toc-item" onclick="goToSlide(16)"><strong>Q5</strong> Semiconductor Diode</div>
+                    <div class="toc-item" onclick="goToSlide(19)"><strong>Q6</strong> Short Questions</div>
+                    <div class="toc-item" onclick="goToSlide(23)"><strong>Q7</strong> Flotation & Boyle's Law</div>
+                    <div class="toc-item" onclick="goToSlide(26)"><strong>Q8</strong> Total Internal Reflection</div>
+                    <div class="toc-item" onclick="goToSlide(29)"><strong>Q9</strong> Smoke Detectors</div>
+                    <div class="toc-item" onclick="goToSlide(33)"><strong>Q10</strong> EM Induction</div>
+                    <div class="toc-item" onclick="goToSlide(37)"><strong>Q11</strong> Capacitors</div>
+                    <div class="toc-item" onclick="goToSlide(41)"><strong>Q12</strong> Particle Physics / Motors</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Q1: ACCELERATION DUE TO GRAVITY ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 1 — Mandatory Experiment</span>
+            <h1>Acceleration Due to Gravity</h1>
+            <div class="context-box">
+                <p>In an experiment to measure the acceleration due to gravity <em>g</em>, the time <em>t</em> for a small, dense sphere to fall from rest through a height <em>s</em> was measured. The procedure was repeated for a number of different heights.</p>
+            </div>
+            <h2>Recorded Data</h2>
+            <table>
+                <tr><th><em>s</em> (cm)</th><td>25</td><td>35</td><td>45</td><td>55</td><td>65</td><td>75</td><td>85</td></tr>
+                <tr><th><em>t</em> (ms)</th><td>226</td><td>267</td><td>303</td><td>335</td><td>365</td><td>391</td><td>416</td></tr>
+            </table>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q1 — Acceleration Due to Gravity</span>
+            <h2>Questions (i) – (ii)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> Draw a labelled diagram of the apparatus used in this experiment.
+                <span class="marks">(12)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q1a1')">Show Answer</button>
+                <div class="answer-box" id="q1a1">
+                    <svg viewBox="0 0 280 280">
+                        <rect x="100" y="15" width="80" height="25" fill="#ddd" stroke="#333" stroke-width="2"/>
+                        <path d="M 115,40 Q 115,52 125,52 Q 135,52 135,40" fill="none" stroke="#333" stroke-width="2"/>
+                        <path d="M 145,40 Q 145,52 155,52 Q 165,52 165,40" fill="none" stroke="#333" stroke-width="2"/>
+                        <text x="140" y="32" text-anchor="middle" font-size="8">Electromagnet</text>
+                        <circle cx="140" cy="68" r="10" fill="#666" stroke="#333" stroke-width="2"/>
+                        <text x="175" y="72" font-size="8">Steel ball</text>
+                        <line x1="70" y1="68" x2="70" y2="200" stroke="#333" stroke-width="1" stroke-dasharray="4"/>
+                        <line x1="65" y1="68" x2="75" y2="68" stroke="#333" stroke-width="2"/>
+                        <line x1="65" y1="200" x2="75" y2="200" stroke="#333" stroke-width="2"/>
+                        <text x="60" y="135" font-size="10" text-anchor="end">s</text>
+                        <rect x="105" y="195" width="70" height="8" fill="#8B4513" stroke="#333" stroke-width="2"/>
+                        <circle cx="105" cy="199" r="4" fill="#333"/>
+                        <text x="140" y="220" text-anchor="middle" font-size="8">Hinged flap</text>
+                        <rect x="195" y="90" width="55" height="35" fill="#f5f5f5" stroke="#333" stroke-width="2" rx="3"/>
+                        <text x="222" y="108" text-anchor="middle" font-size="7">Electronic</text>
+                        <text x="222" y="118" text-anchor="middle" font-size="7">Timer</text>
+                        <path d="M 180,28 Q 205,28 205,90" fill="none" stroke="#333" stroke-width="1.5"/>
+                        <path d="M 175,199 Q 195,199 205,125" fill="none" stroke="#333" stroke-width="1.5"/>
+                        <rect x="15" y="75" width="35" height="20" fill="#f5f5f5" stroke="#333" stroke-width="2" rx="2"/>
+                        <text x="32" y="88" text-anchor="middle" font-size="7">Switch</text>
+                        <path d="M 50,85 Q 75,85 100,28" fill="none" stroke="#333" stroke-width="1.5"/>
+                        <rect x="15" y="160" width="40" height="28" fill="#f5f5f5" stroke="#333" stroke-width="2" rx="2"/>
+                        <text x="35" y="173" text-anchor="middle" font-size="6">Low voltage</text>
+                        <text x="35" y="182" text-anchor="middle" font-size="6">supply</text>
+                    </svg>
+                    <p>Components: Electromagnet, steel ball, hinged flap, electronic timer, switch, power supply, metre stick</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> Explain why a small, dense sphere was used in this experiment.
+                <button class="answer-btn" onclick="toggleAnswer('q1a2')">Show Answer</button>
+                <div class="answer-box" id="q1a2">
+                    <p><strong>Small:</strong> Reduces air resistance (drag ∝ cross-sectional area)</p>
+                    <p><strong>Dense:</strong> Weight >> air resistance, so air resistance is negligible</p>
+                    <p><strong>Sphere:</strong> Same air resistance regardless of orientation</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> Draw a suitable graph to show the relationship between <em>s</em> and <em>t</em>.
+                <button class="answer-btn" onclick="toggleAnswer('q1a3')">Show Answer</button>
+                <div class="answer-box" id="q1a3">
+                    <p>Plot <strong>s vs t²</strong> — gives straight line through origin (since s = ½gt²)</p>
+                    <table style="font-size: 0.8rem; max-width: 500px;">
+                        <tr><th>s (m)</th><td>0.25</td><td>0.35</td><td>0.45</td><td>0.55</td><td>0.65</td><td>0.75</td><td>0.85</td></tr>
+                        <tr><th>t² (s²)</th><td>0.051</td><td>0.071</td><td>0.092</td><td>0.112</td><td>0.133</td><td>0.153</td><td>0.173</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q1 — Acceleration Due to Gravity</span>
+            <h2>Questions (iv) – (v)</h2>
+            
+            <div class="question-item">
+                <strong>(iv)</strong> Use the graph to calculate a value for <em>g</em>.
+                <span class="marks">(21)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q1a4')">Show Answer</button>
+                <div class="answer-box" id="q1a4">
+                    <p>From s = ½gt², slope of s vs t² graph = ½g</p>
+                    <div class="calc-step">slope = Δs/Δt² = (0.85 − 0.25)/(0.173 − 0.051) = 0.60/0.122 = 4.92</div>
+                    <div class="calc-step">g = 2 × slope = 2 × 4.92 = <strong>9.84 m s⁻²</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> State a possible source of error in measuring:
+                <div class="sub-q">(a) the height, <em>s</em></div>
+                <div class="sub-q">(b) the time, <em>t</em></div>
+                <span class="marks">(7)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q1a5')">Show Answer</button>
+                <div class="answer-box" id="q1a5">
+                    <p><strong>(a) Height:</strong> Parallax error; difficulty measuring exact ball position</p>
+                    <p><strong>(b) Time:</strong> Timer may not start/stop exactly when ball releases/lands; reaction time if manual</p>
+                </div>
+            </div>
+            <p class="total-marks">Q1 Total: 40 marks</p>
+        </div>
+
+        <!-- ==================== Q2: DIFFRACTION GRATING ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 2 — Mandatory Experiment</span>
+            <h1>Diffraction Grating</h1>
+            <div class="context-box">
+                <p>In an experiment to measure the wavelength of light from a monochromatic source, a narrow beam of the light was incident normally on a diffraction grating. The grating had <strong>500 lines per mm</strong>. The angle θ between the images was measured.</p>
+            </div>
+            <h2>Recorded Data</h2>
+            <table>
+                <tr><th><em>n</em></th><th>Angle between 1st order images</th><th>Angle between 2nd order images</th></tr>
+                <tr><td><em>θ</em> (°)</td><td>26.2</td><td>55.4</td></tr>
+            </table>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q2 — Diffraction Grating</span>
+            <h2>Questions (i) – (ii)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> Explain how the angles were measured and calculated from the observed images.
+                <span class="marks">(9)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q2a1')">Show Answer</button>
+                <div class="answer-box" id="q2a1">
+                    <p>• Screen placed at known distance D from grating</p>
+                    <p>• Positions of 1st order images marked on either side of central bright image</p>
+                    <p>• Distance x between images measured</p>
+                    <p>• Angle calculated: tan(θ/2) = (x/2) ÷ D</p>
+                    <p>• OR: Spectrometer used to measure angles directly</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> Calculate the grating constant <em>d</em>.
+                <button class="answer-btn" onclick="toggleAnswer('q2a2')">Show Answer</button>
+                <div class="answer-box" id="q2a2">
+                    <div class="calc-step">d = 1/N = 1/500 mm = 0.002 mm = 2.0 × 10⁻⁶ m</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q2 — Diffraction Grating</span>
+            <h2>Questions (iii) – (iv)</h2>
+            
+            <div class="question-item">
+                <strong>(iii)</strong> Calculate the wavelength of the monochromatic light source.
+                <span class="marks">(31)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q2a3')">Show Answer</button>
+                <div class="answer-box" id="q2a3">
+                    <p>Using nλ = d sin θ, with n = 1:</p>
+                    <div class="calc-step">θ = 26.2°/2 = 13.1° (angle to one side)</div>
+                    <div class="calc-step">λ = d sin θ = 2.0 × 10⁻⁶ × sin(13.1°)</div>
+                    <div class="calc-step">λ = 2.0 × 10⁻⁶ × 0.2267 = 4.53 × 10⁻⁷ m = <strong>453 nm</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iv)</strong> Calculate the angle between the third order images.
+                <button class="answer-btn" onclick="toggleAnswer('q2a4')">Show Answer</button>
+                <div class="answer-box" id="q2a4">
+                    <div class="calc-step">sin θ = nλ/d = (3 × 453 × 10⁻⁹)/(2.0 × 10⁻⁶) = 0.6795</div>
+                    <div class="calc-step">θ = 42.8°</div>
+                    <div class="calc-step">Angle between 3rd order images = 2 × 42.8° = <strong>85.6°</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> How many more images could have been observed?
+                <button class="answer-btn" onclick="toggleAnswer('q2a5')">Show Answer</button>
+                <div class="answer-box" id="q2a5">
+                    <p>Max order when sin θ = 1:</p>
+                    <div class="calc-step">n_max = d/λ = 2.0 × 10⁻⁶ / 453 × 10⁻⁹ = 4.4 → n_max = 4</div>
+                    <p>4th order possible: <strong>2 more images</strong> (one each side)</p>
+                </div>
+            </div>
+            <p class="total-marks">Q2 Total: 40 marks</p>
+        </div>
+
+        <!-- ==================== Q3: SONOMETER ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 3 — Mandatory Experiment</span>
+            <h1>Frequency & Length of Stretched String</h1>
+            <div class="context-box">
+                <p>A student investigated the relationship between the fundamental frequency <em>f</em> of a stretched string and its length <em>l</em>. Total length: <strong>95 cm</strong>, Mass: <strong>0.25 g</strong>. Tension kept constant.</p>
+            </div>
+            <svg viewBox="0 0 380 200" style="max-width: 420px;">
+                <defs><pattern id="grid" width="50" height="40" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 40" fill="none" stroke="#e0e0e0" stroke-width="0.5"/></pattern></defs>
+                <rect x="50" y="20" width="300" height="140" fill="url(#grid)"/>
+                <line x1="50" y1="160" x2="350" y2="160" stroke="#333" stroke-width="2"/>
+                <line x1="50" y1="160" x2="50" y2="20" stroke="#333" stroke-width="2"/>
+                <text x="200" y="185" text-anchor="middle" font-size="12" font-style="italic">f (Hz)</text>
+                <text x="30" y="90" text-anchor="middle" font-size="14" font-weight="bold">X</text>
+                <line x1="50" y1="160" x2="330" y2="35" stroke="#2563eb" stroke-width="2.5"/>
+                <circle cx="90" cy="142" r="4" fill="#333"/><circle cx="125" cy="125" r="4" fill="#333"/>
+                <circle cx="160" cy="110" r="4" fill="#333"/><circle cx="205" cy="88" r="4" fill="#333"/>
+                <circle cx="240" cy="70" r="4" fill="#333"/><circle cx="285" cy="50" r="4" fill="#333"/>
+                <circle cx="325" cy="35" r="4" fill="#333"/>
+            </svg>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q3 — Sonometer</span>
+            <h2>Questions (i) – (iv)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> Describe how the frequency and length values were measured.
+                <span class="marks">(12)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q3a1')">Show Answer</button>
+                <div class="answer-box" id="q3a1">
+                    <p>• Signal generator produces known frequency</p>
+                    <p>• Paper rider placed on wire at centre</p>
+                    <p>• Moveable bridge adjusted until rider thrown off (resonance)</p>
+                    <p>• Length between bridges measured with metre stick</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> Label the vertical scale, <strong>X</strong>, using a suitable quantity and unit.
+                <button class="answer-btn" onclick="toggleAnswer('q3a2')">Show Answer</button>
+                <div class="answer-box" id="q3a2">
+                    <div class="calc-step"><strong>X = 1/l (m⁻¹)</strong> — Reciprocal of length</div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> State the relationship between length and frequency.
+                <button class="answer-btn" onclick="toggleAnswer('q3a3')">Show Answer</button>
+                <div class="answer-box" id="q3a3">
+                    <p>Length is <strong>inversely proportional</strong> to frequency: l ∝ 1/f</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iv)</strong> How does the graph demonstrate this relationship?
+                <span class="marks">(9)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q3a4')">Show Answer</button>
+                <div class="answer-box" id="q3a4">
+                    <p>Graph of 1/l vs f is a <strong>straight line through the origin</strong></p>
+                    <p>This shows 1/l ∝ f, therefore l ∝ 1/f</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q3 — Sonometer</span>
+            <h2>Questions (v) – (vi)</h2>
+            
+            <div class="question-item">
+                <strong>(v)</strong> Complete the table using the graph.
+                <table style="font-size: 0.85rem;">
+                    <tr><th>f (Hz)</th><td>256</td><td>288</td><td>320</td><td>361</td><td>414</td><td>486</td><td>512</td></tr>
+                    <tr><th>l (m)</th><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td></tr>
+                </table>
+                <button class="answer-btn" onclick="toggleAnswer('q3a5')">Show Answer</button>
+                <div class="answer-box" id="q3a5">
+                    <table style="font-size: 0.8rem;">
+                        <tr><th>f (Hz)</th><td>256</td><td>288</td><td>320</td><td>361</td><td>414</td><td>486</td><td>512</td></tr>
+                        <tr><th>l (m)</th><td>1.10</td><td>0.97</td><td>0.88</td><td>0.78</td><td>0.68</td><td>0.58</td><td>0.55</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(vi)</strong> Use the slope to calculate the tension of the string.
+                <span class="marks">(19)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q3a6')">Show Answer</button>
+                <div class="answer-box" id="q3a6">
+                    <div class="calc-step">slope = Δ(1/l)/Δf = 2.15/600 = 3.58 × 10⁻³ m⁻¹Hz⁻¹</div>
+                    <div class="calc-step">μ = m/L = 0.25 × 10⁻³ / 0.95 = 2.63 × 10⁻⁴ kg/m</div>
+                    <p>From f = (1/2l)√(T/μ): slope = 2√(μ/T)</p>
+                    <div class="calc-step">T = 4μ/slope² = (4 × 2.63 × 10⁻⁴)/(3.58 × 10⁻³)² = <strong>82 N</strong></div>
+                </div>
+            </div>
+            <p class="total-marks">Q3 Total: 40 marks</p>
+        </div>
+
+        <!-- ==================== Q4: LATENT HEAT ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 4 — Mandatory Experiment</span>
+            <h1>Specific Latent Heat of Vaporisation</h1>
+            <div class="context-box">
+                <p>Dry steam was added to water cooled below room temperature in an insulated aluminium calorimeter.</p>
+            </div>
+            <h2>Recorded Data</h2>
+            <table style="max-width: 500px;">
+                <tr><th>Measurement</th><th>Value</th></tr>
+                <tr><td>Mass of calorimeter</td><td>70.2 g</td></tr>
+                <tr><td>Mass of water + calorimeter</td><td>158.6 g</td></tr>
+                <tr><td>Initial temperature of water</td><td>14 °C</td></tr>
+                <tr><td>Temperature of steam</td><td>100 °C</td></tr>
+                <tr><td>Final temperature of water</td><td>32 °C</td></tr>
+                <tr><td>Mass of cal + water + steam</td><td>161.8 g</td></tr>
+            </table>
+            <p style="font-size: 0.9rem; margin-top: 10px;"><em>c_water = 4180 J kg⁻¹ K⁻¹; c_aluminium = 900 J kg⁻¹ K⁻¹</em></p>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q4 — Latent Heat</span>
+            <h2>Questions (i) – (iii)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> Describe how the mass of water and steam were determined.
+                <span class="marks">(6)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q4a1')">Show Answer</button>
+                <div class="answer-box" id="q4a1">
+                    <div class="calc-step">m_water = 158.6 − 70.2 = 88.4 g = 0.0884 kg</div>
+                    <div class="calc-step">m_steam = 161.8 − 158.6 = 3.2 g = 0.0032 kg</div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> Why is it important that dry steam is added?
+                <button class="answer-btn" onclick="toggleAnswer('q4a2')">Show Answer</button>
+                <div class="answer-box" id="q4a2">
+                    <p>Wet steam contains water droplets that have not undergone phase change — they would not release latent heat, giving incorrect (lower) value.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> Explain how the steam was dried.
+                <span class="marks">(9)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q4a3')">Show Answer</button>
+                <div class="answer-box" id="q4a3">
+                    <p>• Steam trap used between generator and calorimeter</p>
+                    <p>• Water droplets condense and collect in trap</p>
+                    <p>• Only dry steam passes through to calorimeter</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q4 — Latent Heat</span>
+            <h2>Questions (iv) – (v)</h2>
+            
+            <div class="question-item">
+                <strong>(iv)</strong> Why was water cooled below room temperature first?
+                <span class="marks">(6)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q4a4')">Show Answer</button>
+                <div class="answer-box" id="q4a4">
+                    <p>To minimise heat loss/gain to surroundings. Heat gained (when cold) ≈ heat lost (when warm) — compensates for heat exchange.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> Calculate the specific latent heat of vaporisation.
+                <span class="marks">(19)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q4a5')">Show Answer</button>
+                <div class="answer-box" id="q4a5">
+                    <p>Heat lost = Heat gained</p>
+                    <div class="calc-step">ΔT₁ = 100 − 32 = 68 K; ΔT₂ = 32 − 14 = 18 K</div>
+                    <div class="calc-step">Q_water = 0.0884 × 4180 × 18 = 6651 J</div>
+                    <div class="calc-step">Q_cal = 0.0702 × 900 × 18 = 1137 J</div>
+                    <div class="calc-step">Q_cooling = 0.0032 × 4180 × 68 = 909 J</div>
+                    <div class="calc-step">m_s × l_v = 6651 + 1137 − 909 = 6879 J</div>
+                    <div class="calc-step">l_v = 6879/0.0032 = <strong>2.15 × 10⁶ J kg⁻¹</strong></div>
+                </div>
+            </div>
+            <p class="total-marks">Q4 Total: 40 marks</p>
+        </div>
+
+        <!-- ==================== Q5: DIODE ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 5 — Mandatory Experiment</span>
+            <h1>I-V Characteristics of a Semiconductor Diode</h1>
+            <div class="context-box">
+                <p>A student investigated the variation of current <em>I</em> through a semiconductor diode in forward bias for different values of potential difference <em>V</em>.</p>
+            </div>
+            <table>
+                <tr><th>V (V)</th><td>0.00</td><td>0.20</td><td>0.40</td><td>0.50</td><td>0.55</td><td>0.60</td><td>0.65</td><td>0.70</td><td>0.75</td></tr>
+                <tr><th>I (mA)</th><td>0.0</td><td>0.0</td><td>0.1</td><td>0.4</td><td>1.8</td><td>5.6</td><td>12.4</td><td>28.6</td><td>68.5</td></tr>
+            </table>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q5 — Diode</span>
+            <h2>Questions (i) – (iii)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> Draw a circuit diagram and explain how data were measured.
+                <span class="marks">(12)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q5a1')">Show Answer</button>
+                <div class="answer-box" id="q5a1">
+                    <p>Circuit: DC supply → Variable resistor → Diode (forward bias) → Ammeter (series)</p>
+                    <p>Voltmeter in parallel across diode</p>
+                    <p>Adjust variable resistor, read V and I, record values</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> Draw a suitable graph to show the relationship between V and I.
+                <button class="answer-btn" onclick="toggleAnswer('q5a2')">Show Answer</button>
+                <div class="answer-box" id="q5a2">
+                    <p>Plot I (mA) on y-axis vs V (V) on x-axis</p>
+                    <p>Characteristic exponential curve — little current until ~0.5V, then rapid increase</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> Does the graph show Ohm's law is obeyed? Justify.
+                <span class="marks">(15)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q5a3')">Show Answer</button>
+                <div class="answer-box" id="q5a3">
+                    <p><strong>No</strong> — Ohm's law requires straight line through origin</p>
+                    <p>Graph is curved; V/I ratio not constant — diode is non-ohmic</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q5 — Diode</span>
+            <h2>Questions (iv) – (v)</h2>
+            
+            <div class="question-item">
+                <strong>(iv)</strong> Sketch a graph for copper electrodes in copper sulfate solution.
+                <button class="answer-btn" onclick="toggleAnswer('q5a4')">Show Answer</button>
+                <div class="answer-box" id="q5a4">
+                    <p>Straight line through origin — ohmic behaviour</p>
+                    <p>Copper deposited/dissolved — no polarisation</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> How would the graph differ with inactive electrodes?
+                <span class="marks">(13)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q5a5')">Show Answer</button>
+                <div class="answer-box" id="q5a5">
+                    <p>Graph would NOT pass through origin</p>
+                    <p>Minimum voltage (back-emf) needed before current flows</p>
+                    <p>Inactive electrodes cause polarisation — products build up</p>
+                </div>
+            </div>
+            <p class="total-marks">Q5 Total: 40 marks</p>
+        </div>
+
+        <!-- ==================== Q6: SHORT QUESTIONS ==================== -->
+        <div class="slide">
+            <span class="section-badge">Section B — Short Questions</span>
+            <h1>Question 6: Answer any EIGHT</h1>
+            <p class="subtitle">8 × 7 = 56 marks</p>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q6 — Short Questions (a–d)</span>
+            
+            <div class="question-item">
+                <strong>(a)</strong> Define the moment of a force.
+                <button class="answer-btn" onclick="toggleAnswer('q6a')">Show Answer</button>
+                <div class="answer-box" id="q6a">
+                    <p>Product of force and perpendicular distance from point to line of action. τ = F × d</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(b)</strong> Stone thrown up from 120m building, hits ground after 8s. Find initial velocity. (g = 9.8)
+                <button class="answer-btn" onclick="toggleAnswer('q6b')">Show Answer</button>
+                <div class="answer-box" id="q6b">
+                    <div class="calc-step">s = ut + ½at² → −120 = 8u + ½(−9.8)(64)</div>
+                    <div class="calc-step">−120 = 8u − 313.6 → u = <strong>24.2 m s⁻¹</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(c)</strong> Moon's surface gravity = 1.6 m s⁻². Calculate radius. (M = 7.35 × 10²² kg)
+                <button class="answer-btn" onclick="toggleAnswer('q6c')">Show Answer</button>
+                <div class="answer-box" id="q6c">
+                    <div class="calc-step">g = GM/r² → r = √(GM/g) = √(6.67×10⁻¹¹ × 7.35×10²²/1.6)</div>
+                    <div class="calc-step">r = <strong>1.75 × 10⁶ m</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(d)</strong> Diverging lens f = 25cm, object at 40cm. Find image position.
+                <button class="answer-btn" onclick="toggleAnswer('q6d')">Show Answer</button>
+                <div class="answer-box" id="q6d">
+                    <div class="calc-step">1/f = 1/u + 1/v → 1/v = 1/(−25) − 1/(−40)</div>
+                    <div class="calc-step">v = <strong>−15.4 cm</strong> (virtual, same side as object)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q6 — Short Questions (e–h)</span>
+            
+            <div class="question-item">
+                <strong>(e)</strong> Explain the U-value of a material.
+                <button class="answer-btn" onclick="toggleAnswer('q6e')">Show Answer</button>
+                <div class="answer-box" id="q6e">
+                    <p>Rate of heat transfer per unit area per unit temperature difference. Unit: W m⁻² K⁻¹. Lower = better insulator.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(f)</strong> Draw the 5th harmonic in a pipe open at one end.
+                <button class="answer-btn" onclick="toggleAnswer('q6f')">Show Answer</button>
+                <div class="answer-box" id="q6f">
+                    <p>Node at closed end, antinode at open end. 5th harmonic = 2.5λ in pipe. L = 5λ/4</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(g)</strong> Sketch I vs V for a filament bulb.
+                <button class="answer-btn" onclick="toggleAnswer('q6g')">Show Answer</button>
+                <div class="answer-box" id="q6g">
+                    <p>Curve through origin, gradient decreasing. As V↑, temperature↑, resistance↑, I increases more slowly.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(h)</strong> Copper wire 4m, R = 3.5×10⁻² Ω. Find radius. (ρ = 1.7×10⁻⁸ Ω m)
+                <button class="answer-btn" onclick="toggleAnswer('q6h')">Show Answer</button>
+                <div class="answer-box" id="q6h">
+                    <div class="calc-step">A = ρL/R = (1.7×10⁻⁸ × 4)/3.5×10⁻² = 1.94×10⁻⁶ m²</div>
+                    <div class="calc-step">r = √(A/π) = <strong>7.86 × 10⁻⁴ m</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q6 — Short Questions (i–l)</span>
+            
+            <div class="question-item">
+                <strong>(i)</strong> Calculate peak current: V_rms = 240V, R = 20Ω.
+                <button class="answer-btn" onclick="toggleAnswer('q6i')">Show Answer</button>
+                <div class="answer-box" id="q6i">
+                    <div class="calc-step">I_rms = 240/20 = 12 A; I_peak = √2 × 12 = <strong>17.0 A</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(j)</strong> Explain why electrons moving ⊥ to magnetic field move in a circle.
+                <button class="answer-btn" onclick="toggleAnswer('q6j')">Show Answer</button>
+                <div class="answer-box" id="q6j">
+                    <p>F = Bqv always perpendicular to velocity → provides centripetal force → circular motion</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(k)</strong> Write a nuclear fusion equation.
+                <button class="answer-btn" onclick="toggleAnswer('q6k')">Show Answer</button>
+                <div class="answer-box" id="q6k">
+                    <div class="calc-step">²₁H + ³₁H → ⁴₂He + ¹₀n + energy</div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(l)</strong> Distinguish pair production and pair annihilation.
+                <button class="answer-btn" onclick="toggleAnswer('q6l')">Show Answer</button>
+                <div class="answer-box" id="q6l">
+                    <p><strong>Production:</strong> γ → e⁻ + e⁺ (energy → matter, needs ≥1.02 MeV)</p>
+                    <p><strong>Annihilation:</strong> e⁻ + e⁺ → 2γ (matter → energy)</p>
+                </div>
+            </div>
+            <p class="total-marks">Q6 Total: 56 marks (any 8)</p>
+        </div>
+
+        <!-- ==================== Q7: FLOTATION ==================== -->
+        <div class="slide">
+            <span class="section-badge">Section C</span>
+            <span class="title-badge">Question 7</span>
+            <h1>Flotation & Boyle's Law</h1>
+            <div class="context-box">
+                <p>An air bubble of volume <strong>60 cm³</strong> forms at the bottom of a freshwater lake. Pressure on bubble: <strong>385 kPa</strong>.</p>
+            </div>
+            <div class="data-box">g = 9.8 m s⁻²; ρ = 1000 kg m⁻³; P_atm = 1.01 × 10⁵ Pa</div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q7 — Flotation & Boyle's Law</span>
+            <h2>Questions (i) – (iv)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> State the law of flotation.
+                <button class="answer-btn" onclick="toggleAnswer('q7a1')">Show Answer</button>
+                <div class="answer-box" id="q7a1">
+                    <p>A floating body displaces its own weight of fluid.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> Describe an experiment to verify the law of flotation.
+                <button class="answer-btn" onclick="toggleAnswer('q7a2')">Show Answer</button>
+                <div class="answer-box" id="q7a2">
+                    <p>Use eureka can, weigh object, float it, collect displaced water, compare weights.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> Explain how a hydrometer works.
+                <span class="marks">(21)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q7a3')">Show Answer</button>
+                <div class="answer-box" id="q7a3">
+                    <p>Constant weight → displaces same weight of liquid. Denser liquid → floats higher. Calibrated stem reads density.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iv)</strong> State Boyle's law.
+                <span class="marks">(6)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q7a4')">Show Answer</button>
+                <div class="answer-box" id="q7a4">
+                    <p>At constant T, V ∝ 1/P for fixed mass of gas. pV = constant.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q7 — Bubble Problem</span>
+            <h2>Questions (v) – (viii)</h2>
+            
+            <div class="question-item">
+                <strong>(v)</strong> Density at bottom = 4.5×10⁻⁴ g cm⁻³. Find mass of air.
+                <button class="answer-btn" onclick="toggleAnswer('q7a5')">Show Answer</button>
+                <div class="answer-box" id="q7a5">
+                    <div class="calc-step">m = ρV = 4.5×10⁻⁴ × 60 = <strong>0.027 g</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(vi)</strong> Explain why volume increases as bubble rises.
+                <button class="answer-btn" onclick="toggleAnswer('q7a6')">Show Answer</button>
+                <div class="answer-box" id="q7a6">
+                    <p>Pressure decreases as depth decreases. By Boyle's law (pV = const), if P↓ then V↑.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(vii)</strong> Calculate volume at surface.
+                <button class="answer-btn" onclick="toggleAnswer('q7a7')">Show Answer</button>
+                <div class="answer-box" id="q7a7">
+                    <div class="calc-step">p₁V₁ = p₂V₂ → 385 × 60 = 101 × V₂</div>
+                    <div class="calc-step">V₂ = <strong>229 cm³</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(viii)</strong> Calculate the depth of the lake.
+                <span class="marks">(29)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q7a8')">Show Answer</button>
+                <div class="answer-box" id="q7a8">
+                    <div class="calc-step">P_total = P_atm + ρgh → 385000 = 101000 + 1000×9.8×h</div>
+                    <div class="calc-step">h = 284000/9800 = <strong>29.0 m</strong></div>
+                </div>
+            </div>
+            <p class="total-marks">Q7 Total: 56 marks</p>
+        </div>
+
+        <!-- ==================== Q8: TIR ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 8</span>
+            <h1>Total Internal Reflection</h1>
+            <div class="context-box">
+                <p>When light is incident on the inside of a glass surface, total internal reflection may occur.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q8 — Total Internal Reflection</span>
+            <h2>Questions (i) – (iii)</h2>
+            
+            <div class="question-item">
+                <strong>(i)(a)</strong> Explain critical angle.
+                <button class="answer-btn" onclick="toggleAnswer('q8a1')">Show Answer</button>
+                <div class="answer-box" id="q8a1">
+                    <p>Angle of incidence in denser medium for which angle of refraction = 90°.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(i)(b)</strong> Explain total internal reflection.
+                <button class="answer-btn" onclick="toggleAnswer('q8a2')">Show Answer</button>
+                <div class="answer-box" id="q8a2">
+                    <p>When light in denser medium strikes boundary at angle > critical angle, all light reflected back — none refracted.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> Derive formula relating n to critical angle.
+                <button class="answer-btn" onclick="toggleAnswer('q8a3')">Show Answer</button>
+                <div class="answer-box" id="q8a3">
+                    <div class="calc-step">n sin θc = 1 × sin 90° → <strong>n = 1/sin θc</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> Describe an experiment to demonstrate TIR.
+                <span class="marks">(30)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q8a4')">Show Answer</button>
+                <div class="answer-box" id="q8a4">
+                    <p>Semicircular glass block, ray box. Direct ray at centre of flat face. Increase angle until refracted ray disappears — TIR occurs.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q8 — Prism Problems</span>
+            <h2>Questions (iv) – (v)</h2>
+            
+            <div class="question-item">
+                <strong>(iv)(a)</strong> Light enters 45° prism at right angles. Find minimum n for TIR.
+                <button class="answer-btn" onclick="toggleAnswer('q8a5')">Show Answer</button>
+                <div class="answer-box" id="q8a5">
+                    <div class="calc-step">n = 1/sin 45° = 1/0.707 = <strong>1.41 (√2)</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iv)(b)</strong> Calculate maximum speed of light in prism.
+                <button class="answer-btn" onclick="toggleAnswer('q8a6')">Show Answer</button>
+                <div class="answer-box" id="q8a6">
+                    <div class="calc-step">v = c/n = 3×10⁸/1.41 = <strong>2.12 × 10⁸ m s⁻¹</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> Prism n = 1.54, light at 82°. Is TIR still occurring at second surface?
+                <span class="marks">(26)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q8a7')">Show Answer</button>
+                <div class="answer-box" id="q8a7">
+                    <div class="calc-step">θc = sin⁻¹(1/1.54) = 40.5°</div>
+                    <p>Calculate angle at 2nd surface using geometry — if > 40.5°, TIR occurs.</p>
+                    <p><strong>Yes — TIR still occurs</strong></p>
+                </div>
+            </div>
+            <p class="total-marks">Q8 Total: 56 marks</p>
+        </div>
+
+        <!-- ==================== Q9: SMOKE DETECTORS ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 9</span>
+            <h1>Smoke Detectors</h1>
+            <div class="context-box">
+                <p>Smoke detectors use either photoelectric sensing (light scattering) or ionisation (alpha-emitting americium-241). Laser wavelength: <strong>880 nm</strong>. Half-life: <strong>432 years</strong>. Activity: <strong>3.8 × 10⁴</strong> α/s.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q9 — Photoelectric Effect</span>
+            <h2>Questions (i) – (ii)</h2>
+            
+            <div class="question-item">
+                <strong>(i)(a)</strong> Explain the photoelectric effect.
+                <button class="answer-btn" onclick="toggleAnswer('q9a1')">Show Answer</button>
+                <div class="answer-box" id="q9a1">
+                    <p>Emission of electrons from metal surface when light of sufficient frequency is incident.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(i)(b)</strong> Explain threshold frequency.
+                <button class="answer-btn" onclick="toggleAnswer('q9a2')">Show Answer</button>
+                <div class="answer-box" id="q9a2">
+                    <p>Minimum frequency of light that will cause photoelectric emission from a metal.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> Calculate max work function (in eV) for 880nm laser.
+                <span class="marks">(20)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q9a3')">Show Answer</button>
+                <div class="answer-box" id="q9a3">
+                    <div class="calc-step">E = hc/λ = (6.63×10⁻³⁴ × 3×10⁸)/(880×10⁻⁹) = 2.26×10⁻¹⁹ J</div>
+                    <div class="calc-step">E = 2.26×10⁻¹⁹ / 1.6×10⁻¹⁹ = <strong>1.41 eV</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q9 — Radioactivity</span>
+            <h2>Questions (iii) – (vi)</h2>
+            
+            <div class="question-item">
+                <strong>(iii)</strong> What are alpha particles?
+                <button class="answer-btn" onclick="toggleAnswer('q9a4')">Show Answer</button>
+                <div class="answer-box" id="q9a4">
+                    <p>Helium nuclei: 2 protons + 2 neutrons. ⁴₂He</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iv)</strong> Experiment for ionising effect; why α suitable for smoke detectors.
+                <button class="answer-btn" onclick="toggleAnswer('q9a5')">Show Answer</button>
+                <div class="answer-box" id="q9a5">
+                    <p>Charged electroscope near source — leaves collapse. α highly ionising, short range, easily contained.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> Write nuclear equation for Am-241 decay.
+                <span class="marks">(20)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q9a6')">Show Answer</button>
+                <div class="answer-box" id="q9a6">
+                    <div class="calc-step">²⁴¹₉₅Am → ²³⁷₉₃Np + ⁴₂He</div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(vi)</strong> Calculate (a) number of atoms, (b) mass of Am-241.
+                <span class="marks">(16)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q9a7')">Show Answer</button>
+                <div class="answer-box" id="q9a7">
+                    <div class="calc-step">λ = 0.693/(432×365.25×24×3600) = 5.08×10⁻¹¹ s⁻¹</div>
+                    <div class="calc-step">N = A/λ = 3.8×10⁴/5.08×10⁻¹¹ = <strong>7.48×10¹⁴ atoms</strong></div>
+                    <div class="calc-step">mass = N × 241/6.02×10²³ = <strong>0.30 μg</strong></div>
+                </div>
+            </div>
+            <p class="total-marks">Q9 Total: 56 marks</p>
+        </div>
+
+        <!-- ==================== Q10: EM INDUCTION ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 10</span>
+            <h1>Electromagnetic Induction</h1>
+            <div class="context-box">
+                <p>A rectangular coil <strong>12 cm × 5 cm</strong> rotates at <strong>10 rev/s</strong>, with 5 cm side at 90° to magnetic field B = <strong>15 T</strong>.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q10 — EM Induction</span>
+            <h2>Questions (i) – (iii)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> Explain magnetic flux.
+                <button class="answer-btn" onclick="toggleAnswer('q10a1')">Show Answer</button>
+                <div class="answer-box" id="q10a1">
+                    <p>Φ = BA cos θ — product of flux density and area perpendicular to field. Unit: Weber (Wb).</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> State Faraday's law.
+                <button class="answer-btn" onclick="toggleAnswer('q10a2')">Show Answer</button>
+                <div class="answer-box" id="q10a2">
+                    <p>Induced emf = rate of change of magnetic flux. emf = −dΦ/dt</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> Describe experiment demonstrating Faraday's law.
+                <span class="marks">(22)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q10a3')">Show Answer</button>
+                <div class="answer-box" id="q10a3">
+                    <p>Magnet + coil + galvanometer. Move magnet in → deflection. Stop → no deflection. Move out → opposite deflection. Faster → larger deflection.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q10 — Rotating Coil</span>
+            <h2>Questions (iv) – (vi)</h2>
+            
+            <div class="question-item">
+                <strong>(iv)</strong> What is the magnetic flux in position A (field ⊥ to plane)?
+                <button class="answer-btn" onclick="toggleAnswer('q10a4')">Show Answer</button>
+                <div class="answer-box" id="q10a4">
+                    <div class="calc-step">Φ = BA = 15 × 0.12 × 0.05 = <strong>0.09 Wb</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> How long to rotate from A to B (quarter turn)?
+                <button class="answer-btn" onclick="toggleAnswer('q10a5')">Show Answer</button>
+                <div class="answer-box" id="q10a5">
+                    <div class="calc-step">T = 1/10 = 0.1 s; t = T/4 = <strong>0.025 s</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(vi)</strong> Calculate average induced emf from A to B.
+                <button class="answer-btn" onclick="toggleAnswer('q10a6')">Show Answer</button>
+                <div class="answer-box" id="q10a6">
+                    <div class="calc-step">emf = ΔΦ/Δt = 0.09/0.025 = <strong>3.6 V</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q10 — Rotating Coil</span>
+            <h2>Questions (vii) – (viii)</h2>
+            
+            <div class="question-item">
+                <strong>(vii)</strong> Sketch graph of emf during one revolution. Label A and B.
+                <span class="marks">(28)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q10a7')">Show Answer</button>
+                <div class="answer-box" id="q10a7">
+                    <p>Sinusoidal wave. At A: emf = 0 (flux max). At B: emf = max (flux = 0).</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(viii)</strong> State the second law of electromagnetic induction.
+                <span class="marks">(6)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q10a8')">Show Answer</button>
+                <div class="answer-box" id="q10a8">
+                    <p><strong>Lenz's Law:</strong> Direction of induced emf opposes the change causing it.</p>
+                </div>
+            </div>
+            <p class="total-marks">Q10 Total: 56 marks</p>
+        </div>
+
+        <!-- ==================== Q11: CAPACITORS ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 11</span>
+            <h1>Electric Charge & Capacitors</h1>
+            <div class="context-box">
+                <p>A metal sphere is charged by induction. Two capacitors in parallel: V = <strong>15 V</strong>, C₁ = <strong>8 μF</strong>, energy on C₂ = <strong>0.36 mJ</strong>.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q11 — Charging by Induction</span>
+            <h2>Questions (i) – (iii)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> State SI unit of electric charge.
+                <button class="answer-btn" onclick="toggleAnswer('q11a1')">Show Answer</button>
+                <div class="answer-box" id="q11a1">
+                    <div class="calc-step"><strong>Coulomb (C)</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> Draw charge distribution on sphere after charging.
+                <button class="answer-btn" onclick="toggleAnswer('q11a2')">Show Answer</button>
+                <div class="answer-box" id="q11a2">
+                    <p>Charge distributed evenly over outer surface. No charge inside conductor.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> Explain charging by induction (to make positive).
+                <span class="marks">(18)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q11a3')">Show Answer</button>
+                <div class="answer-box" id="q11a3">
+                    <p>1. Bring negative rod near sphere</p>
+                    <p>2. Electrons repelled to far side</p>
+                    <p>3. Earth the far side — electrons flow away</p>
+                    <p>4. Remove earth, then rod</p>
+                    <p>5. Sphere now positive</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="title-badge">Q11 — Capacitors</span>
+            <h2>Questions (iv) – (vii)</h2>
+            
+            <div class="question-item">
+                <strong>(iv)</strong> Define capacitance.
+                <button class="answer-btn" onclick="toggleAnswer('q11a4')">Show Answer</button>
+                <div class="answer-box" id="q11a4">
+                    <p>C = Q/V — ratio of charge to potential difference. Unit: Farad (F).</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> Experiment: C depends on distance between plates.
+                <span class="marks">(16)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q11a5')">Show Answer</button>
+                <div class="answer-box" id="q11a5">
+                    <p>Parallel plates, vary separation d, measure C. Plot C vs 1/d — straight line. C ∝ 1/d.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(vi)</strong> Calculate charge on (a) C₁ and (b) C₂.
+                <button class="answer-btn" onclick="toggleAnswer('q11a6')">Show Answer</button>
+                <div class="answer-box" id="q11a6">
+                    <div class="calc-step">(a) Q₁ = CV = 8×10⁻⁶ × 15 = <strong>120 μC</strong></div>
+                    <div class="calc-step">(b) Q₂ = 2E/V = 2×0.36×10⁻³/15 = <strong>48 μC</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(vii)</strong> C₁ area = 14 cm², εᵣ = 2.8. Find plate separation.
+                <span class="marks">(22)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q11a7')">Show Answer</button>
+                <div class="answer-box" id="q11a7">
+                    <div class="calc-step">d = ε₀εᵣA/C = (8.85×10⁻¹² × 2.8 × 14×10⁻⁴)/(8×10⁻⁶)</div>
+                    <div class="calc-step">d = <strong>4.3 nm</strong></div>
+                </div>
+            </div>
+            <p class="total-marks">Q11 Total: 56 marks</p>
+        </div>
+
+        <!-- ==================== Q12: OPTIONS ==================== -->
+        <div class="slide">
+            <span class="title-badge">Question 12 — Answer EITHER (a) OR (b)</span>
+            <h1>Option (a): Particle Physics</h1>
+            <h1 style="font-size: 1.8rem;">Option (b): Motors & Galvanometers</h1>
+            <p class="subtitle" style="margin-top: 20px;">56 marks</p>
+        </div>
+
+        <div class="slide">
+            <span class="option-badge">Option (a) — Particle Physics</span>
+            <h2>Questions (i) – (v)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> Two differences between leptons and hadrons.
+                <button class="answer-btn" onclick="toggleAnswer('q12a1')">Show Answer</button>
+                <div class="answer-box" id="q12a1">
+                    <p><strong>Leptons:</strong> Fundamental, don't feel strong force (e.g., electron)</p>
+                    <p><strong>Hadrons:</strong> Made of quarks, feel strong force (e.g., proton)</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)</strong> What is an anti-particle?
+                <button class="answer-btn" onclick="toggleAnswer('q12a2')">Show Answer</button>
+                <div class="answer-box" id="q12a2">
+                    <p>Same mass, opposite charge (and quantum numbers).</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> Who predicted anti-particles?
+                <button class="answer-btn" onclick="toggleAnswer('q12a3')">Show Answer</button>
+                <div class="answer-box" id="q12a3">
+                    <div class="calc-step"><strong>Paul Dirac</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iv)</strong> Anti-particle of electron?
+                <button class="answer-btn" onclick="toggleAnswer('q12a4')">Show Answer</button>
+                <div class="answer-box" id="q12a4">
+                    <div class="calc-step"><strong>Positron</strong> (e⁺)</div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> Quark structure of (a) antiproton, (b) antineutron.
+                <span class="marks">(26)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q12a5')">Show Answer</button>
+                <div class="answer-box" id="q12a5">
+                    <div class="calc-step">(a) Antiproton: ū ū d̄</div>
+                    <div class="calc-step">(b) Antineutron: ū d̄ d̄</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="option-badge">Option (a) — Particle Physics</span>
+            <h2>Questions (vi) – (viii)</h2>
+            
+            <div class="question-item">
+                <strong>(vi)</strong> What particles make up a π⁻ meson?
+                <button class="answer-btn" onclick="toggleAnswer('q12a6')">Show Answer</button>
+                <div class="answer-box" id="q12a6">
+                    <p>Quark-antiquark pair: <strong>d + ū</strong></p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(vii)</strong> Could π⁻ be the only particle produced in p-p collision?
+                <span class="marks">(12)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q12a7')">Show Answer</button>
+                <div class="answer-box" id="q12a7">
+                    <p><strong>No</strong> — charge must be conserved. Initial: +2. Need positive particles too.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(viii)</strong> Max number of charged π mesons from two protons at 0.9c.
+                <span class="marks">(18)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q12a8')">Show Answer</button>
+                <div class="answer-box" id="q12a8">
+                    <div class="calc-step">γ = 1/√(1−0.81) = 2.29</div>
+                    <div class="calc-step">Total E = 2 × 2.29 × 938 = 4296 MeV</div>
+                    <div class="calc-step">Available = 4296 − 1876 = 2420 MeV</div>
+                    <div class="calc-step">Max pions = 2420/140 ≈ 17 → <strong>16 charged pions</strong> (8 pairs)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="option-badge">Option (b) — Motors & Galvanometers</span>
+            <h2>Questions (i) – (iii)</h2>
+            
+            <div class="question-item">
+                <strong>(i)</strong> State principle of DC motor, galvanometer, loudspeaker.
+                <button class="answer-btn" onclick="toggleAnswer('q12b1')">Show Answer</button>
+                <div class="answer-box" id="q12b1">
+                    <p>Current-carrying conductor in magnetic field experiences force: F = BIL</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)(a)</strong> Draw DC motor at zero torque position.
+                <button class="answer-btn" onclick="toggleAnswer('q12b2')">Show Answer</button>
+                <div class="answer-box" id="q12b2">
+                    <p>Coil vertical (plane ⊥ to field). Labels: magnets, coil, split-ring commutator, brushes, axle.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(ii)(b)</strong> Explain why zero torque.
+                <span class="marks">(21)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q12b3')">Show Answer</button>
+                <div class="answer-box" id="q12b3">
+                    <p>Forces act along same line through axis — perpendicular distance = 0 — torque = 0.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(iii)</strong> Describe operation of moving-coil galvanometer.
+                <button class="answer-btn" onclick="toggleAnswer('q12b4')">Show Answer</button>
+                <div class="answer-box" id="q12b4">
+                    <p>Coil in radial field. Current → torque. Deflection ∝ current. Hair springs provide restoring force.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <span class="option-badge">Option (b) — Motors & Galvanometers</span>
+            <h2>Questions (iv) – (vi)</h2>
+            
+            <div class="question-item">
+                <strong>(iv)</strong> What to add to convert galvanometer to ohmmeter?
+                <button class="answer-btn" onclick="toggleAnswer('q12b5')">Show Answer</button>
+                <div class="answer-box" id="q12b5">
+                    <p>Battery + variable resistor + non-linear scale calibrated in ohms.</p>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(v)</strong> Galvanometer: 4 mA fsd, 60 Ω. Find multiplier for 15 V voltmeter.
+                <span class="marks">(25)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q12b6')">Show Answer</button>
+                <div class="answer-box" id="q12b6">
+                    <div class="calc-step">R_total = V/I = 15/0.004 = 3750 Ω</div>
+                    <div class="calc-step">R_multiplier = 3750 − 60 = <strong>3690 Ω</strong></div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <strong>(vi)</strong> Explain how loudspeaker produces sound.
+                <span class="marks">(10)</span>
+                <button class="answer-btn" onclick="toggleAnswer('q12b7')">Show Answer</button>
+                <div class="answer-box" id="q12b7">
+                    <p>AC signal → coil in magnetic field. Alternating force → coil vibrates. Attached cone pushes air → sound waves. Frequency of sound = frequency of signal.</p>
+                </div>
+            </div>
+            <p class="total-marks">Q12 Total: 56 marks</p>
+        </div>
+
+    </div>
+
+    <div class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">47</span></div>
+    <div class="nav">
+        <button onclick="goToSlide(0)">🏠</button>
+        <button id="prevBtn" onclick="changeSlide(-1)">◀</button>
+        <button id="nextBtn" onclick="changeSlide(1)">▶</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 47;
+        const container = document.getElementById('slideContainer');
+        
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+            updateSlide();
+        }
+        
+        function goToSlide(n) {
+            currentSlide = n;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+            updateSlide();
+        }
+        
+        function updateSlide() {
+            container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+        
+        function toggleAnswer(id) {
+            const box = document.getElementById(id);
+            const btn = box.previousElementSibling;
+            box.classList.toggle('show');
+            btn.textContent = box.classList.contains('show') ? 'Hide' : 'Show Answer';
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'Home') goToSlide(0);
+        });
+        
+        updateSlide();
+    </script>
+</body>
+</html>
