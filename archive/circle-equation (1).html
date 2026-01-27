@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equation of a Circle</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 { text-align: center; color: #1e3a8a; font-size: 2rem; margin-bottom: 20px; }
+    h2 { color: #1e40af; font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
+    .nav {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 30px;
+    }
+    .nav button {
+      padding: 10px 16px; border: none; border-radius: 8px; font-size: 0.95rem;
+      font-weight: 600; cursor: pointer; background: #e5e7eb; color: #374151;
+    }
+    .nav button:hover { background: #d1d5db; }
+    .nav button.active { background: #2563eb; color: white; }
+    .section { display: none; max-width: 1200px; margin: 0 auto; }
+    .section.active { display: block; }
+    svg { display: block; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .formula-box {
+      background: linear-gradient(90deg, #dbeafe, #e9d5ff);
+      padding: 25px; border-radius: 16px; margin: 20px auto; max-width: 600px;
+    }
+    .formula { font-family: 'Courier New', monospace; font-size: 1.8rem; font-weight: bold; color: #1f2937; text-align: center; }
+    .formula-info { display: flex; justify-content: center; gap: 40px; margin-top: 15px; font-size: 1.1rem; }
+    .explanation { background: #eff6ff; padding: 20px; border-radius: 12px; margin: 20px auto; max-width: 700px; }
+    .explanation p { color: #374151; font-size: 1.1rem; margin-bottom: 10px; }
+    .pythag-box {
+      background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-family: 'Courier New', monospace; font-size: 1.5rem; text-align: center; margin: 15px 0;
+    }
+    .red { color: #dc2626; }
+    .green { color: #16a34a; }
+    .purple { color: #7c3aed; }
+    .amber { color: #d97706; }
+    
+    .interactive-wrap { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; }
+    .slider-v { display: flex; flex-direction: column; align-items: center; height: 400px; justify-content: center; }
+    .slider-v label { font-weight: bold; color: #16a34a; margin-bottom: 10px; }
+    .slider-v input { writing-mode: vertical-lr; direction: rtl; height: 300px; }
+    .slider-h { display: flex; flex-direction: column; align-items: center; width: 400px; }
+    .slider-h label { font-weight: bold; color: #dc2626; margin-bottom: 5px; }
+    .slider-h input { width: 300px; }
+    .slider-r { display: flex; flex-direction: column; align-items: center; }
+    .slider-r label { font-weight: bold; color: #7c3aed; margin-bottom: 10px; }
+    .slider-r input { width: 150px; }
+    .live-eq-box {
+      background: linear-gradient(90deg, #dbeafe, #e9d5ff);
+      padding: 20px; border-radius: 12px; margin: 20px auto; max-width: 800px; text-align: center;
+    }
+    .live-eq-box .eq { font-family: 'Courier New', monospace; font-size: 1.6rem; font-weight: bold; }
+    .live-eq-box .info { margin-top: 10px; font-size: 1.1rem; }
+    .transform-box { background: #fef3c7; padding: 15px; border-radius: 10px; margin-top: 15px; font-size: 1rem; }
+    .drag-hint { background: #f0fdf4; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 15px; font-size: 0.95rem; color: #166534; }
+    
+    .type-btns { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .type-btns button {
+      padding: 12px 20px; border: 2px solid #3b82f6; border-radius: 8px;
+      font-size: 1rem; font-weight: 600; cursor: pointer; background: white; color: #3b82f6;
+    }
+    .type-btns button.active { background: #3b82f6; color: white; }
+    .type-btns.purple button { border-color: #8b5cf6; color: #8b5cf6; }
+    .type-btns.purple button.active { background: #8b5cf6; color: white; }
+    
+    .sub-section { display: none; }
+    .sub-section.active { display: block; }
+    
+    .example-card, .practice-card, .word-card {
+      background: white; padding: 20px; border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px;
+    }
+    .example-content { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: center; }
+    .example-eq {
+      font-family: 'Courier New', monospace; font-size: 1.4rem; text-align: center;
+      background: #f3f4f6; padding: 15px 25px; border-radius: 8px;
+    }
+    .reveal-btn {
+      display: block; width: 100%; max-width: 300px; margin: 15px auto 0; padding: 12px;
+      background: #3b82f6; color: white; border: none; border-radius: 8px;
+      font-size: 1rem; font-weight: bold; cursor: pointer;
+    }
+    .reveal-btn:hover { background: #2563eb; }
+    .answer-box { display: none; margin-top: 15px; padding: 15px; background: #f0fdf4; border-radius: 8px; text-align: center; font-size: 1.1rem; }
+    .answer-box.show { display: block; }
+    
+    .practice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 1100px; margin: 0 auto; }
+    @media (max-width: 900px) { .practice-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .practice-grid { grid-template-columns: 1fr; } }
+    .practice-card .q-num { font-size: 0.9rem; font-weight: bold; color: #6b7280; margin-bottom: 8px; }
+    .practice-card .q-eq {
+      font-family: 'Courier New', monospace; font-size: 1.05rem; text-align: center;
+      background: #f3f4f6; padding: 10px; border-radius: 6px; margin-bottom: 12px;
+    }
+    .practice-card input {
+      width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px;
+      font-size: 1rem; text-align: center; margin-bottom: 8px;
+    }
+    .practice-card input:focus { border-color: #8b5cf6; outline: none; }
+    .check-btn {
+      width: 100%; padding: 10px; background: #e5e7eb; border: none;
+      border-radius: 6px; font-weight: 600; cursor: pointer;
+    }
+    .check-btn:hover { background: #d1d5db; }
+    .p-answer { display: none; margin-top: 10px; padding: 10px; background: #f0fdf4; border-radius: 6px; text-align: center; }
+    .p-answer.show { display: block; }
+    
+    .word-text { font-size: 1.05rem; color: #374151; line-height: 1.5; margin-bottom: 15px; padding: 15px; background: #fef3c7; border-radius: 8px; }
+    .word-inputs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 15px; }
+    .word-inputs input { padding: 10px 15px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 1rem; text-align: center; width: 180px; }
+  </style>
+</head>
+<body>
+  <h1>Equation of a Circle</h1>
+  
+  <div class="nav">
+    <button class="active" onclick="showSection('origin')">1. Simplest Case</button>
+    <button onclick="showSection('derivation')">2. General Derivation</button>
+    <button onclick="showSection('standard')">3. Standard Form</button>
+    <button onclick="showSection('interactive')">4. Interactive</button>
+    <button onclick="showSection('examples')">5. Examples</button>
+    <button onclick="showSection('practice')">6. Practice</button>
+  </div>
+
+  <!-- SECTION 1: ORIGIN -->
+  <div id="origin" class="section active">
+    <h2>Simplest Case: Circle at the Origin</h2>
+    <svg viewBox="-160 -160 320 320" width="420" height="420">
+      <defs><pattern id="g0" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="#e5e7eb" stroke-width="0.5"/></pattern></defs>
+      <rect x="-160" y="-160" width="320" height="320" fill="url(#g0)"/>
+      <line x1="-160" y1="0" x2="160" y2="0" stroke="#374151" stroke-width="2"/>
+      <line x1="0" y1="-160" x2="0" y2="160" stroke="#374151" stroke-width="2"/>
+      <text x="145" y="-10" font-size="16" fill="#374151" font-style="italic">x</text>
+      <text x="10" y="-140" font-size="16" fill="#374151" font-style="italic">y</text>
+      <circle cx="0" cy="0" r="100" fill="none" stroke="#3b82f6" stroke-width="3"/>
+      <circle cx="0" cy="0" r="5" fill="#ef4444"/>
+      <text x="8" y="18" font-size="14" fill="#ef4444" font-weight="bold">(0, 0)</text>
+      <circle cx="80" cy="-60" r="5" fill="#10b981"/>
+      <text x="88" y="-65" font-size="14" fill="#10b981" font-weight="bold">(x, y)</text>
+      <line x1="0" y1="0" x2="80" y2="-60" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="30" y="-40" font-size="16" fill="#8b5cf6" font-weight="bold">r</text>
+      <line x1="0" y1="0" x2="80" y2="0" stroke="#f59e0b" stroke-width="3"/>
+      <line x1="80" y1="0" x2="80" y2="-60" stroke="#f59e0b" stroke-width="3"/>
+      <path d="M 70 0 L 70 -10 L 80 -10" fill="none" stroke="#f59e0b" stroke-width="2"/>
+      <text x="35" y="18" font-size="14" fill="#f59e0b" font-weight="bold">x</text>
+      <text x="88" y="-25" font-size="14" fill="#f59e0b" font-weight="bold">y</text>
+    </svg>
+    <div class="explanation">
+      <p>When the circle is centred at the <strong>origin (0, 0)</strong>, the horizontal distance is simply <span class="amber"><strong>x</strong></span> and the vertical distance is simply <span class="amber"><strong>y</strong></span>.</p>
+      <p>By <strong>Pythagoras' Theorem</strong>:</p>
+      <div class="pythag-box"><span class="amber">x²</span> + <span class="amber">y²</span> = <span class="purple">r²</span></div>
+      <p style="text-align:center;">This is the equation of a circle with centre <span class="red"><strong>(0, 0)</strong></span> and radius <span class="purple"><strong>r</strong></span></p>
+    </div>
+    <div class="formula-box">
+      <div class="formula">x² + y² = r²</div>
+      <div class="formula-info"><span><strong>Centre:</strong> (0, 0)</span><span><strong>Radius:</strong> r</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: GENERAL DERIVATION -->
+  <div id="derivation" class="section">
+    <h2>General Case: Circle at (h, k)</h2>
+    <p style="text-align:center; color:#6b7280; margin-bottom:15px;">Now we translate the circle away from the origin...</p>
+    <svg viewBox="-20 -20 340 340" width="450" height="450">
+      <defs><pattern id="g1" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="#e5e7eb" stroke-width="0.5"/></pattern></defs>
+      <rect x="-20" y="-20" width="340" height="340" fill="url(#g1)"/>
+      <line x1="0" y1="300" x2="300" y2="300" stroke="#374151" stroke-width="2"/>
+      <line x1="0" y1="300" x2="0" y2="0" stroke="#374151" stroke-width="2"/>
+      <text x="290" y="295" font-size="16" fill="#374151" font-style="italic">x</text>
+      <text x="8" y="15" font-size="16" fill="#374151" font-style="italic">y</text>
+      <circle cx="150" cy="150" r="100" fill="none" stroke="#3b82f6" stroke-width="3"/>
+      <circle cx="150" cy="150" r="5" fill="#ef4444"/>
+      <text x="155" y="170" font-size="14" fill="#ef4444" font-weight="bold">(h, k)</text>
+      <circle cx="220" cy="80" r="5" fill="#10b981"/>
+      <text x="228" y="75" font-size="14" fill="#10b981" font-weight="bold">(x, y)</text>
+      <line x1="150" y1="150" x2="220" y2="80" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="175" y="100" font-size="16" fill="#8b5cf6" font-weight="bold">r</text>
+      <line x1="150" y1="150" x2="220" y2="150" stroke="#f59e0b" stroke-width="3"/>
+      <line x1="220" y1="150" x2="220" y2="80" stroke="#f59e0b" stroke-width="3"/>
+      <path d="M 210 150 L 210 140 L 220 140" fill="none" stroke="#f59e0b" stroke-width="2"/>
+      <text x="175" y="168" font-size="14" fill="#f59e0b" font-weight="bold">x − h</text>
+      <text x="228" y="120" font-size="14" fill="#f59e0b" font-weight="bold">y − k</text>
+    </svg>
+    <div class="explanation">
+      <p>When the centre is at <span class="red"><strong>(h, k)</strong></span>, the horizontal distance becomes <span class="amber"><strong>x − h</strong></span> and the vertical distance becomes <span class="amber"><strong>y − k</strong></span>.</p>
+      <p>By <strong>Pythagoras' Theorem</strong>:</p>
+      <div class="pythag-box"><span class="amber">(x − h)²</span> + <span class="amber">(y − k)²</span> = <span class="purple">r²</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: STANDARD FORM -->
+  <div id="standard" class="section">
+    <h2>Standard Form of a Circle</h2>
+    <div class="formula-box">
+      <div class="formula">(x − h)² + (y − k)² = r²</div>
+      <div class="formula-info"><span><strong>Centre:</strong> (h, k)</span><span><strong>Radius:</strong> r</span></div>
+    </div>
+    <svg viewBox="-150 -150 300 300" width="380" height="380">
+      <defs><pattern id="g2" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="0.5"/></pattern></defs>
+      <rect x="-150" y="-150" width="300" height="300" fill="url(#g2)"/>
+      <line x1="-150" y1="0" x2="150" y2="0" stroke="#374151" stroke-width="2"/>
+      <line x1="0" y1="-150" x2="0" y2="150" stroke="#374151" stroke-width="2"/>
+      <text x="135" y="-8" font-size="14" fill="#374151" font-style="italic">x</text>
+      <text x="8" y="-135" font-size="14" fill="#374151" font-style="italic">y</text>
+      <circle cx="50" cy="-30" r="70" fill="rgba(59, 130, 246, 0.1)" stroke="#3b82f6" stroke-width="3"/>
+      <circle cx="50" cy="-30" r="5" fill="#ef4444"/>
+      <text x="60" y="-35" font-size="14" fill="#ef4444" font-weight="bold">(h, k)</text>
+      <line x1="50" y1="-30" x2="120" y2="-30" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="80" y="-45" font-size="16" fill="#8b5cf6" font-weight="bold">r</text>
+    </svg>
+    <div class="explanation" style="max-width:800px;">
+      <p style="font-weight:bold; margin-bottom:15px;">Transformations from x² + y² = r²</p>
+      <p><span class="red"><strong>h</strong></span> → Horizontal translation (moves centre left/right)</p>
+      <p><span class="green"><strong>k</strong></span> → Vertical translation (moves centre up/down)</p>
+      <p><span class="purple"><strong>r</strong></span> → Dilation (scales the circle larger/smaller)</p>
+    </div>
+  </div>
+
+  <!-- SECTION 4: INTERACTIVE -->
+  <div id="interactive" class="section">
+    <h2>Explore: Move the Circle!</h2>
+    <div class="drag-hint"><strong>Drag the red centre</strong> to move the circle | <strong>Drag the green point</strong> to change radius | Or use sliders</div>
+    <div class="live-eq-box">
+      <div class="eq" id="live-eq">(x − 3)² + (y − 3)² = 4</div>
+      <div class="info">
+        <span class="red"><strong>Centre: (<span id="c-disp">3, 3</span>)</strong></span>
+        <span style="margin: 0 15px;">|</span>
+        <span class="purple"><strong>Radius: <span id="r-disp">2</span></strong></span>
+      </div>
+      <div class="transform-box">
+        <strong>Transformations:</strong>
+        <span class="red">h = <span id="h-t">3</span></span> |
+        <span class="green">k = <span id="k-t">3</span></span> |
+        <span class="purple">r = <span id="r-t">2</span></span>
+      </div>
+    </div>
+    <div class="interactive-wrap">
+      <div class="slider-v">
+        <label>k = <span id="k-val">3</span></label>
+        <input type="range" min="-5" max="5" value="3" id="k-slider" oninput="updateSliders()">
+        <span style="font-size:0.8rem;color:#6b7280;">Vertical</span>
+      </div>
+      <div>
+        <svg viewBox="-180 -180 360 360" width="460" height="460" id="int-svg">
+          <defs><pattern id="g3" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="#e5e7eb" stroke-width="0.5"/></pattern></defs>
+          <rect x="-180" y="-180" width="360" height="360" fill="url(#g3)"/>
+          <line x1="-180" y1="0" x2="180" y2="0" stroke="#374151" stroke-width="2"/>
+          <line x1="0" y1="-180" x2="0" y2="180" stroke="#374151" stroke-width="2"/>
+          <g id="ticks"></g>
+          <text x="165" y="-10" font-size="16" fill="#374151" font-style="italic">x</text>
+          <text x="10" y="-160" font-size="16" fill="#374151" font-style="italic">y</text>
+          <circle id="circ" cx="90" cy="-90" r="60" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="3"/>
+          <line id="rad-line" x1="90" y1="-90" x2="150" y2="-90" stroke="#8b5cf6" stroke-width="2"/>
+          <circle id="ctr-dot" cx="90" cy="-90" r="10" fill="#ef4444" style="cursor:grab;"/>
+          <circle id="rad-dot" cx="150" cy="-90" r="8" fill="#10b981" style="cursor:grab;"/>
+        </svg>
+        <div class="slider-h">
+          <label>h = <span id="h-val">3</span></label>
+          <input type="range" min="-5" max="5" value="3" id="h-slider" oninput="updateSliders()">
+          <span style="font-size:0.8rem;color:#6b7280;">Horizontal</span>
+        </div>
+      </div>
+      <div class="slider-r">
+        <label>r = <span id="r-val">2</span></label>
+        <input type="range" min="1" max="5" step="0.5" value="2" id="r-slider" oninput="updateSliders()">
+        <span style="font-size:0.8rem;color:#6b7280;">Dilation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: EXAMPLES -->
+  <div id="examples" class="section">
+    <h2>Examples</h2>
+    <div class="type-btns">
+      <button class="active" onclick="showSub('ex','eq2g')">Equation → Graph</button>
+      <button onclick="showSub('ex','g2eq')">Graph → Equation</button>
+    </div>
+    <div id="eq2g" class="sub-section active"></div>
+    <div id="g2eq" class="sub-section"></div>
+  </div>
+
+  <!-- SECTION 6: PRACTICE -->
+  <div id="practice" class="section">
+    <h2>Practice</h2>
+    <div class="type-btns purple">
+      <button class="active" onclick="showSub('pr','pr-eq')">Equation → Centre &amp; Radius</button>
+      <button onclick="showSub('pr','pr-diag')">Diagram → Equation</button>
+      <button onclick="showSub('pr','pr-word')">Word Problems</button>
+    </div>
+    <div id="pr-eq" class="sub-section active"><div class="practice-grid" id="eq-grid"></div></div>
+    <div id="pr-diag" class="sub-section"><div class="practice-grid" id="diag-grid"></div></div>
+    <div id="pr-word" class="sub-section" id="word-cont"></div>
+  </div>
+
+  <script>
+    let H = 3, K = 3, R = 2;
+    let dragC = false, dragR = false;
+    
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
+    
+    function showSub(group, id) {
+      const parent = document.getElementById(group === 'ex' ? 'examples' : 'practice');
+      parent.querySelectorAll('.sub-section').forEach(s => s.classList.remove('active'));
+      parent.querySelectorAll('.type-btns button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
+    
+    function updateDisp() {
+      document.getElementById('h-val').textContent = H;
+      document.getElementById('k-val').textContent = K;
+      document.getElementById('r-val').textContent = R;
+      document.getElementById('h-slider').value = H;
+      document.getElementById('k-slider').value = K;
+      document.getElementById('r-slider').value = R;
+      
+      const hs = H >= 0 ? '− ' + H : '+ ' + (-H);
+      const ks = K >= 0 ? '− ' + K : '+ ' + (-K);
+      document.getElementById('live-eq').textContent = '(x ' + hs + ')² + (y ' + ks + ')² = ' + (R*R);
+      document.getElementById('c-disp').textContent = H + ', ' + K;
+      document.getElementById('r-disp').textContent = R;
+      document.getElementById('h-t').textContent = H;
+      document.getElementById('k-t').textContent = K;
+      document.getElementById('r-t').textContent = R;
+      
+      const cx = H * 30, cy = -K * 30, rp = R * 30;
+      document.getElementById('circ').setAttribute('cx', cx);
+      document.getElementById('circ').setAttribute('cy', cy);
+      document.getElementById('circ').setAttribute('r', rp);
+      document.getElementById('ctr-dot').setAttribute('cx', cx);
+      document.getElementById('ctr-dot').setAttribute('cy', cy);
+      document.getElementById('rad-dot').setAttribute('cx', cx + rp);
+      document.getElementById('rad-dot').setAttribute('cy', cy);
+      document.getElementById('rad-line').setAttribute('x1', cx);
+      document.getElementById('rad-line').setAttribute('y1', cy);
+      document.getElementById('rad-line').setAttribute('x2', cx + rp);
+      document.getElementById('rad-line').setAttribute('y2', cy);
+    }
+    
+    function updateSliders() {
+      H = parseInt(document.getElementById('h-slider').value);
+      K = parseInt(document.getElementById('k-slider').value);
+      R = parseFloat(document.getElementById('r-slider').value);
+      updateDisp();
+    }
+    
+    const svg = document.getElementById('int-svg');
+    const ctrDot = document.getElementById('ctr-dot');
+    const radDot = document.getElementById('rad-dot');
+    
+    function getCoords(e) {
+      const rect = svg.getBoundingClientRect();
+      return { x: (e.clientX - rect.left) / rect.width * 360 - 180, y: (e.clientY - rect.top) / rect.height * 360 - 180 };
+    }
+    
+    ctrDot.onmousedown = e => { dragC = true; e.preventDefault(); };
+    radDot.onmousedown = e => { dragR = true; e.preventDefault(); };
+    document.onmousemove = e => {
+      if (dragC) {
+        const c = getCoords(e);
+        H = Math.max(-5, Math.min(5, Math.round(c.x / 30)));
+        K = Math.max(-5, Math.min(5, Math.round(-c.y / 30)));
+        updateDisp();
+      }
+      if (dragR) {
+        const c = getCoords(e);
+        const dist = Math.sqrt((c.x - H*30)**2 + (c.y + K*30)**2);
+        R = Math.max(1, Math.min(5, Math.round(dist / 30 * 2) / 2));
+        updateDisp();
+      }
+    };
+    document.onmouseup = () => { dragC = dragR = false; };
+    
+    ctrDot.ontouchstart = e => { dragC = true; e.preventDefault(); };
+    radDot.ontouchstart = e => { dragR = true; e.preventDefault(); };
+    document.ontouchmove = e => {
+      if (!dragC && !dragR) return;
+      const t = e.touches[0];
+      const rect = svg.getBoundingClientRect();
+      const c = { x: (t.clientX - rect.left) / rect.width * 360 - 180, y: (t.clientY - rect.top) / rect.height * 360 - 180 };
+      if (dragC) {
+        H = Math.max(-5, Math.min(5, Math.round(c.x / 30)));
+        K = Math.max(-5, Math.min(5, Math.round(-c.y / 30)));
+      }
+      if (dragR) {
+        const dist = Math.sqrt((c.x - H*30)**2 + (c.y + K*30)**2);
+        R = Math.max(1, Math.min(5, Math.round(dist / 30 * 2) / 2));
+      }
+      updateDisp();
+    };
+    document.ontouchend = () => { dragC = dragR = false; };
+    
+    function initTicks() {
+      const g = document.getElementById('ticks');
+      for (let n = -5; n <= 5; n++) {
+        if (n === 0) continue;
+        g.innerHTML += '<line x1="'+n*30+'" y1="-5" x2="'+n*30+'" y2="5" stroke="#374151"/>';
+        g.innerHTML += '<text x="'+n*30+'" y="18" font-size="11" fill="#374151" text-anchor="middle">'+n+'</text>';
+        g.innerHTML += '<line x1="-5" y1="'+(-n*30)+'" x2="5" y2="'+(-n*30)+'" stroke="#374151"/>';
+        g.innerHTML += '<text x="-14" y="'+(-n*30+4)+'" font-size="11" fill="#374151" text-anchor="middle">'+n+'</text>';
+      }
+    }
+    
+    function miniSVG(h, k, r, id, showAns) {
+      return '<svg viewBox="-150 -150 300 300" width="150" height="150" style="background:white;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">' +
+        '<defs><pattern id="mg'+id+'" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="0.5"/></pattern></defs>' +
+        '<rect x="-150" y="-150" width="300" height="300" fill="url(#mg'+id+')"/>' +
+        '<line x1="-150" y1="0" x2="150" y2="0" stroke="#374151" stroke-width="1.5"/>' +
+        '<line x1="0" y1="-150" x2="0" y2="150" stroke="#374151" stroke-width="1.5"/>' +
+        '<circle cx="'+(h*25)+'" cy="'+(-k*25)+'" r="'+(r*25)+'" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="2"/>' +
+        '<circle cx="'+(h*25)+'" cy="'+(-k*25)+'" r="4" fill="#ef4444"/>' +
+        (showAns ? '<line x1="'+(h*25)+'" y1="'+(-k*25)+'" x2="'+(h*25+r*25)+'" y2="'+(-k*25)+'" stroke="#8b5cf6" stroke-width="1.5"/>' : '') +
+        '</svg>';
+    }
+    
+    function toggle(id) {
+      const box = document.getElementById(id);
+      box.classList.toggle('show');
+      const btn = box.previousElementSibling;
+      btn.textContent = box.classList.contains('show') ? 'Hide Answer' : 'Show Answer';
+    }
+    
+    function initExamples() {
+      const eq2g = [
+        { eq: '(x − 2)² + (y + 5)² = 49', h: 2, k: -5, r: 7 },
+        { eq: '(x + 3)² + (y − 1)² = 16', h: -3, k: 1, r: 4 },
+        { eq: '(x − 4)² + (y + 2)² = 25', h: 4, k: -2, r: 5 }
+      ];
+      const g2eq = [
+        { h: 3, k: 2, r: 4, eq: '(x − 3)² + (y − 2)² = 16' },
+        { h: -2, k: -3, r: 3, eq: '(x + 2)² + (y + 3)² = 9' },
+        { h: 1, k: -4, r: 5, eq: '(x − 1)² + (y + 4)² = 25' }
+      ];
+      
+      const c1 = document.getElementById('eq2g');
+      eq2g.forEach((ex, i) => {
+        c1.innerHTML += '<div class="example-card"><div class="example-content">' +
+          '<div class="example-eq">' + ex.eq + '</div>' +
+          '<span style="font-size:2rem;color:#9ca3af;">→</span>' +
+          miniSVG(ex.h, ex.k, ex.r, 'e1'+i, false) +
+          '</div><button class="reveal-btn" onclick="toggle(\'e1a'+i+'\')">Show Answer</button>' +
+          '<div class="answer-box" id="e1a'+i+'">' +
+          '<div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-items:center;">' +
+          miniSVG(ex.h, ex.k, ex.r, 'e1b'+i, true) +
+          '<div><div class="red"><strong>Centre: ('+ex.h+', '+ex.k+')</strong></div><div class="purple"><strong>Radius: '+ex.r+'</strong></div></div>' +
+          '</div></div></div>';
+      });
+      
+      const c2 = document.getElementById('g2eq');
+      g2eq.forEach((ex, i) => {
+        c2.innerHTML += '<div class="example-card"><div class="example-content">' +
+          miniSVG(ex.h, ex.k, ex.r, 'e2'+i, true) +
+          '<span style="font-size:2rem;color:#9ca3af;">→</span>' +
+          '<div class="example-eq" style="background:#e5e7eb;color:#9ca3af;">? = ?</div>' +
+          '</div><button class="reveal-btn" onclick="toggle(\'e2a'+i+'\')">Show Answer</button>' +
+          '<div class="answer-box" id="e2a'+i+'">' +
+          '<div style="font-family:Courier New,monospace;font-size:1.3rem;margin-bottom:10px;"><strong>'+ex.eq+'</strong></div>' +
+          '<span class="red"><strong>Centre: ('+ex.h+', '+ex.k+')</strong></span> | <span class="purple"><strong>Radius: '+ex.r+'</strong></span>' +
+          '</div></div>';
+      });
+    }
+    
+    function initPractice() {
+      const eqQ = [
+        { eq: '(x − 2)² + (y − 3)² = 16', c: '(2, 3)', r: '4' },
+        { eq: '(x + 1)² + (y − 4)² = 25', c: '(−1, 4)', r: '5' },
+        { eq: '(x − 5)² + (y + 2)² = 9', c: '(5, −2)', r: '3' },
+        { eq: '(x + 3)² + (y + 1)² = 49', c: '(−3, −1)', r: '7' },
+        { eq: '(x − 4)² + (y − 6)² = 36', c: '(4, 6)', r: '6' },
+        { eq: 'x² + (y − 5)² = 4', c: '(0, 5)', r: '2' },
+        { eq: '(x + 2)² + y² = 64', c: '(−2, 0)', r: '8' },
+        { eq: '(x − 1)² + (y + 7)² = 100', c: '(1, −7)', r: '10' },
+        { eq: '(x + 4)² + (y − 2)² = 1', c: '(−4, 2)', r: '1' }
+      ];
+      const diagQ = [
+        { h: 2, k: 3, r: 3, eq: '(x − 2)² + (y − 3)² = 9' },
+        { h: -1, k: 2, r: 4, eq: '(x + 1)² + (y − 2)² = 16' },
+        { h: 3, k: -2, r: 2, eq: '(x − 3)² + (y + 2)² = 4' },
+        { h: -2, k: -1, r: 3, eq: '(x + 2)² + (y + 1)² = 9' },
+        { h: 0, k: 3, r: 4, eq: 'x² + (y − 3)² = 16' },
+        { h: 4, k: 0, r: 2, eq: '(x − 4)² + y² = 4' }
+      ];
+      const wordQ = [
+        { t: 'A circular pond has its centre at (3, −2) and radius 5m. Write the equation of the boundary.', a: '(x − 3)² + (y + 2)² = 25', c: '(3, −2)', r: '5' },
+        { t: 'A Ferris wheel has centre at height 12m and 8m from a reference point. Diameter is 10m. Write the equation.', a: '(x − 8)² + (y − 12)² = 25', c: '(8, 12)', r: '5' },
+        { t: 'A radio transmitter at (−4, 6) broadcasts up to 7km. Write the equation of the broadcast area.', a: '(x + 4)² + (y − 6)² = 49', c: '(−4, 6)', r: '7' },
+        { t: 'A circular track has diameter 400m with origin at centre. Write the equation.', a: 'x² + y² = 40000', c: '(0, 0)', r: '200' },
+        { t: 'A garden has equation (x + 2)² + (y − 5)² = 36. Find centre, radius and area (π ≈ 3.14).', a: 'Centre (−2, 5), Radius 6, Area ≈ 113.04 m²', c: '(−2, 5)', r: '6' },
+        { t: 'A spotlight creates a circular pool of light within 3m of the point (2, 1). Write the equation.', a: '(x − 2)² + (y − 1)² = 9', c: '(2, 1)', r: '3' }
+      ];
+      
+      const g1 = document.getElementById('eq-grid');
+      eqQ.forEach((q, i) => {
+        g1.innerHTML += '<div class="practice-card"><div class="q-num">Q'+(i+1)+'</div>' +
+          '<div class="q-eq">'+q.eq+'</div>' +
+          '<input type="text" placeholder="Centre: (?, ?)">' +
+          '<input type="text" placeholder="Radius: ?">' +
+          '<button class="check-btn" onclick="toggle(\'peq'+i+'\')">Check</button>' +
+          '<div class="p-answer" id="peq'+i+'"><div class="red"><strong>Centre: '+q.c+'</strong></div><div class="purple"><strong>Radius: '+q.r+'</strong></div></div></div>';
+      });
+      
+      const g2 = document.getElementById('diag-grid');
+      diagQ.forEach((q, i) => {
+        g2.innerHTML += '<div class="practice-card"><div class="q-num">Q'+(i+1)+'</div>' +
+          miniSVG(q.h, q.k, q.r, 'd'+i, true) +
+          '<input type="text" placeholder="Equation: ?" style="margin-top:12px;">' +
+          '<button class="check-btn" onclick="toggle(\'pdiag'+i+'\')">Check</button>' +
+          '<div class="p-answer" id="pdiag'+i+'"><div style="font-family:Courier New,monospace;"><strong>'+q.eq+'</strong></div></div></div>';
+      });
+      
+      const g3 = document.getElementById('pr-word');
+      wordQ.forEach((q, i) => {
+        g3.innerHTML += '<div class="example-card"><div class="q-num" style="font-weight:bold;color:#6b7280;margin-bottom:8px;">Q'+(i+1)+'</div>' +
+          '<div class="word-text">'+q.t+'</div>' +
+          '<div class="word-inputs"><input type="text" placeholder="Centre: (?, ?)"><input type="text" placeholder="Radius: ?"><input type="text" placeholder="Equation: ?"></div>' +
+          '<button class="check-btn" onclick="toggle(\'pword'+i+'\')" style="max-width:300px;margin:0 auto;display:block;">Check</button>' +
+          '<div class="p-answer" id="pword'+i+'"><div class="red"><strong>Centre: '+q.c+'</strong></div><div class="purple"><strong>Radius: '+q.r+'</strong></div>' +
+          '<div style="font-family:Courier New,monospace;margin-top:8px;"><strong>'+q.a+'</strong></div></div></div>';
+      });
+    }
+    
+    initTicks();
+    initExamples();
+    initPractice();
+    updateDisp();
+  </script>
+</body>
+</html>

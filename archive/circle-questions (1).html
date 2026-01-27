@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-ordinate Geometry: The Circle - Questions</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        .slide {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .slide.active { display: flex; flex-direction: column; }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0f4c75;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 1.4rem;
+            color: #3282b8;
+        }
+        .header .qnum {
+            background: #3282b8;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            overflow: hidden;
+        }
+        
+        .question-panel {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid #0f4c75;
+            overflow-y: auto;
+        }
+        .question-panel h2 {
+            color: #bbe1fa;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        .question-panel .q-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .question-panel .parts {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+        .question-panel .parts li {
+            margin: 10px 0;
+        }
+        .diagram {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .diagram svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .solution-panel {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid #0f4c75;
+            position: relative;
+            overflow-y: auto;
+        }
+        .solution-panel h2 {
+            color: #bbe1fa;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .solution-content {
+            font-size: 1rem;
+            line-height: 1.9;
+            transition: filter 0.5s ease;
+        }
+        .solution-content.blurred {
+            filter: blur(8px);
+            user-select: none;
+        }
+        .solution-content .step {
+            margin: 15px 0;
+            padding: 10px 15px;
+            background: rgba(50, 130, 184, 0.1);
+            border-left: 3px solid #3282b8;
+            border-radius: 0 8px 8px 0;
+        }
+        .solution-content .answer {
+            margin-top: 15px;
+            padding: 12px 18px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .reveal-btn {
+            background: linear-gradient(135deg, #3282b8, #0f4c75);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .reveal-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(50, 130, 184, 0.4);
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding-top: 20px;
+        }
+        .nav button {
+            background: #3282b8;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .nav button:hover:not(:disabled) {
+            background: #bbe1fa;
+            color: #1a1a2e;
+        }
+        .nav button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .nav .counter {
+            font-size: 1.1rem;
+            color: #bbe1fa;
+        }
+        
+        .math { font-family: 'Times New Roman', serif; font-style: italic; }
+        .eq { 
+            display: block; 
+            margin: 10px 0; 
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            text-align: center;
+        }
+        sup { font-size: 0.7em; vertical-align: super; }
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Q7(i) -->
+<div class="slide active">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q7 (i)</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                Find the equation of the following circle:
+                <div class="diagram">
+                    <svg width="280" height="280" viewBox="-7 -7 14 14">
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#666"/>
+                            </marker>
+                        </defs>
+                        <line x1="-6" y1="0" x2="6" y2="0" stroke="#666" stroke-width="0.05" marker-end="url(#arrow)"/>
+                        <line x1="0" y1="6" x2="0" y2="-6" stroke="#666" stroke-width="0.05" marker-end="url(#arrow)"/>
+                        <circle cx="0" cy="0" r="5" fill="none" stroke="#3282b8" stroke-width="0.1"/>
+                        <circle cx="4" cy="3" r="0.15" fill="#ff6b6b"/>
+                        <text x="4.5" y="3.5" font-size="0.8" fill="#bbe1fa">(4, 3)</text>
+                        <text x="5.5" y="-0.5" font-size="0.7" fill="#666">x</text>
+                        <text x="0.3" y="-5.5" font-size="0.7" fill="#666">y</text>
+                    </svg>
+                </div>
+                The circle passes through the point (4, 3) and is centred at the origin.
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>Step 1:</strong> Centre is at origin: (0, 0)
+                </div>
+                <div class="step">
+                    <strong>Step 2:</strong> Find radius using distance from centre to point (4, 3)
+                    <span class="eq"><span class="math">r</span> = √[(4−0)² + (3−0)²] = √[16 + 9] = √25 = 5</span>
+                </div>
+                <div class="step">
+                    <strong>Step 3:</strong> Circle equation with centre (0,0) and radius <span class="math">r</span>:
+                    <span class="eq"><span class="math">x</span>² + <span class="math">y</span>² = <span class="math">r</span>²</span>
+                </div>
+                <div class="answer">
+                    <span class="math">x</span>² + <span class="math">y</span>² = 25
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()" disabled>← Previous</button>
+        <span class="counter">1 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 2: Q7(ii) -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q7 (ii)</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                Find the equation of the following circle:
+                <div class="diagram">
+                    <svg width="280" height="280" viewBox="-7 -7 14 14">
+                        <line x1="-6" y1="0" x2="6" y2="0" stroke="#666" stroke-width="0.05"/>
+                        <line x1="0" y1="6" x2="0" y2="-6" stroke="#666" stroke-width="0.05"/>
+                        <circle cx="-3" cy="3" r="3" fill="none" stroke="#3282b8" stroke-width="0.1"/>
+                        <circle cx="-3" cy="3" r="0.15" fill="#ff6b6b"/>
+                        <text x="-4.5" y="3.8" font-size="0.8" fill="#bbe1fa">(−3, 3)</text>
+                    </svg>
+                </div>
+                The circle has centre (−3, 3) and passes through the origin.
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>Step 1:</strong> Centre is (−3, 3)
+                </div>
+                <div class="step">
+                    <strong>Step 2:</strong> Find radius (distance from centre to origin):
+                    <span class="eq"><span class="math">r</span> = √[(−3−0)² + (3−0)²] = √[9 + 9] = √18 = 3√2</span>
+                </div>
+                <div class="step">
+                    <strong>Step 3:</strong> Circle equation: (<span class="math">x</span> − <span class="math">h</span>)² + (<span class="math">y</span> − <span class="math">k</span>)² = <span class="math">r</span>²
+                    <span class="eq">(<span class="math">x</span> + 3)² + (<span class="math">y</span> − 3)² = 18</span>
+                </div>
+                <div class="answer">
+                    (<span class="math">x</span> + 3)² + (<span class="math">y</span> − 3)² = 18
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">2 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 3: Q7(iii) -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q7 (iii)</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                Find the equation of the following circle:
+                <div class="diagram">
+                    <svg width="280" height="280" viewBox="-7 -7 14 14">
+                        <line x1="-6" y1="0" x2="6" y2="0" stroke="#666" stroke-width="0.05"/>
+                        <line x1="0" y1="6" x2="0" y2="-6" stroke="#666" stroke-width="0.05"/>
+                        <circle cx="-4" cy="-4" r="4" fill="none" stroke="#3282b8" stroke-width="0.1"/>
+                        <circle cx="-4" cy="-4" r="0.15" fill="#ff6b6b"/>
+                        <text x="-5.5" y="-4.5" font-size="0.8" fill="#bbe1fa">(−4, −4)</text>
+                    </svg>
+                </div>
+                The circle has centre (−4, −4) and touches the y-axis.
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>Step 1:</strong> Centre is (−4, −4)
+                </div>
+                <div class="step">
+                    <strong>Step 2:</strong> Circle touches y-axis means radius = |x-coordinate of centre|
+                    <span class="eq"><span class="math">r</span> = |−4| = 4</span>
+                </div>
+                <div class="step">
+                    <strong>Step 3:</strong> Circle equation:
+                    <span class="eq">(<span class="math">x</span> + 4)² + (<span class="math">y</span> + 4)² = 16</span>
+                </div>
+                <div class="answer">
+                    (<span class="math">x</span> + 4)² + (<span class="math">y</span> + 4)² = 16
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">3 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 4: Q7(iv) -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q7 (iv)</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                Find the equation of the following circle:
+                <div class="diagram">
+                    <svg width="280" height="280" viewBox="-7 -7 14 14">
+                        <line x1="-6" y1="0" x2="6" y2="0" stroke="#666" stroke-width="0.05"/>
+                        <line x1="0" y1="6" x2="0" y2="-6" stroke="#666" stroke-width="0.05"/>
+                        <circle cx="2" cy="-4" r="4" fill="none" stroke="#3282b8" stroke-width="0.1"/>
+                        <circle cx="2" cy="-4" r="0.15" fill="#ff6b6b"/>
+                        <text x="2.5" y="-4.5" font-size="0.8" fill="#bbe1fa">(2, −4)</text>
+                    </svg>
+                </div>
+                The circle has centre (2, −4) and touches the x-axis.
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>Step 1:</strong> Centre is (2, −4)
+                </div>
+                <div class="step">
+                    <strong>Step 2:</strong> Circle touches x-axis means radius = |y-coordinate of centre|
+                    <span class="eq"><span class="math">r</span> = |−4| = 4</span>
+                </div>
+                <div class="step">
+                    <strong>Step 3:</strong> Circle equation:
+                    <span class="eq">(<span class="math">x</span> − 2)² + (<span class="math">y</span> + 4)² = 16</span>
+                </div>
+                <div class="answer">
+                    (<span class="math">x</span> − 2)² + (<span class="math">y</span> + 4)² = 16
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">4 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 5: Q8 -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q8</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                A circle has the following equation:
+                <span class="eq"><span class="math">x</span>² + <span class="math">y</span>² = 4</span>
+                <ul class="parts">
+                    <li>(a) Write down the co-ordinates of the centre of the circle.</li>
+                    <li>(b) Write down the radius of the circle.</li>
+                    <li>(c) Construct the circle.</li>
+                    <li>(d) Using the formula <span class="math">C</span> = 2π<span class="math">r</span>, find the circumference. Give your answer correct to two decimal places.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>(a)</strong> Compare <span class="math">x</span>² + <span class="math">y</span>² = 4 with <span class="math">x</span>² + <span class="math">y</span>² = <span class="math">r</span>²
+                    <br>Centre: <strong>(0, 0)</strong>
+                </div>
+                <div class="step">
+                    <strong>(b)</strong> <span class="math">r</span>² = 4, so <span class="math">r</span> = <strong>2</strong>
+                </div>
+                <div class="step">
+                    <strong>(c)</strong> Draw a circle centred at origin with radius 2 units.
+                </div>
+                <div class="step">
+                    <strong>(d)</strong> <span class="math">C</span> = 2π<span class="math">r</span> = 2π(2) = 4π
+                    <span class="eq">= 4 × 3.14159... = 12.566...</span>
+                </div>
+                <div class="answer">
+                    (a) (0, 0) &nbsp; (b) 2 &nbsp; (d) <span class="math">C</span> = <strong>12.57</strong> units
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">5 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 6: Q9 -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q9</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                A circle has the following equation:
+                <span class="eq"><span class="math">x</span>² + <span class="math">y</span>² = 36</span>
+                <ul class="parts">
+                    <li>(a) Write down the co-ordinates of the centre of the circle.</li>
+                    <li>(b) Write down the radius of the circle.</li>
+                    <li>(c) Construct the circle.</li>
+                    <li>(d) Using the formula <span class="math">C</span> = 2π<span class="math">r</span>, find the circumference. Give your answer correct to two decimal places.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>(a)</strong> Compare <span class="math">x</span>² + <span class="math">y</span>² = 36 with <span class="math">x</span>² + <span class="math">y</span>² = <span class="math">r</span>²
+                    <br>Centre: <strong>(0, 0)</strong>
+                </div>
+                <div class="step">
+                    <strong>(b)</strong> <span class="math">r</span>² = 36, so <span class="math">r</span> = <strong>6</strong>
+                </div>
+                <div class="step">
+                    <strong>(c)</strong> Draw a circle centred at origin with radius 6 units.
+                </div>
+                <div class="step">
+                    <strong>(d)</strong> <span class="math">C</span> = 2π<span class="math">r</span> = 2π(6) = 12π
+                    <span class="eq">= 12 × 3.14159... = 37.699...</span>
+                </div>
+                <div class="answer">
+                    (a) (0, 0) &nbsp; (b) 6 &nbsp; (d) <span class="math">C</span> = <strong>37.70</strong> units
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">6 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 7: Q10 -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q10</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                <span class="math">A</span>(−2, 1) and <span class="math">B</span>(2, −1) are the endpoints of a diameter of the circle <span class="math">p</span>.
+                <div class="diagram">
+                    <svg width="240" height="240" viewBox="-4 -4 8 8">
+                        <line x1="-3.5" y1="0" x2="3.5" y2="0" stroke="#666" stroke-width="0.03"/>
+                        <line x1="0" y1="3.5" x2="0" y2="-3.5" stroke="#666" stroke-width="0.03"/>
+                        <circle cx="0" cy="0" r="2.24" fill="none" stroke="#3282b8" stroke-width="0.08"/>
+                        <line x1="-2" y1="1" x2="2" y2="-1" stroke="#ff6b6b" stroke-width="0.06"/>
+                        <circle cx="-2" cy="1" r="0.12" fill="#ff6b6b"/>
+                        <circle cx="2" cy="-1" r="0.12" fill="#ff6b6b"/>
+                        <text x="-2.8" y="1.5" font-size="0.6" fill="#bbe1fa">A(−2, 1)</text>
+                        <text x="1.5" y="-1.5" font-size="0.6" fill="#bbe1fa">B(2, −1)</text>
+                        <text x="2.5" y="0.8" font-size="0.6" fill="#3282b8">p</text>
+                    </svg>
+                </div>
+                <ul class="parts">
+                    <li>(a) Find the co-ordinates of the centre of the circle.</li>
+                    <li>(b) Calculate the radius. Give your answer in the form √<span class="math">p</span>, where <span class="math">p</span> ∈ ℕ.</li>
+                    <li>(c) Write down the equation of the circle.</li>
+                    <li>(d) Using <span class="math">A</span> = π<span class="math">r</span>², find the area correct to two decimal places.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>(a)</strong> Centre = midpoint of diameter
+                    <span class="eq">= ((−2+2)/2, (1+(−1))/2) = (0, 0)</span>
+                </div>
+                <div class="step">
+                    <strong>(b)</strong> Radius = distance from centre to <span class="math">A</span>
+                    <span class="eq"><span class="math">r</span> = √[(−2−0)² + (1−0)²] = √[4 + 1] = <strong>√5</strong></span>
+                </div>
+                <div class="step">
+                    <strong>(c)</strong> Centre (0,0), <span class="math">r</span>² = 5
+                    <span class="eq"><span class="math">x</span>² + <span class="math">y</span>² = 5</span>
+                </div>
+                <div class="step">
+                    <strong>(d)</strong> <span class="math">A</span> = π<span class="math">r</span>² = π(5) = 5π = 15.707...
+                </div>
+                <div class="answer">
+                    (a) (0, 0) &nbsp; (b) √5 &nbsp; (c) <span class="math">x</span>² + <span class="math">y</span>² = 5 &nbsp; (d) <strong>15.71</strong> sq. units
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">7 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 8: Q11 -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q11</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                <span class="math">A</span>(−3, 4) and <span class="math">B</span> are the endpoints of a diameter of the circle <span class="math">w</span>, as shown.
+                <div class="diagram">
+                    <svg width="240" height="240" viewBox="-5 -2 10 8">
+                        <line x1="-4" y1="0" x2="5" y2="0" stroke="#666" stroke-width="0.03"/>
+                        <line x1="0" y1="5" x2="0" y2="-1" stroke="#666" stroke-width="0.03"/>
+                        <circle cx="0" cy="2" r="3.6" fill="none" stroke="#3282b8" stroke-width="0.08"/>
+                        <line x1="-3" y1="4" x2="3" y2="0" stroke="#ff6b6b" stroke-width="0.06"/>
+                        <circle cx="-3" cy="4" r="0.12" fill="#ff6b6b"/>
+                        <circle cx="3" cy="0" r="0.12" fill="#ff6b6b"/>
+                        <circle cx="0" cy="0" r="0.12" fill="#4caf50"/>
+                        <text x="-4" y="4.8" font-size="0.6" fill="#bbe1fa">A(−3, 4)</text>
+                        <text x="3.3" y="-0.3" font-size="0.6" fill="#bbe1fa">B</text>
+                        <text x="0.3" y="-0.5" font-size="0.5" fill="#4caf50">(0, 0)</text>
+                        <text x="3" y="3" font-size="0.6" fill="#3282b8">w</text>
+                    </svg>
+                </div>
+                The circle passes through the origin (0, 0).
+                <ul class="parts">
+                    <li>(a) Find the co-ordinates of <span class="math">B</span>.</li>
+                    <li>(b) Calculate the radius of the circle.</li>
+                    <li>(c) Write down the equation of the circle.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>(a)</strong> Centre = midpoint of <span class="math">AB</span>. Let <span class="math">B</span> = (<span class="math">x</span>, <span class="math">y</span>).
+                    <br>Circle passes through origin, and origin lies on circle.
+                    <br>By symmetry through centre: If <span class="math">A</span>(−3, 4), centre is midpoint, and <span class="math">B</span> is the reflection.
+                    <br>Centre = ((−3+<span class="math">x</span>)/2, (4+<span class="math">y</span>)/2)
+                    <br>Distance from centre to origin = distance from centre to <span class="math">A</span>
+                    <br>Since <span class="math">A</span>, origin, and <span class="math">B</span> are related: <span class="math">B</span> = <strong>(3, −4)</strong>
+                </div>
+                <div class="step">
+                    <strong>(b)</strong> Diameter = |<span class="math">AB</span>| = √[(3−(−3))² + (−4−4)²] = √[36 + 64] = √100 = 10
+                    <br>Radius = 10/2 = <strong>5</strong>
+                </div>
+                <div class="step">
+                    <strong>(c)</strong> Centre = ((−3+3)/2, (4−4)/2) = (0, 0)
+                    <span class="eq"><span class="math">x</span>² + <span class="math">y</span>² = 25</span>
+                </div>
+                <div class="answer">
+                    (a) <span class="math">B</span>(3, −4) &nbsp; (b) <span class="math">r</span> = 5 &nbsp; (c) <span class="math">x</span>² + <span class="math">y</span>² = 25
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">8 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 9: Q12 -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q12</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                The diagram shows the circle <span class="math">c</span>. The point <span class="math">P</span>(12, <span class="math">k</span>), <span class="math">k</span> > 0, is on the circle.
+                <div class="diagram">
+                    <svg width="280" height="200" viewBox="-15 -8 30 16">
+                        <line x1="-14" y1="0" x2="14" y2="0" stroke="#666" stroke-width="0.1"/>
+                        <line x1="0" y1="7" x2="0" y2="-7" stroke="#666" stroke-width="0.1"/>
+                        <circle cx="0" cy="0" r="13" fill="none" stroke="#3282b8" stroke-width="0.15"/>
+                        <circle cx="-13" cy="0" r="0.3" fill="#ff6b6b"/>
+                        <circle cx="13" cy="0" r="0.3" fill="#ff6b6b"/>
+                        <circle cx="12" cy="5" r="0.3" fill="#4caf50"/>
+                        <text x="-13" y="-1" font-size="1.2" fill="#bbe1fa">B(−13, 0)</text>
+                        <text x="10" y="-1" font-size="1.2" fill="#bbe1fa">A(13, 0)</text>
+                        <text x="10" y="6.5" font-size="1.2" fill="#4caf50">P(12, k)</text>
+                    </svg>
+                </div>
+                <ul class="parts">
+                    <li>(a) Find the value of <span class="math">k</span>.</li>
+                    <li>(b) Show that <span class="math">AP</span> is perpendicular to <span class="math">BP</span>.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>(a)</strong> Circle has diameter from <span class="math">B</span>(−13, 0) to <span class="math">A</span>(13, 0)
+                    <br>Centre = (0, 0), radius = 13
+                    <br>Equation: <span class="math">x</span>² + <span class="math">y</span>² = 169
+                    <br>Point <span class="math">P</span>(12, <span class="math">k</span>) is on circle:
+                    <span class="eq">12² + <span class="math">k</span>² = 169</span>
+                    <span class="eq">144 + <span class="math">k</span>² = 169</span>
+                    <span class="eq"><span class="math">k</span>² = 25, so <span class="math">k</span> = <strong>5</strong> (since <span class="math">k</span> > 0)</span>
+                </div>
+                <div class="step">
+                    <strong>(b)</strong> <span class="math">P</span> = (12, 5), <span class="math">A</span> = (13, 0), <span class="math">B</span> = (−13, 0)
+                    <br>Slope of <span class="math">AP</span> = (5−0)/(12−13) = 5/(−1) = −5
+                    <br>Slope of <span class="math">BP</span> = (5−0)/(12−(−13)) = 5/25 = 1/5
+                    <br>Product of slopes = (−5) × (1/5) = <strong>−1</strong>
+                </div>
+                <div class="answer">
+                    (a) <span class="math">k</span> = 5 &nbsp; (b) Slopes multiply to −1 ∴ <span class="math">AP</span> ⊥ <span class="math">BP</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">9 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 10: Q13 (a-c) -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q13 (a–c)</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                The line segment joining <span class="math">A</span>(−5, 1) and <span class="math">B</span>(5, −1) is the diameter of a circle.
+                <ul class="parts">
+                    <li>(a) Find the co-ordinates of the centre of the circle.</li>
+                    <li>(b) Calculate the radius of the circle. Give your answer in the form √<span class="math">p</span>, where <span class="math">p</span> ∈ ℕ.</li>
+                    <li>(c) Write down the equation of the circle.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>(a)</strong> Centre = midpoint of <span class="math">AB</span>
+                    <span class="eq">= ((−5+5)/2, (1+(−1))/2) = <strong>(0, 0)</strong></span>
+                </div>
+                <div class="step">
+                    <strong>(b)</strong> Radius = distance from centre to <span class="math">A</span>
+                    <span class="eq"><span class="math">r</span> = √[(−5−0)² + (1−0)²] = √[25 + 1] = <strong>√26</strong></span>
+                </div>
+                <div class="step">
+                    <strong>(c)</strong> Centre (0, 0), <span class="math">r</span>² = 26
+                    <span class="eq"><span class="math">x</span>² + <span class="math">y</span>² = 26</span>
+                </div>
+                <div class="answer">
+                    (a) (0, 0) &nbsp; (b) √26 &nbsp; (c) <span class="math">x</span>² + <span class="math">y</span>² = 26
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">10 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 11: Q13 (d-e) -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Q13 (d–e)</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Question</h2>
+            <div class="q-text">
+                The line segment joining <span class="math">A</span>(−5, 1) and <span class="math">B</span>(5, −1) is the diameter of a circle.
+                <br><br>
+                From parts (a)–(c): Centre (0, 0), radius √26, equation <span class="math">x</span>² + <span class="math">y</span>² = 26
+                <ul class="parts">
+                    <li>(d) Using the formula <span class="math">A</span> = π<span class="math">r</span>², find the area of the circle. Give your answer in square units, correct to two decimal places.</li>
+                    <li>(e) Is the area of the square with vertices <span class="math">O</span>(0, 0), <span class="math">A</span>(9, 0), <span class="math">B</span>(9, 9) and <span class="math">C</span>(0, 9) greater than the area of the circle described in this question? Explain your answer.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Solution <button class="reveal-btn" onclick="toggleSolution(this)">Show</button></h2>
+            <div class="solution-content blurred">
+                <div class="step">
+                    <strong>(d)</strong> <span class="math">A</span> = π<span class="math">r</span>² = π(26) = 26π
+                    <span class="eq">= 26 × 3.14159... = 81.681...</span>
+                </div>
+                <div class="step">
+                    <strong>(e)</strong> Square has side length 9
+                    <br>Area of square = 9² = 81 square units
+                    <br>Area of circle = 81.68 square units
+                    <br><br>
+                    81 < 81.68
+                </div>
+                <div class="answer">
+                    (d) Area = <strong>81.68</strong> sq. units
+                    <br>(e) <strong>No</strong>, the square's area (81) is less than the circle's area (81.68).
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">11 / 12</span>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+</div>
+
+<!-- Slide 12: Summary -->
+<div class="slide">
+    <div class="header">
+        <h1>Co-ordinate Geometry: The Circle</h1>
+        <span class="qnum">Summary</span>
+    </div>
+    <div class="content">
+        <div class="question-panel">
+            <h2>Key Formulas</h2>
+            <div class="q-text">
+                <div class="step">
+                    <strong>Circle centred at origin:</strong>
+                    <span class="eq"><span class="math">x</span>² + <span class="math">y</span>² = <span class="math">r</span>²</span>
+                </div>
+                <div class="step">
+                    <strong>Circle centred at (<span class="math">h</span>, <span class="math">k</span>):</strong>
+                    <span class="eq">(<span class="math">x</span> − <span class="math">h</span>)² + (<span class="math">y</span> − <span class="math">k</span>)² = <span class="math">r</span>²</span>
+                </div>
+                <div class="step">
+                    <strong>Midpoint formula:</strong>
+                    <span class="eq">M = ((x₁+x₂)/2, (y₁+y₂)/2)</span>
+                </div>
+                <div class="step">
+                    <strong>Distance formula:</strong>
+                    <span class="eq"><span class="math">d</span> = √[(x₂−x₁)² + (y₂−y₁)²]</span>
+                </div>
+            </div>
+        </div>
+        <div class="solution-panel">
+            <h2>Key Facts</h2>
+            <div class="solution-content">
+                <div class="step">
+                    <strong>Centre from diameter:</strong> Midpoint of diameter endpoints
+                </div>
+                <div class="step">
+                    <strong>Radius from diameter:</strong> Half the diameter length
+                </div>
+                <div class="step">
+                    <strong>Touches x-axis:</strong> radius = |<span class="math">k</span>| (y-coord of centre)
+                </div>
+                <div class="step">
+                    <strong>Touches y-axis:</strong> radius = |<span class="math">h</span>| (x-coord of centre)
+                </div>
+                <div class="step">
+                    <strong>Perpendicular lines:</strong> product of slopes = −1
+                </div>
+                <div class="step">
+                    <strong>Circumference:</strong> <span class="math">C</span> = 2π<span class="math">r</span>
+                </div>
+                <div class="step">
+                    <strong>Area:</strong> <span class="math">A</span> = π<span class="math">r</span>²
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">← Previous</button>
+        <span class="counter">12 / 12</span>
+        <button onclick="nextSlide()" disabled>Next →</button>
+    </div>
+</div>
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+
+function showSlide(n) {
+    slides[currentSlide].classList.remove('active');
+    currentSlide = (n + totalSlides) % totalSlides;
+    slides[currentSlide].classList.add('active');
+    updateNav();
+}
+
+function nextSlide() { showSlide(currentSlide + 1); }
+function prevSlide() { showSlide(currentSlide - 1); }
+
+function updateNav() {
+    const nav = slides[currentSlide].querySelector('.nav');
+    const prevBtn = nav.querySelector('button:first-child');
+    const nextBtn = nav.querySelector('button:last-child');
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === totalSlides - 1;
+}
+
+function toggleSolution(btn) {
+    const content = btn.closest('.solution-panel').querySelector('.solution-content');
+    content.classList.toggle('blurred');
+    btn.textContent = content.classList.contains('blurred') ? 'Show' : 'Hide';
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+    if (e.key === 'ArrowLeft') prevSlide();
+});
+</script>
+
+</body>
+</html>

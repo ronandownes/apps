@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LCA Mathematical Concepts and Skills</title>
+    <style>
+        :root {
+            --content-size: 1.6rem;
+            --mcs-title-size: calc(var(--content-size) * 1.3);
+            --subtitle-size: calc(var(--content-size) * 0.8);
+            --students-header-size: calc(var(--content-size) * 1.1);
+            --title-main-size: 3.5rem;
+            --title-sub-size: 2rem;
+            --label-size: var(--content-size);
+            --btn-text-size: 0.95rem;
+            
+            --ink: #000;
+            --line: #e0e0e0;
+            --muted: #666;
+            --primary: #e94560;
+            --primary-light: #ff6b6b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --official-bg: #fef3c7;
+            --official-border: #f59e0b;
+            --student-bg: #d1fae5;
+            --student-border: #10b981;
+            --sidebar-width: 280px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ========== VIEW MODE TOGGLE ========== */
+        .view-toggle {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0;
+            background: var(--card-bg);
+            border: 2px solid var(--line);
+            border-radius: 30px;
+            padding: 4px;
+            z-index: 300;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .view-btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.2s;
+        }
+
+        .view-btn:hover { color: var(--ink); }
+        .view-btn.active { background: var(--primary); color: white; }
+
+        .view-btn.official-btn.active { background: var(--official-border); }
+        .view-btn.student-btn.active { background: var(--student-border); }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--card-bg);
+            border-right: 2px solid var(--line);
+            overflow-y: auto;
+            z-index: 200;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            padding: 15px;
+        }
+
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-toggle {
+            position: fixed;
+            left: 15px;
+            top: 15px;
+            width: 44px;
+            height: 44px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 250;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover { background: var(--primary-light); }
+        .sidebar.open + .sidebar-toggle { left: calc(var(--sidebar-width) + 15px); }
+
+        .sidebar h3 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--line);
+        }
+
+        .sidebar-section { margin-bottom: 15px; }
+
+        .sidebar-section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-item {
+            display: block;
+            padding: 8px 10px;
+            margin: 3px 0;
+            font-size: 0.85rem;
+            color: var(--ink);
+            text-decoration: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .sidebar-item:hover { background: var(--bg); border-color: var(--line); }
+        .sidebar-item.active { background: var(--primary); color: white; font-weight: 600; }
+        .sidebar-item .slide-num { display: inline-block; width: 22px; text-align: center; margin-right: 6px; font-weight: 600; }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .sidebar.open ~ .main-content { margin-left: var(--sidebar-width); }
+
+        .slide {
+            display: none;
+            min-height: 100vh;
+            padding: 70px 30px 120px 80px;
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .slide.active { display: flex; flex-direction: column; }
+
+        /* ========== HEADER ========== */
+        .slide-header-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            align-items: stretch;
+        }
+
+        .mcs-title {
+            flex: 0 0 420px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            padding: 18px 24px;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.2);
+        }
+
+        .mcs-title h1 { font-size: var(--mcs-title-size); font-weight: 800; margin-bottom: 6px; line-height: 1.15; }
+        .mcs-title .subtitle { font-size: var(--subtitle-size); color: rgba(255,255,255,0.9); font-weight: 500; }
+
+        .students-box {
+            flex: 1;
+            background: var(--card-bg);
+            border: 2px solid var(--line);
+            border-radius: 12px;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .students-box h1 { font-size: var(--students-header-size); font-weight: 700; color: var(--primary); text-align: right; }
+
+        /* ========== CONTENT ITEMS ========== */
+        .content { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+
+        .item-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.3s ease;
+        }
+
+        .item-group.visible { opacity: 1; transform: translateY(0); }
+
+        .item {
+            background: var(--card-bg);
+            border: 2px solid var(--line);
+            border-radius: 10px;
+            padding: 18px 22px;
+            font-size: var(--content-size);
+            line-height: 1.4;
+            transition: all 0.3s ease;
+        }
+
+        .item.official {
+            background: var(--official-bg);
+            border-color: var(--official-border);
+            border-left-width: 5px;
+        }
+
+        .item.student {
+            background: var(--student-bg);
+            border-color: var(--student-border);
+            border-left-width: 5px;
+        }
+
+        .item .label {
+            color: var(--primary);
+            font-weight: 900;
+            margin-right: 14px;
+            display: inline-block;
+            min-width: 50px;
+            font-size: var(--label-size);
+        }
+
+        .item .tag {
+            display: inline-block;
+            font-size: 0.7em;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .item.official .tag { background: var(--official-border); color: white; }
+        .item.student .tag { background: var(--student-border); color: white; }
+
+        /* ========== VIEW MODE VISIBILITY ========== */
+        body.view-official .item.student { display: none; }
+        body.view-student .item.official { display: none; }
+        body.view-both .item { display: block; }
+
+        /* ========== NAVIGATION ========== */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: var(--card-bg);
+            border: 2px solid var(--line);
+            border-radius: 50px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: var(--btn-text-size);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            min-width: 80px;
+        }
+
+        .btn:hover { background: var(--primary-light); }
+        .btn:disabled { background: #cbd5e1; color: #64748b; cursor: not-allowed; }
+        .btn.secondary { background: var(--bg); color: var(--primary); border: 2px solid var(--primary); }
+        .btn.secondary:hover { background: var(--primary); color: white; }
+
+        .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 5px; background: var(--line); z-index: 1000; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); width: 0%; transition: width 0.3s ease; }
+
+        .slide-counter {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--line);
+            border-radius: 25px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--muted);
+            z-index: 100;
+        }
+
+        /* ========== TITLE SLIDE ========== */
+        .title-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100vh;
+            padding: 30px;
+        }
+
+        .title-slide h1 { 
+            font-size: var(--title-main-size); 
+            font-weight: 900; 
+            color: var(--primary); 
+            margin-bottom: 20px; 
+            line-height: 1.2;
+        }
+        .title-slide h2 { 
+            font-size: var(--title-sub-size); 
+            font-weight: 400; 
+            color: var(--muted); 
+            max-width: 900px;
+            margin-bottom: 40px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 30px;
+            margin-top: 40px;
+            font-size: 1.1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-swatch {
+            width: 30px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+
+        .legend-swatch.official { background: var(--official-bg); border-color: var(--official-border); }
+        .legend-swatch.student { background: var(--student-bg); border-color: var(--student-border); }
+
+        .keyboard-hint {
+            position: fixed;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            border: 2px solid var(--line);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            color: var(--muted);
+            opacity: 0.6;
+            z-index: 90;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1000px) {
+            :root { --content-size: 1.4rem; }
+            .mcs-title { flex: 0 0 320px; }
+            .slide { padding-left: 70px; }
+            .view-toggle { top: auto; bottom: 85px; }
+        }
+
+        @media (max-width: 750px) {
+            .slide-header-container { flex-direction: column; }
+            .mcs-title, .students-box { flex: none; width: 100%; }
+            .students-box { justify-content: flex-start; }
+            .students-box h1 { text-align: left; }
+            :root { --content-size: 1.2rem; }
+            .view-toggle { flex-wrap: wrap; width: 90%; justify-content: center; }
+            .view-btn { padding: 6px 12px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body class="view-both">
+    <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
+    <div class="slide-counter" id="slideCounter">1 / 7</div>
+
+    <!-- View Mode Toggle -->
+    <div class="view-toggle">
+        <button class="view-btn official-btn" data-view="official">Official</button>
+        <button class="view-btn student-btn" data-view="student">Student-Friendly</button>
+        <button class="view-btn active" data-view="both">Both</button>
+    </div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <h3>📘 LCA Mathematical Concepts & Skills</h3>
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Mathematical Concepts</div>
+            <a class="sidebar-item" data-slide="0"><span class="slide-num">0</span>Title Slide</a>
+            <a class="sidebar-item" data-slide="1"><span class="slide-num">1</span>MCS.1: Reason Mathematically</a>
+            <a class="sidebar-item" data-slide="2"><span class="slide-num">2</span>MCS.2: Calculations & Operations</a>
+            <a class="sidebar-item" data-slide="3"><span class="slide-num">3</span>MCS.3: 2D & 3D Shapes</a>
+            <a class="sidebar-item" data-slide="4"><span class="slide-num">4</span>MCS.4: Relationships & Expressions</a>
+            <a class="sidebar-item" data-slide="5"><span class="slide-num">5</span>MCS.5: Statistical Investigation</a>
+        </div>
+    </nav>
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+    <div class="main-content">
+        <!-- Title Slide -->
+        <div class="slide active" id="slide-0">
+            <div class="title-slide">
+                <h1>LCA Mathematical Concepts and Skills (MCS)</h1>
+                <h2>Leaving Certificate Applied - Mathematical Applications</h2>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-swatch official"></div> Official specification</div>
+                    <div class="legend-item"><div class="legend-swatch student"></div> Student-friendly version</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCS.1: Reason Mathematically -->
+        <div class="slide" id="slide-1">
+            <div class="slide-header-container">
+                <div class="mcs-title"><h1>MCS.1</h1><div class="subtitle">Reason mathematically about problems</div></div>
+                <div class="students-box"><h1>Students should be able to:</h1></div>
+            </div>
+            <div class="content">
+                <div class="item-group">
+                    <div class="item official"><span class="label">a.</span><span class="tag">OFFICIAL</span>Make sense of a given problem and represent it using mathematics</div>
+                    <div class="item student"><span class="label">a.</span><span class="tag">STUDENT</span>Understand what a problem is asking and turn it into maths</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">b.</span><span class="tag">OFFICIAL</span>Apply knowledge and skills to solve a problem, including decomposing it into manageable parts and/or simplifying it using appropriate assumptions</div>
+                    <div class="item student"><span class="label">b.</span><span class="tag">STUDENT</span>Break problems into smaller steps and solve them using maths skills</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">c.</span><span class="tag">OFFICIAL</span>Interpret and justify their solution in terms of the original problem and communicate their findings mathematically</div>
+                    <div class="item student"><span class="label">c.</span><span class="tag">STUDENT</span>Explain your answer in plain English and show how it solves the original problem</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCS.2: Calculations & Operations -->
+        <div class="slide" id="slide-2">
+            <div class="slide-header-container">
+                <div class="mcs-title"><h1>MCS.2</h1><div class="subtitle">Calculations and operations</div></div>
+                <div class="students-box"><h1>Students should be able to:</h1></div>
+            </div>
+            <div class="content">
+                <div class="item-group">
+                    <div class="item official"><span class="label">a.</span><span class="tag">OFFICIAL</span>Perform calculations on positive and negative numbers: addition, subtraction, multiplication, division, square roots, and positive whole number powers</div>
+                    <div class="item student"><span class="label">a.</span><span class="tag">STUDENT</span>Work with positive and negative numbers using all four operations, square roots, and powers</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">b.</span><span class="tag">OFFICIAL</span>Use the order of arithmetic operations, including the use of brackets</div>
+                    <div class="item student"><span class="label">b.</span><span class="tag">STUDENT</span>Use BIDMAS/BODMAS (order of operations) correctly, including brackets</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">c.</span><span class="tag">OFFICIAL</span>Present answers to the degree of accuracy required (nearest whole number, nearest thousand, two decimal places)</div>
+                    <div class="item student"><span class="label">c.</span><span class="tag">STUDENT</span>Round answers to the required level of accuracy (whole numbers, thousands, decimals)</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">d.</span><span class="tag">OFFICIAL</span>Use appropriate units and convert between them (mm, cm, m, km, seconds, minutes, hours, days, €k, €million, degrees)</div>
+                    <div class="item student"><span class="label">d.</span><span class="tag">STUDENT</span>Choose correct units and convert between them (length, time, money, angles)</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">e.</span><span class="tag">OFFICIAL</span>Flexibly convert between fractions, decimals, and percentages</div>
+                    <div class="item student"><span class="label">e.</span><span class="tag">STUDENT</span>Move confidently between fractions, decimals, and percentages</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">f.</span><span class="tag">OFFICIAL</span>Use and understand ratio and proportion</div>
+                    <div class="item student"><span class="label">f.</span><span class="tag">STUDENT</span>Use ratio and proportion to compare quantities and solve problems</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCS.3: 2D & 3D Shapes -->
+        <div class="slide" id="slide-3">
+            <div class="slide-header-container">
+                <div class="mcs-title"><h1>MCS.3</h1><div class="subtitle">Investigate 2D and 3D shapes</div></div>
+                <div class="students-box"><h1>Students should be able to:</h1></div>
+            </div>
+            <div class="content">
+                <div class="item-group">
+                    <div class="item official"><span class="label">a.</span><span class="tag">OFFICIAL</span>Draw and interpret scaled diagrams, using geometric tools (ruler, straight edge, set square, protractor, compass)</div>
+                    <div class="item student"><span class="label">a.</span><span class="tag">STUDENT</span>Draw and understand scale diagrams using proper drawing tools</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">b.</span><span class="tag">OFFICIAL</span>Draw and interpret nets, including rectangular solids and cylinders</div>
+                    <div class="item student"><span class="label">b.</span><span class="tag">STUDENT</span>Draw and understand nets of 3D shapes like boxes and cylinders</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">c.</span><span class="tag">OFFICIAL</span>Find the perimeter and area of 2D shapes (combinations of discs, triangles, and rectangles)</div>
+                    <div class="item student"><span class="label">c.</span><span class="tag">STUDENT</span>Calculate the perimeter and area of flat shapes made from basic shapes</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">d.</span><span class="tag">OFFICIAL</span>Find the volume and surface area of 3D shapes (rectangular solids and cylinders)</div>
+                    <div class="item student"><span class="label">d.</span><span class="tag">STUDENT</span>Calculate the volume and surface area of 3D shapes like boxes and cylinders</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">e.</span><span class="tag">OFFICIAL</span>Recognise and use angle facts: at a point, on a straight line, and in squares, rectangles, parallelograms, and triangles</div>
+                    <div class="item student"><span class="label">e.</span><span class="tag">STUDENT</span>Use angle rules for points, straight lines, and common shapes</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">f.</span><span class="tag">OFFICIAL</span>Apply the theorem of Pythagoras to solve simple problems</div>
+                    <div class="item student"><span class="label">f.</span><span class="tag">STUDENT</span>Use Pythagoras' theorem to solve right-angled triangle problems</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCS.4: Relationships & Expressions -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header-container">
+                <div class="mcs-title"><h1>MCS.4</h1><div class="subtitle">Explore relationships and expressions</div></div>
+                <div class="students-box"><h1>Students should be able to:</h1></div>
+            </div>
+            <div class="content">
+                <div class="item-group">
+                    <div class="item official"><span class="label">a.</span><span class="tag">OFFICIAL</span>Evaluate expressions given the value of variables</div>
+                    <div class="item student"><span class="label">a.</span><span class="tag">STUDENT</span>Substitute numbers into formulas to find answers</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">b.</span><span class="tag">OFFICIAL</span>Represent linear relationships in tables, graphs, and generalised expressions (expressed in words)</div>
+                    <div class="item student"><span class="label">b.</span><span class="tag">STUDENT</span>Show straight-line relationships in tables, graphs, and word formulas</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">c.</span><span class="tag">OFFICIAL</span>Select and use suitable strategies for finding solutions to problems involving linear relationships (graphic, numeric, trial and improvement, working backwards)</div>
+                    <div class="item student"><span class="label">c.</span><span class="tag">STUDENT</span>Use different methods (graphs, tables, trial and error) to solve problems with straight-line patterns</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCS.5: Statistical Investigation -->
+        <div class="slide" id="slide-5">
+            <div class="slide-header-container">
+                <div class="mcs-title"><h1>MCS.5</h1><div class="subtitle">Carry out a statistical investigation</div></div>
+                <div class="students-box"><h1>Students should be able to:</h1></div>
+            </div>
+            <div class="content">
+                <div class="item-group">
+                    <div class="item official"><span class="label">a.</span><span class="tag">OFFICIAL</span>Generate a statistical question</div>
+                    <div class="item student"><span class="label">a.</span><span class="tag">STUDENT</span>Ask a good question that can be answered with data</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">b.</span><span class="tag">OFFICIAL</span>Plan and implement a method to generate and/or source unbiased, representative data</div>
+                    <div class="item student"><span class="label">b.</span><span class="tag">STUDENT</span>Collect fair and representative data for your investigation</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">c.</span><span class="tag">OFFICIAL</span>Select, draw, and interpret appropriate graphical displays (bar charts, pie charts, trend graphs, histograms)</div>
+                    <div class="item student"><span class="label">c.</span><span class="tag">STUDENT</span>Choose, draw and understand suitable charts and graphs for your data</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">d.</span><span class="tag">OFFICIAL</span>Select, calculate, and interpret summary statistics: measures of central tendency (mean, median, mode) and spread (range)</div>
+                    <div class="item student"><span class="label">d.</span><span class="tag">STUDENT</span>Calculate and explain averages (mean, median, mode) and range</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">e.</span><span class="tag">OFFICIAL</span>Evaluate the effectiveness of different graphical displays in representing data</div>
+                    <div class="item student"><span class="label">e.</span><span class="tag">STUDENT</span>Judge which type of graph best shows your data clearly</div>
+                </div>
+                <div class="item-group">
+                    <div class="item official"><span class="label">f.</span><span class="tag">OFFICIAL</span>Discuss misconceptions and misuses of statistics</div>
+                    <div class="item student"><span class="label">f.</span><span class="tag">STUDENT</span>Recognize when statistics are misleading or used incorrectly</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="keyboard-hint">Space/→: next • ←: prev • ↑: hide • ↓: show all • M: menu</div>
+
+    <div class="controls">
+        <button class="btn" id="prevSlide">◀ Prev</button>
+        <button class="btn secondary" id="prevItem">◀ Item</button>
+        <button class="btn secondary" id="hideAll">Hide</button>
+        <button class="btn" id="nextItem">Item ▶</button>
+        <button class="btn" id="nextSlide">Next ▶</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        let currentItem = -1;
+        const totalSlides = 6;
+
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        function getSlideItems(slideIndex) {
+            const slide = document.getElementById(`slide-${slideIndex}`);
+            return slide ? slide.querySelectorAll('.item-group') : [];
+        }
+
+        function updateProgress() {
+            const progress = (currentSlide / (totalSlides - 1)) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function updateSidebarActive() {
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+                if (parseInt(item.dataset.slide) === currentSlide) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        function showSlide(index) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById(`slide-${index}`).classList.add('active');
+            currentSlide = index;
+            currentItem = -1;
+            updateProgress();
+            updateButtons();
+            updateSidebarActive();
+        }
+
+        function hideAllItems() {
+            const items = getSlideItems(currentSlide);
+            items.forEach(item => item.classList.remove('visible'));
+            currentItem = -1;
+            updateButtons();
+        }
+
+        function showNextItem() {
+            const items = getSlideItems(currentSlide);
+            if (currentItem < items.length - 1) {
+                currentItem++;
+                items[currentItem].classList.add('visible');
+            } else if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+                return;
+            }
+            updateButtons();
+        }
+
+        function showPrevItem() {
+            const items = getSlideItems(currentSlide);
+            if (currentItem > 0) {
+                items[currentItem].classList.remove('visible');
+                currentItem--;
+            } else if (currentItem === 0) {
+                items[currentItem].classList.remove('visible');
+                currentItem = -1;
+            }
+            updateButtons();
+        }
+
+        function showAllItems() {
+            const items = getSlideItems(currentSlide);
+            items.forEach(item => item.classList.add('visible'));
+            currentItem = items.length - 1;
+            updateButtons();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) showSlide(currentSlide - 1);
+        }
+
+        function updateButtons() {
+            const items = getSlideItems(currentSlide);
+            document.getElementById('prevSlide').disabled = currentSlide === 0;
+            document.getElementById('nextSlide').disabled = currentSlide === totalSlides - 1;
+            document.getElementById('nextItem').disabled = currentItem >= items.length - 1 && currentSlide === totalSlides - 1;
+            document.getElementById('prevItem').disabled = currentItem < 0;
+        }
+
+        // View toggle
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.body.className = `view-${btn.dataset.view}`;
+            });
+        });
+
+        // Sidebar toggle
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            sidebarToggle.textContent = sidebar.classList.contains('open') ? '✕' : '☰';
+        });
+
+        // Sidebar navigation
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                showSlide(parseInt(item.dataset.slide));
+                if (window.innerWidth < 750) {
+                    sidebar.classList.remove('open');
+                    sidebarToggle.textContent = '☰';
+                }
+            });
+        });
+
+        // Button listeners
+        document.getElementById('prevSlide').addEventListener('click', prevSlide);
+        document.getElementById('nextSlide').addEventListener('click', nextSlide);
+        document.getElementById('hideAll').addEventListener('click', hideAllItems);
+        document.getElementById('nextItem').addEventListener('click', showNextItem);
+        document.getElementById('prevItem').addEventListener('click', showPrevItem);
+
+        // Keyboard
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); showNextItem(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); showPrevItem(); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); hideAllItems(); }
+            else if (e.key === 'ArrowDown') { e.preventDefault(); showAllItems(); }
+            else if (e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'm' || e.key === 'M') {
+                sidebar.classList.toggle('open');
+                sidebarToggle.textContent = sidebar.classList.contains('open') ? '✕' : '☰';
+            }
+        });
+
+        // Clicker
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.controls') && !e.target.closest('.sidebar') && !e.target.closest('.sidebar-toggle') && !e.target.closest('.view-toggle')) {
+                showNextItem();
+            }
+        });
+
+        updateProgress();
+        updateButtons();
+        updateSidebarActive();
+    </script>
+</body>
+</html>

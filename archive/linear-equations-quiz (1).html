@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Equations Quiz</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container { max-width: 650px; margin: 0 auto; }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 6px;
+            font-weight: 300;
+            font-size: 2rem;
+        }
+
+        .level-title {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            font-size: 1.15rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .level-nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid transparent;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .level-btn:hover { background: rgba(255,255,255,0.25); }
+        .level-btn.active { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            height: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #45B8AC, #009B77);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 20px;
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            min-height: 400px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .question-num {
+            background: #555;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #009B77, #45B8AC);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .equation {
+            font-size: 2rem;
+            text-align: center;
+            margin: 30px 0 35px;
+            color: #333;
+        }
+
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            background: #f5f5f5;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 18px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            background: #e8e8e8;
+            border-color: #ccc;
+            transform: scale(1.02);
+        }
+
+        .choice-btn.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .choice-btn.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .choice-btn:disabled { cursor: default; }
+
+        .feedback {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            min-height: 30px;
+        }
+
+        .feedback.correct { color: #28a745; }
+        .feedback.incorrect { color: #dc3545; }
+
+        .next-btn {
+            display: block;
+            margin: 25px auto 0;
+            background: linear-gradient(135deg, #555, #333);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+
+        .encouragement {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .encouragement h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .encouragement p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .encouragement .emoji {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        /* Results screen */
+        .results {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .results h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .results .final-score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #009B77, #45B8AC);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+        }
+
+        .results .message {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .star-container {
+            font-size: 2.5rem;
+            margin: 20px 0;
+        }
+
+        .star { opacity: 0.2; transition: all 0.3s ease; }
+        .star.earned { opacity: 1; animation: popIn 0.4s ease; }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #6B5B95, #8B7BA5);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover { transform: scale(1.05); }
+
+        /* Confetti */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); }
+        }
+
+        .hidden { display: none !important; }
+
+        /* Working modal */
+        .working-btn {
+            background: none;
+            border: none;
+            color: #6B5B95;
+            cursor: pointer;
+            font-size: 0.95rem;
+            text-decoration: underline;
+            margin-top: 10px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 30px 35px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal { transform: scale(1); }
+
+        .modal h3 { color: #444; margin-bottom: 20px; font-size: 1.1rem; }
+
+        .working-step {
+            font-size: 1.15rem;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .working-step:last-child { border-bottom: none; color: #009B77; font-weight: 600; }
+
+        .step-num {
+            background: #555;
+            color: white;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .working-step:last-child .step-num { background: #009B77; }
+
+        .close-modal {
+            position: absolute;
+            top: 10px; right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-modal:hover { color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Linear Equations</h1>
+        <div class="level-title" id="level-title">Level 1: One-Step Problems</div>
+        
+        <div class="level-nav">
+            <button class="level-btn active" onclick="setLevel(1)">1</button>
+            <button class="level-btn" onclick="setLevel(2)">2</button>
+            <button class="level-btn" onclick="setLevel(3)">3</button>
+            <button class="level-btn" onclick="setLevel(4)">4</button>
+            <button class="level-btn" onclick="setLevel(5)">5</button>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div class="quiz-card" id="quiz-card">
+            <!-- Content injected by JS -->
+        </div>
+    </div>
+
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <h3>Working</h3>
+            <div id="working-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let equations = [];
+        let currentQ = 0;
+        let score = 0;
+        let currentLevel = 1;
+        let answered = false;
+
+        const levelInfo = {
+            1: "Level 1: One-Step Problems",
+            2: "Level 2: Two-Step Problems",
+            3: "Level 3: Simplify Sides First",
+            4: "Level 4: Brackets",
+            5: "Level 5: Brackets & Fractions"
+        };
+
+        const encouragements = [
+            { emoji: "💪", title: "Halfway there!", msg: "You're doing great—keep it up!" },
+            { emoji: "🔥", title: "On fire!", msg: "Strong work so far!" },
+            { emoji: "⭐", title: "Fantastic!", msg: "You've got this!" },
+            { emoji: "🚀", title: "Brilliant!", msg: "Keep that momentum going!" }
+        ];
+
+        function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function randNonZero(min, max) { let n; do { n = randInt(min, max); } while (n === 0); return n; }
+        function pm(n) { return n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`; }
+
+        function generateChoices(correct) {
+            let choices = new Set([correct]);
+            let attempts = 0;
+            while (choices.size < 4 && attempts < 50) {
+                let offset = randNonZero(-5, 5);
+                choices.add(correct + offset);
+                attempts++;
+            }
+            while (choices.size < 4) {
+                choices.add(correct + choices.size * 2);
+            }
+            return shuffle([...choices]);
+        }
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Level generators
+        function genLevel1() {
+            equations = [];
+            let a, x, c, q;
+
+            a = randInt(5, 25); x = randInt(2, 20);
+            equations.push({ eq: `x + ${a} = ${x + a}`, ans: x,
+                steps: [`x + ${a} = ${x + a}`, `x = ${x + a} - ${a}`, `x = ${x}`] });
+
+            a = randInt(5, 20); x = randInt(15, 35);
+            equations.push({ eq: `x - ${a} = ${x - a}`, ans: x,
+                steps: [`x - ${a} = ${x - a}`, `x = ${x - a} + ${a}`, `x = ${x}`] });
+
+            a = randInt(10, 30); let y = randInt(-12, 12);
+            equations.push({ eq: `${a} + y = ${a + y}`, ans: y,
+                steps: [`${a} + y = ${a + y}`, `y = ${a + y} - ${a}`, `y = ${y}`] });
+
+            c = randInt(2, 9); x = randInt(2, 12);
+            equations.push({ eq: `${c}x = ${c * x}`, ans: x,
+                steps: [`${c}x = ${c * x}`, `x = \\dfrac{${c * x}}{${c}}`, `x = ${x}`] });
+
+            a = randInt(2, 7); q = randInt(2, 9); x = a * q;
+            equations.push({ eq: `\\dfrac{x}{${a}} = ${q}`, ans: x,
+                steps: [`\\dfrac{x}{${a}} = ${q}`, `x = ${q} \\times ${a}`, `x = ${x}`] });
+
+            a = randInt(20, 35); x = randInt(5, 15);
+            equations.push({ eq: `${a} - x = ${a - x}`, ans: x,
+                steps: [`${a} - x = ${a - x}`, `-x = ${a - x} - ${a}`, `-x = ${-x}`, `x = ${x}`] });
+
+            a = randInt(2, 5); let nr = randInt(-7, -2); x = nr * (-a);
+            equations.push({ eq: `\\dfrac{x}{-${a}} = ${nr}`, ans: x,
+                steps: [`\\dfrac{x}{-${a}} = ${nr}`, `x = (${nr}) \\times (-${a})`, `x = ${x}`] });
+
+            c = randInt(2, 6); x = randInt(2, 9);
+            equations.push({ eq: `-${c}x = ${-c * x}`, ans: x,
+                steps: [`-${c}x = ${-c * x}`, `x = \\dfrac{${-c * x}}{-${c}}`, `x = ${x}`] });
+        }
+
+        function genLevel2() {
+            equations = [];
+            for (let i = 0; i < 4; i++) {
+                let a = randInt(2, 7), b = randNonZero(-12, 12), x = randInt(-8, 8);
+                let rhs = a * x + b;
+                equations.push({ eq: `${a}x ${pm(b)} = ${rhs}`, ans: x,
+                    steps: [`${a}x ${pm(b)} = ${rhs}`, `${a}x = ${rhs - b}`, `x = \\dfrac{${rhs - b}}{${a}}`, `x = ${x}`] });
+            }
+            for (let i = 0; i < 4; i++) {
+                let a = randInt(3, 6), c = randInt(1, a - 1);
+                let b = randNonZero(-10, 10), x = randInt(-6, 6);
+                let d = a * x + b - c * x;
+                equations.push({ eq: `${a}x ${pm(b)} = ${c}x ${pm(d)}`, ans: x,
+                    steps: [`${a}x ${pm(b)} = ${c}x ${pm(d)}`, `${a - c}x = ${d - b}`, `x = \\dfrac{${d - b}}{${a - c}}`, `x = ${x}`] });
+            }
+        }
+
+        function genLevel3() {
+            equations = [];
+            for (let i = 0; i < 8; i++) {
+                let x = randInt(-6, 6);
+                let a1 = randInt(1, 5), a2 = randNonZero(-4, 4);
+                let b1 = randNonZero(-10, 10), b2 = randNonZero(-10, 10);
+                let aT = a1 + a2, bT = b1 + b2;
+                if (aT === 0) { a2 = 1; aT = a1 + 1; }
+                let rhs = aT * x + bT;
+                let lhs = `${a1 === 1 ? '' : a1}x ${pm(b1)} ${a2 > 0 ? '+' : '-'} ${Math.abs(a2) === 1 ? '' : Math.abs(a2)}x ${pm(b2)}`;
+                equations.push({ eq: `${lhs} = ${rhs}`, ans: x,
+                    steps: [`${lhs} = ${rhs}`, `${aT}x ${pm(bT)} = ${rhs}`, `${aT}x = ${rhs - bT}`, `x = ${x}`] });
+            }
+        }
+
+        function genLevel4() {
+            equations = [];
+            for (let i = 0; i < 8; i++) {
+                let a = randInt(2, 5), b = randNonZero(-6, 6), c = randNonZero(-10, 10);
+                let x = randInt(-5, 5);
+                let rhs = a * (x + b) + c;
+                let exp = a * b;
+                equations.push({ eq: `${a}(x ${pm(b)}) ${pm(c)} = ${rhs}`, ans: x,
+                    steps: [`${a}(x ${pm(b)}) ${pm(c)} = ${rhs}`, `${a}x ${pm(exp)} ${pm(c)} = ${rhs}`,
+                        `${a}x ${pm(exp + c)} = ${rhs}`, `${a}x = ${rhs - exp - c}`, `x = ${x}`] });
+            }
+        }
+
+        function genLevel5() {
+            equations = [];
+            for (let i = 0; i < 8; i++) {
+                let d = randInt(2, 4), a = randInt(2, 4), b = randNonZero(-5, 5);
+                let x = randInt(-5, 5);
+                let num = a * x + b;
+                while (num % d !== 0) { b++; num = a * x + b; }
+                let c = randNonZero(-6, 6);
+                let rhs = num / d + c;
+                equations.push({ eq: `\\dfrac{${a}x ${pm(b)}}{${d}} ${pm(c)} = ${rhs}`, ans: x,
+                    steps: [`\\dfrac{${a}x ${pm(b)}}{${d}} ${pm(c)} = ${rhs}`,
+                        `${a}x ${pm(b)} ${pm(c * d)} = ${rhs * d}`,
+                        `${a}x = ${rhs * d - b - c * d}`, `x = ${x}`] });
+            }
+        }
+
+        function generateEquations() {
+            switch (currentLevel) {
+                case 1: genLevel1(); break;
+                case 2: genLevel2(); break;
+                case 3: genLevel3(); break;
+                case 4: genLevel4(); break;
+                case 5: genLevel5(); break;
+            }
+            equations.forEach(eq => { eq.choices = generateChoices(eq.ans); });
+        }
+
+        function setLevel(n) {
+            currentLevel = n;
+            document.querySelectorAll('.level-btn').forEach((btn, i) => btn.classList.toggle('active', i + 1 === n));
+            document.getElementById('level-title').textContent = levelInfo[n];
+            currentQ = 0;
+            score = 0;
+            generateEquations();
+            renderQuestion();
+        }
+
+        function updateProgress() {
+            document.getElementById('progress-fill').style.width = `${(currentQ / 8) * 100}%`;
+        }
+
+        function renderQuestion() {
+            answered = false;
+            updateProgress();
+            const card = document.getElementById('quiz-card');
+            const q = equations[currentQ];
+
+            card.innerHTML = `
+                <div class="question-header">
+                    <span class="question-num">Question ${currentQ + 1} of 8</span>
+                    <span class="score-badge">Score: ${score}/8</span>
+                </div>
+                <div class="equation" id="equation"></div>
+                <div class="choices" id="choices"></div>
+                <div class="feedback" id="feedback"></div>
+            `;
+
+            katex.render(q.eq + ', \\quad x = \\, ?', document.getElementById('equation'), { displayMode: true });
+
+            const choicesDiv = document.getElementById('choices');
+            q.choices.forEach((choice, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice;
+                btn.onclick = () => checkAnswer(choice, btn);
+                choicesDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(choice, btn) {
+            if (answered) return;
+            answered = true;
+
+            const q = equations[currentQ];
+            const feedback = document.getElementById('feedback');
+            const allBtns = document.querySelectorAll('.choice-btn');
+
+            allBtns.forEach(b => {
+                b.disabled = true;
+                if (parseInt(b.textContent) === q.ans) b.classList.add('correct');
+            });
+
+            if (choice === q.ans) {
+                score++;
+                btn.classList.add('correct');
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = '✓ Correct!';
+            } else {
+                btn.classList.add('incorrect');
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '✗ Not quite';
+            }
+
+            // Add working button and next button
+            feedback.innerHTML += `<br><button class="working-btn" onclick="showWorking(${currentQ})">Show working</button>`;
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'next-btn';
+            nextBtn.textContent = currentQ < 7 ? 'Next Question →' : 'See Results →';
+            nextBtn.onclick = nextQuestion;
+            document.getElementById('quiz-card').appendChild(nextBtn);
+        }
+
+        function nextQuestion() {
+            currentQ++;
+            if (currentQ === 4) {
+                showEncouragement();
+            } else if (currentQ >= 8) {
+                showResults();
+            } else {
+                renderQuestion();
+            }
+        }
+
+        function showEncouragement() {
+            updateProgress();
+            const enc = encouragements[randInt(0, encouragements.length - 1)];
+            const card = document.getElementById('quiz-card');
+            card.innerHTML = `
+                <div class="encouragement">
+                    <div class="emoji">${enc.emoji}</div>
+                    <h2>${enc.title}</h2>
+                    <p>${enc.msg}</p>
+                    <p style="font-size: 1.3rem; color: #009B77; font-weight: 600;">Current score: ${score}/4</p>
+                    <button class="next-btn" onclick="renderQuestion()">Continue →</button>
+                </div>
+            `;
+        }
+
+        function showResults() {
+            updateProgress();
+            launchConfetti();
+
+            const card = document.getElementById('quiz-card');
+            const stars = Math.ceil(score / 2); // 0-2: 1 star, 3-4: 2 stars, 5-6: 3 stars, 7-8: 4 stars
+            let message = '';
+            if (score === 8) message = "Perfect score! Outstanding work! 🎉";
+            else if (score >= 6) message = "Excellent work! You've really got this!";
+            else if (score >= 4) message = "Good effort! Keep practising!";
+            else message = "Keep going—practice makes perfect!";
+
+            card.innerHTML = `
+                <div class="results">
+                    <h2>Quiz Complete!</h2>
+                    <div class="star-container">
+                        ${[1,2,3,4].map(i => `<span class="star ${i <= stars ? 'earned' : ''}" style="animation-delay: ${i * 0.2}s">⭐</span>`).join('')}
+                    </div>
+                    <div class="final-score">${score}/8</div>
+                    <p class="message">${message}</p>
+                    <button class="restart-btn" onclick="setLevel(${currentLevel})">🔄 Try Again</button>
+                    ${currentLevel < 5 ? `<button class="restart-btn" onclick="setLevel(${currentLevel + 1})">Next Level →</button>` : ''}
+                </div>
+            `;
+
+            // Animate stars
+            setTimeout(() => {
+                document.querySelectorAll('.star.earned').forEach((star, i) => {
+                    setTimeout(() => star.style.animation = 'popIn 0.4s ease', i * 200);
+                });
+            }, 100);
+        }
+
+        function showWorking(index) {
+            const q = equations[index];
+            const content = document.getElementById('working-content');
+            content.innerHTML = '';
+            q.steps.forEach((step, i) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'working-step';
+                stepDiv.innerHTML = `<span class="step-num">${i + 1}</span><span id="step-${i}"></span>`;
+                content.appendChild(stepDiv);
+                katex.render(step, document.getElementById(`step-${i}`), { displayMode: false });
+            });
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (!event || event.target === document.getElementById('modal-overlay'))
+                document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        function launchConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            const colors = ['#6B5B95', '#009B77', '#DD4132', '#D65076', '#45B8AC', '#FFD700'];
+            for (let i = 0; i < 80; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                container.appendChild(confetti);
+            }
+            setTimeout(() => container.innerHTML = '', 4000);
+        }
+
+        generateEquations();
+        renderQuestion();
+    </script>
+</body>
+</html>

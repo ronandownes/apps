@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 20: Co-ordinate Geometry – The Circle</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            min-height: 100vh;
+        }
+        
+        .slide {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            padding: 20px 40px;
+            flex-direction: column;
+        }
+        .slide.active { display: flex; }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0f4c75;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            color: #3282b8;
+        }
+        .header .qnum {
+            background: #3282b8;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        /* Navigation */
+        .nav-top {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .nav-top button {
+            background: #3282b8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .nav-top button:hover:not(:disabled) {
+            background: #bbe1fa;
+            color: #1a1a2e;
+        }
+        .nav-top button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .nav-top .counter {
+            color: #bbe1fa;
+            font-size: 1rem;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        /* Two-column content */
+        .content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            overflow: hidden;
+            min-height: 0;
+        }
+        
+        /* Panels */
+        .panel {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 25px 30px;
+            border: 2px solid #0f4c75;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .panel-header h2 {
+            color: #bbe1fa;
+            font-size: 1.3rem;
+        }
+        
+        .panel-content {
+            flex: 1;
+            font-size: 1.15rem;
+            line-height: 1.9;
+        }
+        
+        /* Question styling */
+        .q-label {
+            display: inline-block;
+            background: #e67e22;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .page-ref {
+            float: right;
+            color: #888;
+            font-size: 0.85rem;
+        }
+        
+        /* Keywords */
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .keyword {
+            background: rgba(50, 130, 184, 0.3);
+            border: 1px solid #3282b8;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 1rem;
+            color: #bbe1fa;
+        }
+        
+        /* Math blocks */
+        .formula-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #3282b8;
+            padding: 20px 25px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        .formula-box.highlight {
+            border-left-color: #4caf50;
+            background: rgba(76, 175, 80, 0.15);
+        }
+        .formula-box.special {
+            border-left-color: #e67e22;
+            background: rgba(230, 126, 34, 0.15);
+        }
+        
+        .math { font-family: 'Times New Roman', serif; font-style: italic; }
+        .eq { 
+            display: block; 
+            margin: 12px 0; 
+            font-size: 1.25rem;
+        }
+        sup { font-size: 0.7em; vertical-align: super; }
+        
+        /* Concept callout */
+        .concept {
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid #9b59b6;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .concept-title {
+            color: #9b59b6;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        /* Note callout */
+        .note {
+            background: rgba(230, 126, 34, 0.15);
+            border-left: 4px solid #e67e22;
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 15px 0;
+        }
+        .note-icon {
+            color: #e67e22;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        /* Solution controls */
+        .solution-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .ctrl-btn {
+            background: linear-gradient(135deg, #3282b8, #0f4c75);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        .ctrl-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(50, 130, 184, 0.4);
+        }
+        .ctrl-btn.active {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+        }
+        
+        /* Solution content */
+        .solution-content {
+            transition: filter 0.4s ease;
+        }
+        .solution-content.blurred {
+            filter: blur(8px);
+            user-select: none;
+        }
+        
+        .step {
+            margin: 15px 0;
+            padding: 15px 20px;
+            background: rgba(50, 130, 184, 0.1);
+            border-left: 3px solid #3282b8;
+            border-radius: 0 10px 10px 0;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+        .step.hidden {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        .step-num {
+            color: #3282b8;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .answer {
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        /* FT overlay */
+        .ft-btn {
+            background: #9b59b6;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        .ft-btn:hover {
+            background: #8e44ad;
+        }
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay.active { display: flex; }
+        .overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+        }
+        .overlay-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===================== SLIDE 1: Introduction ===================== -->
+<div class="slide active" id="slide-1">
+    <div class="header">
+        <h1>Chapter 20: Co-ordinate Geometry – The Circle</h1>
+        <div class="nav-top">
+            <button onclick="prevSlide()" disabled>← Prev</button>
+            <span class="counter">1 / 2</span>
+            <button onclick="nextSlide()">Next →</button>
+        </div>
+    </div>
+    
+    <div class="content">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>The Circle Equation</h2>
+            </div>
+            <div class="panel-content">
+                <div class="keywords">
+                    <span class="keyword">circle</span>
+                    <span class="keyword">radius</span>
+                    <span class="keyword">tangent</span>
+                </div>
+                
+                <p style="margin: 20px 0;">The <strong>standard equation</strong> of a circle with centre (<span class="math">h</span>, <span class="math">k</span>) and radius <span class="math">r</span> is:</p>
+                
+                <div class="formula-box">
+                    (<span class="math">x</span> − <span class="math">h</span>)<sup>2</sup> + (<span class="math">y</span> − <span class="math">k</span>)<sup>2</sup> = <span class="math">r</span><sup>2</sup>
+                </div>
+                
+                <button class="ft-btn" onclick="showFT()">📘 View on Formulae & Tables p.19</button>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Special Cases</h2>
+            </div>
+            <div class="panel-content">
+                <div class="concept">
+                    <div class="concept-title">Special Case: Centre at Origin (<span class="math">h</span> = 0, <span class="math">k</span> = 0)</div>
+                    <p>When the centre is at the origin, the equation simplifies to:</p>
+                    <div class="formula-box highlight">
+                        <span class="math">x</span><sup>2</sup> + <span class="math">y</span><sup>2</sup> = <span class="math">r</span><sup>2</sup>
+                    </div>
+                </div>
+                
+                <div class="concept">
+                    <div class="concept-title">Point on Circle Through Origin</div>
+                    <p>If a point (<span class="math">x</span><sub>1</sub>, <span class="math">y</span><sub>1</sub>) lies on a circle centred at the origin:</p>
+                    <div class="formula-box special">
+                        <span class="math">x</span><sup>2</sup> + <span class="math">y</span><sup>2</sup> = |<span class="math">x</span><sub>1</sub>|<sup>2</sup> + |<span class="math">y</span><sub>1</sub>|<sup>2</sup>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <span class="note-icon">💡</span>
+                    <strong>Key insight:</strong> Because we square the coordinates, the signs don't matter! The sum of two squares is always positive.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== SLIDE 2: Worked Example 20.1 ===================== -->
+<div class="slide" id="slide-2">
+    <div class="header">
+        <h1>Chapter 20: Co-ordinate Geometry – The Circle</h1>
+        <div class="nav-top">
+            <button onclick="prevSlide()">← Prev</button>
+            <span class="counter">2 / 2</span>
+            <button onclick="nextSlide()" disabled>Next →</button>
+        </div>
+    </div>
+    
+    <div class="content">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Question</h2>
+            </div>
+            <div class="panel-content">
+                <span class="q-label">Worked Example 20.1</span>
+                <span class="page-ref">p. 485</span>
+                
+                <p style="margin-top: 20px; font-size: 1.25rem;">
+                    The circle <span class="math">c</span> has <strong>centre (0, 0)</strong> and <strong>radius 7 units</strong>.
+                </p>
+                
+                <p style="margin-top: 15px; font-size: 1.25rem;">
+                    Write down the equation of <span class="math">c</span>.
+                </p>
+                
+                <div class="concept" style="margin-top: 30px;">
+                    <div class="concept-title">Key Concept</div>
+                    <p>Since the centre is at the origin, we use:</p>
+                    <div class="formula-box highlight">
+                        <span class="math">x</span><sup>2</sup> + <span class="math">y</span><sup>2</sup> = <span class="math">r</span><sup>2</sup>
+                    </div>
+                    <p style="margin-top: 10px;">The radius <span class="math">r</span> = 7, so we need <strong>7<sup>2</sup></strong> on the right-hand side.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Solution</h2>
+                <div class="solution-controls">
+                    <button class="ctrl-btn" onclick="toggleBlur(this, 'sol-2')">Show</button>
+                    <button class="ctrl-btn" onclick="stepThrough('sol-2')">Step-by-step</button>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div id="sol-2" class="solution-content blurred">
+                    <div class="step" data-step="1">
+                        <span class="step-num">Step 1</span>
+                        Identify what we know:
+                        <span class="eq">Centre = (0, 0)</span>
+                        <span class="eq">Radius <span class="math">r</span> = 7</span>
+                    </div>
+                    
+                    <div class="step hidden" data-step="2">
+                        <span class="step-num">Step 2</span>
+                        Write the equation of a circle centred at the origin:
+                        <span class="eq"><span class="math">x</span><sup>2</sup> + <span class="math">y</span><sup>2</sup> = <span class="math">r</span><sup>2</sup></span>
+                    </div>
+                    
+                    <div class="step hidden" data-step="3">
+                        <span class="step-num">Step 3</span>
+                        Substitute <span class="math">r</span> = 7:
+                        <span class="eq"><span class="math">x</span><sup>2</sup> + <span class="math">y</span><sup>2</sup> = (7)<sup>2</sup></span>
+                        <span class="eq"><span class="math">x</span><sup>2</sup> + <span class="math">y</span><sup>2</sup> = 49</span>
+                    </div>
+                    
+                    <div class="answer hidden" data-step="4">
+                        ∴ <span class="math">x</span><sup>2</sup> + <span class="math">y</span><sup>2</sup> = 49
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FT Overlay -->
+<div class="overlay" id="ft-overlay" onclick="hideFT()">
+    <span class="overlay-close">&times;</span>
+    <img src="/mnt/user-data/uploads/019.webp" alt="Formulae & Tables p.19">
+</div>
+
+<script>
+// Slide navigation
+let currentSlide = 1;
+const totalSlides = 2;
+
+function showSlide(n) {
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+    currentSlide = Math.max(1, Math.min(n, totalSlides));
+    document.getElementById('slide-' + currentSlide).classList.add('active');
+    updateNav();
+}
+
+function nextSlide() { showSlide(currentSlide + 1); }
+function prevSlide() { showSlide(currentSlide - 1); }
+
+function updateNav() {
+    document.querySelectorAll('.slide').forEach((slide, idx) => {
+        const nav = slide.querySelector('.nav-top');
+        if (nav) {
+            const btns = nav.querySelectorAll('button');
+            btns[0].disabled = (idx === 0);
+            btns[1].disabled = (idx === totalSlides - 1);
+            nav.querySelector('.counter').textContent = (idx + 1) + ' / ' + totalSlides;
+        }
+    });
+}
+
+// Solution blur toggle
+function toggleBlur(btn, solId) {
+    const content = document.getElementById(solId);
+    content.classList.toggle('blurred');
+    btn.textContent = content.classList.contains('blurred') ? 'Show' : 'Hide';
+    btn.classList.toggle('active', !content.classList.contains('blurred'));
+    
+    // If showing, reveal all steps
+    if (!content.classList.contains('blurred')) {
+        content.querySelectorAll('.step, .answer').forEach(el => el.classList.remove('hidden'));
+    }
+}
+
+// Step-by-step reveal
+const stepState = {};
+function stepThrough(solId) {
+    const content = document.getElementById(solId);
+    
+    // Remove blur first
+    content.classList.remove('blurred');
+    const showBtn = content.closest('.panel').querySelector('.ctrl-btn');
+    if (showBtn) {
+        showBtn.textContent = 'Hide';
+        showBtn.classList.add('active');
+    }
+    
+    // Initialize step counter
+    if (!stepState[solId]) stepState[solId] = 0;
+    stepState[solId]++;
+    
+    const steps = content.querySelectorAll('[data-step]');
+    steps.forEach(step => {
+        const stepNum = parseInt(step.dataset.step);
+        if (stepNum <= stepState[solId]) {
+            step.classList.remove('hidden');
+        } else {
+            step.classList.add('hidden');
+        }
+    });
+    
+    // Reset if we've shown all
+    if (stepState[solId] >= steps.length) {
+        stepState[solId] = 0;
+    }
+}
+
+// FT overlay
+function showFT() {
+    document.getElementById('ft-overlay').classList.add('active');
+}
+function hideFT() {
+    document.getElementById('ft-overlay').classList.remove('active');
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextSlide();
+    if (e.key === 'ArrowLeft') prevSlide();
+    if (e.key === 'Escape') hideFT();
+});
+
+// Initialize
+updateNav();
+</script>
+
+</body>
+</html>

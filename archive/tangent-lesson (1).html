@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tangent to a Cubic – Lesson & Practice</title>
+<style>
+:root{--ink:#000;--line:#cfcfcf;--muted:#666;--blue:#2563eb;--green:#16a34a;--orange:#ea580c;--red:#dc2626;--purple:#7c3aed}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--ink)}
+.wrap{max-width:1000px;margin:0 auto;padding:12px}
+.card{border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+h1{text-align:center;color:var(--blue);margin:0 0 8px}
+.subtitle{text-align:center;color:var(--muted);margin-bottom:16px}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab-btn{border:2px solid var(--line);border-radius:6px;background:#fff;padding:10px 20px;font-size:15px;cursor:pointer;font-weight:600;transition:all 0.2s}
+.tab-btn:hover{background:#f5f5f5}
+.tab-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Input controls */
+.input-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
+.input-block{border:1px solid var(--line);border-radius:8px;padding:12px 16px;min-width:100px;text-align:center}
+.input-block h3{margin:0 0 8px;font-size:14px;color:var(--muted)}
+.input-block input{width:70px;border:2px solid var(--blue);border-radius:6px;padding:8px;font-size:22px;text-align:center;font-family:"Times New Roman",Times,serif;font-weight:bold}
+.input-block input:focus{outline:none;border-color:#000}
+.input-display{font-family:"Times New Roman",Times,serif;font-size:16px;margin-top:6px;color:var(--ink)}
+
+/* Calculation display */
+.calc{border:2px solid var(--line);border-radius:8px;padding:20px;margin-top:16px;background:#fff}
+.section-title{font-size:20px;font-weight:bold;margin-bottom:12px;color:var(--ink)}
+.work-line{display:flex;align-items:center;margin:16px 0;min-height:48px}
+.line-num{font-family:"Times New Roman",Times,serif;font-size:18px;color:#888;min-width:40px;text-align:right;margin-right:16px}
+.math-content{font-family:"Times New Roman",Times,serif;font-size:28px;font-weight:bold;flex:1}
+.logic-hint{font-family:Segoe UI,Arial,sans-serif;font-size:15px;font-style:italic;font-weight:600;margin-left:20px;white-space:nowrap}
+.hint-blue{color:var(--blue)}
+.hint-green{color:var(--green)}
+.hint-orange{color:var(--orange)}
+.hint-red{color:var(--red)}
+.hint-purple{color:var(--purple)}
+
+.answer-box{display:inline-block;border:3px solid #000;padding:14px 20px;font-family:"Times New Roman",Times,serif;font-size:32px;font-weight:bold;margin-top:12px}
+.answer-box .label{font-style:italic}
+
+.method-box{border:2px solid var(--line);border-radius:8px;padding:16px;margin-top:16px;background:#fafafa}
+.method-title{font-size:16px;font-weight:bold;margin-bottom:10px}
+.method-1 .method-title{color:var(--purple)}
+.method-2 .method-title{color:var(--green)}
+.methods-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.methods-row{grid-template-columns:1fr}}
+
+/* Quiz styles */
+.quiz-question{border:2px solid var(--line);border-radius:8px;padding:16px;margin-bottom:16px;background:#fff}
+.quiz-stem{font-family:"Times New Roman",Times,serif;font-size:22px;margin-bottom:12px}
+.quiz-options{display:flex;flex-direction:column;gap:8px}
+.quiz-option{border:2px solid var(--line);border-radius:6px;padding:10px 14px;cursor:pointer;font-family:"Times New Roman",Times,serif;font-size:18px;transition:all 0.2s}
+.quiz-option:hover{background:#f5f5f5;border-color:#999}
+.quiz-option.selected{border-color:var(--blue);background:#eff6ff}
+.quiz-option.correct{border-color:var(--green);background:#dcfce7}
+.quiz-option.incorrect{border-color:var(--red);background:#fee2e2}
+.quiz-feedback{margin-top:12px;padding:10px;border-radius:6px;font-weight:600;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.correct{background:#dcfce7;color:var(--green)}
+.quiz-feedback.incorrect{background:#fee2e2;color:var(--red)}
+.quiz-score{text-align:center;font-size:24px;font-weight:bold;padding:20px;background:#f0f9ff;border-radius:8px;margin-top:16px}
+.quiz-btn{border:2px solid var(--line);border-radius:6px;background:#fff;padding:8px 16px;font-size:14px;cursor:pointer;font-weight:600;margin-top:12px}
+.quiz-btn:hover{background:#f5f5f5}
+.quiz-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.quiz-btn.primary:hover{background:#1d4ed8}
+
+/* Worksheet styles */
+.worksheet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:800px){.worksheet-grid{grid-template-columns:1fr}}
+.ws-question{border:2px solid var(--line);border-radius:8px;padding:14px;background:#fff}
+.ws-num{font-weight:bold;color:var(--blue);margin-bottom:8px}
+.ws-problem{font-family:"Times New Roman",Times,serif;font-size:18px;margin-bottom:10px}
+.ws-answer{font-family:"Times New Roman",Times,serif;font-size:16px;padding:10px;background:#f0fdf4;border-radius:6px;border:1px solid #bbf7d0;display:none}
+.ws-answer.show{display:block}
+.ws-solution{font-size:14px;color:var(--muted);margin-top:8px;padding:10px;background:#fafafa;border-radius:6px;display:none;line-height:1.6}
+.ws-solution.show{display:block}
+.ws-btn{border:2px solid var(--line);border-radius:6px;background:#fff;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:500;margin-right:6px;margin-top:8px}
+.ws-btn:hover{background:#f5f5f5}
+.ws-controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+
+/* Key steps box */
+.key-steps{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:14px 18px;margin-top:16px}
+.key-steps h3{margin:0 0 10px;font-size:16px;color:var(--purple)}
+.key-steps ol{margin:0;padding-left:20px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tangent to a Cubic Function</h1>
+  <p class="subtitle">Finding the equation of a tangent line at a given point</p>
+  
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('explore')">Explore</button>
+    <button class="tab-btn" onclick="showTab('quiz')">Quiz</button>
+    <button class="tab-btn" onclick="showTab('worksheet')">Worksheet</button>
+  </div>
+  
+  <!-- EXPLORE TAB -->
+  <div id="explore" class="tab-content active">
+    <div class="card">
+      <div class="input-row">
+        <div class="input-block">
+          <h3>Coefficient a</h3>
+          <input type="number" id="coefA" value="1" onchange="update()" oninput="update()">
+          <div class="input-display">x³ term</div>
+        </div>
+        <div class="input-block">
+          <h3>Coefficient b</h3>
+          <input type="number" id="coefB" value="-4" onchange="update()" oninput="update()">
+          <div class="input-display">x² term</div>
+        </div>
+        <div class="input-block">
+          <h3>Coefficient c</h3>
+          <input type="number" id="coefC" value="3" onchange="update()" oninput="update()">
+          <div class="input-display">x term</div>
+        </div>
+        <div class="input-block">
+          <h3>Coefficient d</h3>
+          <input type="number" id="coefD" value="0" onchange="update()" oninput="update()">
+          <div class="input-display">constant</div>
+        </div>
+        <div class="input-block" style="background:#fff7ed">
+          <h3>Evaluate at x =</h3>
+          <input type="number" id="xVal" value="2" onchange="update()" oninput="update()">
+          <div class="input-display">point of tangency</div>
+        </div>
+      </div>
+      
+      <div class="calc">
+        <div class="section-title">The Function</div>
+        <div class="work-line">
+          <span class="line-num"></span>
+          <span class="math-content" id="funcDisplay"><i>h</i>(<i>x</i>) = <i>x</i>³ − 4<i>x</i>² + 3<i>x</i></span>
+        </div>
+      </div>
+      
+      <div class="calc">
+        <div class="section-title">Step 1: Find the y-coordinate</div>
+        <div class="work-line">
+          <span class="line-num">(1)</span>
+          <span class="math-content" id="step1a"></span>
+          <span class="logic-hint hint-blue">Substitute x</span>
+        </div>
+        <div class="work-line">
+          <span class="line-num">(2)</span>
+          <span class="math-content" id="step1b"></span>
+          <span class="logic-hint hint-blue">Evaluate powers</span>
+        </div>
+        <div class="work-line">
+          <span class="line-num">(3)</span>
+          <span class="math-content" id="step1c"></span>
+          <span class="logic-hint hint-green">y-coordinate</span>
+        </div>
+        <div style="margin-left:56px;margin-top:8px;font-size:16px;color:var(--muted)">
+          Point of tangency: <span id="pointDisplay" style="font-weight:bold;color:var(--ink)"></span>
+        </div>
+      </div>
+      
+      <div class="calc">
+        <div class="section-title">Step 2: Differentiate to find h′(x)</div>
+        <div class="work-line">
+          <span class="line-num">(4)</span>
+          <span class="math-content" id="step2a"></span>
+          <span class="logic-hint hint-orange">Power rule</span>
+        </div>
+      </div>
+      
+      <div class="calc">
+        <div class="section-title">Step 3: Find the slope at x = <span id="xValDisplay2">2</span></div>
+        <div class="work-line">
+          <span class="line-num">(5)</span>
+          <span class="math-content" id="step3a"></span>
+          <span class="logic-hint hint-blue">Substitute x</span>
+        </div>
+        <div class="work-line">
+          <span class="line-num">(6)</span>
+          <span class="math-content" id="step3b"></span>
+          <span class="logic-hint hint-blue">Evaluate</span>
+        </div>
+        <div class="work-line">
+          <span class="line-num">(7)</span>
+          <span class="math-content" id="step3c"></span>
+          <span class="logic-hint hint-red">Slope = <span id="slopeHint"></span></span>
+        </div>
+      </div>
+      
+      <div class="calc">
+        <div class="section-title">Step 4: Find the equation of the tangent</div>
+        <div class="methods-row">
+          <div class="method-box method-2">
+            <div class="method-title">✓ Quick Method: y = mx + c</div>
+            <div class="work-line" style="margin:10px 0">
+              <span class="line-num">(8)</span>
+              <span class="math-content" style="font-size:22px" id="m2a"><i>c</i> = <i>y</i>₁ − <i>m</i> · <i>x</i>₁</span>
+              <span class="logic-hint hint-green">Rearrange for c</span>
+            </div>
+            <div class="work-line" style="margin:10px 0">
+              <span class="line-num">(9)</span>
+              <span class="math-content" style="font-size:22px" id="m2b"></span>
+              <span class="logic-hint hint-blue">Substitute</span>
+            </div>
+            <div class="work-line" style="margin:10px 0">
+              <span class="line-num">(10)</span>
+              <span class="math-content" style="font-size:22px" id="m2c"></span>
+              <span class="logic-hint hint-green">c = <span id="cHint"></span></span>
+            </div>
+          </div>
+          <div class="method-box method-1">
+            <div class="method-title">Point-Slope Form</div>
+            <div class="work-line" style="margin:10px 0">
+              <span class="line-num"></span>
+              <span class="math-content" style="font-size:20px"><i>y</i> − <i>y</i>₁ = <i>m</i>(<i>x</i> − <i>x</i>₁)</span>
+            </div>
+            <div class="work-line" style="margin:10px 0">
+              <span class="line-num"></span>
+              <span class="math-content" style="font-size:20px" id="m1a"></span>
+            </div>
+            <div class="work-line" style="margin:10px 0">
+              <span class="line-num"></span>
+              <span class="math-content" style="font-size:20px" id="m1b"></span>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:20px">
+          <div class="answer-box">
+            <span class="label">Tangent: </span><span id="finalAnswer"></span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="key-steps">
+        <h3>Key Steps Summary</h3>
+        <ol>
+          <li><strong>Find the point:</strong> Evaluate h(x) at the given x to get y₁</li>
+          <li><strong>Differentiate:</strong> Find h′(x)</li>
+          <li><strong>Find the slope:</strong> Evaluate h′(x) at the given x — this is m</li>
+          <li><strong>Find c:</strong> Use c = y₁ − m·x₁</li>
+          <li><strong>Write the equation:</strong> y = mx + c</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  
+  <!-- QUIZ TAB -->
+  <div id="quiz" class="tab-content">
+    <div class="card">
+      <div class="section-title">Multiple Choice Quiz</div>
+      <p style="color:var(--muted);margin-bottom:16px">Test your understanding — select the correct answer for each question.</p>
+      <div id="quizContainer"></div>
+      <div id="quizScore" class="quiz-score" style="display:none"></div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="quiz-btn primary" onclick="checkQuiz()">Check Answers</button>
+        <button class="quiz-btn" onclick="resetQuiz()">Reset Quiz</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- WORKSHEET TAB -->
+  <div id="worksheet" class="tab-content">
+    <div class="card">
+      <div class="section-title">Practice Worksheet</div>
+      <p style="color:var(--muted);margin-bottom:12px">Find the equation of the tangent to h(x) at the given point.</p>
+      <div class="ws-controls">
+        <button class="ws-btn" onclick="showAllAnswers()">Show All Answers</button>
+        <button class="ws-btn" onclick="hideAllAnswers()">Hide All Answers</button>
+        <button class="ws-btn" onclick="showAllSolutions()">Show All Solutions</button>
+        <button class="ws-btn" onclick="hideAllSolutions()">Hide All Solutions</button>
+      </div>
+      <div class="worksheet-grid" id="worksheetGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ FORMATTING HELPERS ============
+const fmt = n => Number.isInteger(n) ? n.toString() : parseFloat(n.toFixed(4)).toString();
+const fmtSigned = (n, lead = true) => n >= 0 ? (lead ? ' + ' + fmt(n) : fmt(n)) : ' − ' + fmt(Math.abs(n));
+
+function formatTerm(coef, power, isFirst = false) {
+  if (coef === 0) return '';
+  const sign = coef > 0 ? (isFirst ? '' : ' + ') : (isFirst ? '−' : ' − ');
+  const abs = Math.abs(coef);
+  const coefStr = (abs === 1 && power !== '') ? '' : abs;
+  return sign + coefStr + power;
+}
+
+function buildFunction(a, b, c, d) {
+  let str = '';
+  if (a !== 0) str += formatTerm(a, '<i>x</i>³', true);
+  if (b !== 0) str += formatTerm(b, '<i>x</i>²', str === '');
+  if (c !== 0) str += formatTerm(c, '<i>x</i>', str === '');
+  if (d !== 0) str += formatTerm(d, '', str === '');
+  return str || '0';
+}
+
+function buildDerivative(a, b, c) {
+  const da = 3 * a, db = 2 * b, dc = c;
+  let str = '';
+  if (da !== 0) str += formatTerm(da, '<i>x</i>²', true);
+  if (db !== 0) str += formatTerm(db, '<i>x</i>', str === '');
+  if (dc !== 0) str += formatTerm(dc, '', str === '');
+  return str || '0';
+}
+
+function buildFunctionPlain(a, b, c, d) {
+  let str = '';
+  if (a !== 0) str += formatTerm(a, 'x³', true);
+  if (b !== 0) str += formatTerm(b, 'x²', str === '');
+  if (c !== 0) str += formatTerm(c, 'x', str === '');
+  if (d !== 0) str += formatTerm(d, '', str === '');
+  return str || '0';
+}
+
+// ============ EXPLORE TAB ============
+function update() {
+  const a = parseFloat(document.getElementById('coefA').value) || 0;
+  const b = parseFloat(document.getElementById('coefB').value) || 0;
+  const c = parseFloat(document.getElementById('coefC').value) || 0;
+  const d = parseFloat(document.getElementById('coefD').value) || 0;
+  const x = parseFloat(document.getElementById('xVal').value) || 0;
+  
+  const h = a*x*x*x + b*x*x + c*x + d;
+  const hPrime = 3*a*x*x + 2*b*x + c;
+  const yInt = h - hPrime * x;
+  
+  // Function display
+  document.getElementById('funcDisplay').innerHTML = '<i>h</i>(<i>x</i>) = ' + buildFunction(a, b, c, d);
+  
+  // Step 1: Find y
+  const aCoef = a !== 1 ? (a === -1 ? '−' : '(' + a + ')') : '';
+  const bCoef = Math.abs(b) !== 1 ? Math.abs(b) : '';
+  const bSign = b >= 0 ? ' + ' : ' − ';
+  const cSign = c >= 0 ? ' + ' : ' − ';
+  const dPart = d !== 0 ? (d >= 0 ? ' + ' + d : ' − ' + Math.abs(d)) : '';
+  
+  document.getElementById('step1a').innerHTML = 
+    `<i>h</i>(${x}) = ${aCoef}(${x})³${bSign}${bCoef}(${x})²${cSign}${Math.abs(c)}(${x})${dPart}`;
+  
+  const ax3 = a * x * x * x;
+  const bx2 = b * x * x;
+  const cx1 = c * x;
+  document.getElementById('step1b').innerHTML = 
+    `<i>h</i>(${x}) = ${fmt(ax3)}${bx2 >= 0 ? ' + ' : ' − '}${fmt(Math.abs(bx2))}${cx1 >= 0 ? ' + ' : ' − '}${fmt(Math.abs(cx1))}${dPart}`;
+  
+  document.getElementById('step1c').innerHTML = `<i>h</i>(${x}) = ${fmt(h)}`;
+  document.getElementById('pointDisplay').textContent = `(${x}, ${fmt(h)})`;
+  
+  // Step 2: Derivative
+  document.getElementById('step2a').innerHTML = `<i>h</i>′(<i>x</i>) = ${buildDerivative(a, b, c)}`;
+  
+  // Step 3: Slope
+  document.getElementById('xValDisplay2').textContent = x;
+  const da = 3 * a, db = 2 * b, dc = c;
+  const daCoef = da !== 1 ? (da === -1 ? '−' : '(' + da + ')') : '';
+  const dbCoef = Math.abs(db) !== 1 ? Math.abs(db) : '';
+  const dbSign = db >= 0 ? ' + ' : ' − ';
+  const dcSign = dc >= 0 ? ' + ' : ' − ';
+  
+  document.getElementById('step3a').innerHTML = 
+    `<i>h</i>′(${x}) = ${daCoef}(${x})²${dbSign}${dbCoef}(${x})${dcSign}${Math.abs(dc)}`;
+  
+  const dax2 = da * x * x;
+  const dbx1 = db * x;
+  document.getElementById('step3b').innerHTML = 
+    `<i>h</i>′(${x}) = ${fmt(dax2)}${dbx1 >= 0 ? ' + ' : ' − '}${fmt(Math.abs(dbx1))}${dcSign}${Math.abs(dc)}`;
+  
+  document.getElementById('step3c').innerHTML = `<i>m</i> = ${fmt(hPrime)}`;
+  document.getElementById('slopeHint').textContent = fmt(hPrime);
+  
+  // Step 4: Line equation - Method 2 (Quick)
+  document.getElementById('m2b').innerHTML = `<i>c</i> = ${fmt(h)} − (${fmt(hPrime)})(${x})`;
+  document.getElementById('m2c').innerHTML = `<i>c</i> = ${fmt(h)}${fmtSigned(-hPrime * x)} = ${fmt(yInt)}`;
+  document.getElementById('cHint').textContent = fmt(yInt);
+  
+  // Method 1 (Point-slope)
+  document.getElementById('m1a').innerHTML = `<i>y</i> − (${fmt(h)}) = ${fmt(hPrime)}(<i>x</i> − ${x})`;
+  document.getElementById('m1b').innerHTML = `<i>y</i> = ${fmt(hPrime)}<i>x</i>${fmtSigned(yInt)}`;
+  
+  // Final answer
+  document.getElementById('finalAnswer').innerHTML = `<i>y</i> = ${fmt(hPrime)}<i>x</i>${fmtSigned(yInt)}`;
+}
+
+// ============ TAB SWITCHING ============
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ============ QUIZ ============
+const quizQuestions = [
+  {
+    stem: 'If h(x) = x³ − 2x² + x, what is h′(x)?',
+    options: ['3x² − 4x + 1', '3x² − 2x + 1', 'x² − 4x + 1', '3x² − 4x'],
+    correct: 0
+  },
+  {
+    stem: 'For h(x) = 2x³ + x² − 3x + 4, what is h(1)?',
+    options: ['2', '4', '6', '0'],
+    correct: 1
+  },
+  {
+    stem: 'If the slope of a tangent is 5 and it passes through (2, 3), what is c in y = mx + c?',
+    options: ['−7', '13', '−13', '7'],
+    correct: 0
+  },
+  {
+    stem: 'What is the derivative of −x³ + 4x² − 2x + 1?',
+    options: ['−3x² + 8x − 2', '3x² + 8x − 2', '−3x² + 4x − 2', '−x² + 8x − 2'],
+    correct: 0
+  },
+  {
+    stem: 'If h′(x) = 6x² − 4x + 3, what is h′(2)?',
+    options: ['19', '17', '15', '21'],
+    correct: 0
+  },
+  {
+    stem: 'For h(x) = x³ − 3x² + 2x, the slope at x = 1 is:',
+    options: ['−1', '0', '1', '2'],
+    correct: 0
+  }
+];
+
+function renderQuiz() {
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = quizQuestions.map((q, i) => `
+    <div class="quiz-question" id="qq${i}">
+      <div class="quiz-stem"><strong>Q${i + 1}.</strong> ${q.stem}</div>
+      <div class="quiz-options">
+        ${q.options.map((opt, j) => `
+          <div class="quiz-option" onclick="selectOption(${i}, ${j})" id="opt${i}-${j}">${String.fromCharCode(65 + j)}) ${opt}</div>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback" id="fb${i}"></div>
+    </div>
+  `).join('');
+}
+
+let quizAnswers = {};
+
+function selectOption(q, opt) {
+  // Clear previous selection for this question
+  for (let j = 0; j < 4; j++) {
+    document.getElementById(`opt${q}-${j}`).classList.remove('selected', 'correct', 'incorrect');
+  }
+  document.getElementById(`opt${q}-${opt}`).classList.add('selected');
+  quizAnswers[q] = opt;
+}
+
+function checkQuiz() {
+  let score = 0;
+  quizQuestions.forEach((q, i) => {
+    const fb = document.getElementById(`fb${i}`);
+    const selected = quizAnswers[i];
+    
+    // Clear all styling first
+    for (let j = 0; j < q.options.length; j++) {
+      document.getElementById(`opt${i}-${j}`).classList.remove('selected', 'correct', 'incorrect');
+    }
+    
+    if (selected === undefined) {
+      fb.textContent = 'No answer selected';
+      fb.className = 'quiz-feedback show incorrect';
+    } else if (selected === q.correct) {
+      document.getElementById(`opt${i}-${selected}`).classList.add('correct');
+      fb.textContent = '✓ Correct!';
+      fb.className = 'quiz-feedback show correct';
+      score++;
+    } else {
+      document.getElementById(`opt${i}-${selected}`).classList.add('incorrect');
+      document.getElementById(`opt${i}-${q.correct}`).classList.add('correct');
+      fb.textContent = '✗ Incorrect. The correct answer is ' + String.fromCharCode(65 + q.correct) + '.';
+      fb.className = 'quiz-feedback show incorrect';
+    }
+  });
+  
+  const scoreEl = document.getElementById('quizScore');
+  scoreEl.textContent = `Score: ${score} / ${quizQuestions.length}`;
+  scoreEl.style.display = 'block';
+}
+
+function resetQuiz() {
+  quizAnswers = {};
+  quizQuestions.forEach((q, i) => {
+    for (let j = 0; j < q.options.length; j++) {
+      document.getElementById(`opt${i}-${j}`).classList.remove('selected', 'correct', 'incorrect');
+    }
+    document.getElementById(`fb${i}`).className = 'quiz-feedback';
+  });
+  document.getElementById('quizScore').style.display = 'none';
+}
+
+// ============ WORKSHEET ============
+const worksheetProblems = [
+  { a: 1, b: -3, c: 2, d: 0, x: 2 },
+  { a: 2, b: -1, c: -4, d: 0, x: 1 },
+  { a: -1, b: 2, c: 5, d: 0, x: 3 },
+  { a: 1, b: -2, c: 1, d: 3, x: 2 },
+  { a: 2, b: 1, c: -3, d: -4, x: 1 },
+  { a: -1, b: 3, c: -2, d: 5, x: 2 },
+  { a: 1, b: -4, c: 4, d: -1, x: 3 },
+  { a: 2, b: -3, c: 0, d: 6, x: 2 },
+  { a: -2, b: 1, c: 3, d: -2, x: 1 },
+];
+
+function renderWorksheet() {
+  const container = document.getElementById('worksheetGrid');
+  container.innerHTML = worksheetProblems.map((p, i) => {
+    const { a, b, c, d, x } = p;
+    const h = a*x*x*x + b*x*x + c*x + d;
+    const hPrime = 3*a*x*x + 2*b*x + c;
+    const yInt = h - hPrime * x;
+    const funcStr = buildFunctionPlain(a, b, c, d);
+    const derivStr = buildFunctionPlain(3*a, 2*b, c, 0).replace(/x³/g, 'x²').replace(/x²/g, 'x').replace(/x/g, '');
+    // Rebuild derivative properly
+    let dStr = '';
+    if (3*a !== 0) dStr += formatTerm(3*a, 'x²', true);
+    if (2*b !== 0) dStr += formatTerm(2*b, 'x', dStr === '');
+    if (c !== 0) dStr += formatTerm(c, '', dStr === '');
+    dStr = dStr || '0';
+    
+    const answer = `y = ${fmt(hPrime)}x${fmtSigned(yInt)}`;
+    
+    const solution = `
+      <div><strong>(1)</strong> h(${x}) = ${fmt(h)} → Point: (${x}, ${fmt(h)})</div>
+      <div><strong>(2)</strong> h′(x) = ${dStr}</div>
+      <div><strong>(3)</strong> h′(${x}) = ${fmt(hPrime)} → m = ${fmt(hPrime)}</div>
+      <div><strong>(4)</strong> c = ${fmt(h)} − (${fmt(hPrime)})(${x}) = ${fmt(yInt)}</div>
+      <div><strong>(5)</strong> ${answer}</div>
+    `;
+    
+    return `
+      <div class="ws-question">
+        <div class="ws-num">Q${i + 1}</div>
+        <div class="ws-problem">h(x) = ${funcStr}<br>Find tangent at x = ${x}</div>
+        <div class="ws-answer" id="ans${i}"><strong>Answer:</strong> ${answer}</div>
+        <div class="ws-solution" id="sol${i}">${solution}</div>
+        <div>
+          <button class="ws-btn" onclick="toggleAnswer(${i})">Answer</button>
+          <button class="ws-btn" onclick="toggleSolution(${i})">Solution</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleAnswer(i) {
+  document.getElementById(`ans${i}`).classList.toggle('show');
+}
+
+function toggleSolution(i) {
+  document.getElementById(`sol${i}`).classList.toggle('show');
+}
+
+function showAllAnswers() {
+  worksheetProblems.forEach((_, i) => document.getElementById(`ans${i}`).classList.add('show'));
+}
+
+function hideAllAnswers() {
+  worksheetProblems.forEach((_, i) => document.getElementById(`ans${i}`).classList.remove('show'));
+}
+
+function showAllSolutions() {
+  worksheetProblems.forEach((_, i) => document.getElementById(`sol${i}`).classList.add('show'));
+}
+
+function hideAllSolutions() {
+  worksheetProblems.forEach((_, i) => document.getElementById(`sol${i}`).classList.remove('show'));
+}
+
+// ============ INIT ============
+update();
+renderQuiz();
+renderWorksheet();
+</script>
+</body>
+</html>

@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slope, y-intercept, Line</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%); min-height: 100vh; padding: 10px; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .header h1 { font-size: 1.7rem; color: #2c3e50; margin-bottom: 4px; }
+        .dots-logo { display: flex; justify-content: center; gap: 5px; margin-bottom: 6px; }
+        .dot-logo { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
+        .dot-logo.green { background: #27ae60; }
+        .dot-logo.blue { background: #3498db; }
+        .dot-logo.red { background: #e74c3c; }
+        .dot-logo.black { background: #2c3e50; }
+        .tagline { color: #5a6c7d; font-style: italic; font-size: 1rem; }
+        .lo-badge { display: inline-block; background: #e8f4f8; color: #2980b9; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem; margin-top: 4px; }
+        .lo-badge code { background: #3498db; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; margin-right: 5px; }
+        .mode-tabs { display: flex; justify-content: center; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+        .mode-tab { padding: 7px 12px; font-size: 0.9rem; border: none; border-radius: 16px; cursor: pointer; background: white; color: #2c3e50; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.08); transition: all 0.3s; }
+        .mode-tab:hover { transform: translateY(-1px); }
+        .mode-tab.active { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .content-area { background: white; border-radius: 10px; padding: 12px; box-shadow: 0 3px 15px rgba(0,0,0,0.08); }
+        .hidden { display: none !important; }
+
+        /* Formula Display - FIRST and PROMINENT */
+        .formula-display { text-align: center; padding: 15px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 10px; margin-bottom: 12px; }
+        .formula-label { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 6px; }
+        .formula-main { font-size: 2.2rem; font-family: 'Times New Roman', serif; color: #2c3e50; }
+        .formula-main .val-box { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
+        .formula-main .val-box.slope { background: #e8f5e9; color: #27ae60; border: 2px solid #27ae60; }
+        .formula-main .val-box.intercept { background: #ffebee; color: #e74c3c; border: 2px solid #e74c3c; }
+        .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
+        .frac .num { font-size: 0.75em; line-height: 1; }
+        .frac .den { font-size: 0.75em; line-height: 1; border-top: 2px solid currentColor; padding-top: 2px; min-width: 0.6em; }
+
+        /* Controls row */
+        .controls-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; justify-content: center; }
+        .control-box { background: #f8f9fa; padding: 10px 15px; border-radius: 10px; text-align: center; }
+        .control-box h4 { font-size: 0.85rem; color: #2c3e50; margin-bottom: 8px; }
+        .control-box h4 .green { color: #27ae60; font-weight: bold; }
+        .control-box h4 .red { color: #e74c3c; font-weight: bold; }
+        .slope-slider { width: 180px; cursor: pointer; height: 8px; }
+        .intercept-display { font-size: 1.3rem; font-weight: bold; color: #e74c3c; margin-top: 4px; }
+        .drag-hint { font-size: 0.75rem; color: #95a5a6; margin-top: 4px; }
+
+        /* Canvas */
+        .canvas-container { text-align: center; }
+        canvas { border: 2px solid #bdc3c7; border-radius: 8px; max-width: 100%; cursor: ns-resize; }
+
+        /* Quiz/Test shared styles */
+        .mini-dots { display: flex; justify-content: center; gap: 4px; margin-bottom: 8px; }
+        .mini-dots .dot-logo { width: 10px; height: 10px; }
+        .score-bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px; }
+        .score-bar .label { color: #7f8c8d; font-size: 0.9rem; }
+        .score-bar .score { font-size: 1.2rem; font-weight: bold; color: #27ae60; }
+        .progress-dots { display: flex; gap: 4px; }
+        .progress-dot { width: 16px; height: 16px; border-radius: 50%; background: #bdc3c7; }
+        .progress-dot.correct { background: #27ae60; }
+        .progress-dot.wrong { background: #e74c3c; }
+        .progress-dot.current { background: #3498db; transform: scale(1.1); }
+
+        .question-box { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 12px; text-align: center; }
+        .question-box .prompt { font-size: 1.05rem; color: #2c3e50; margin-bottom: 8px; }
+        .question-box canvas { max-width: 300px; border-radius: 6px; }
+
+        /* Dial controls */
+        .answer-section { background: #fff; padding: 12px; border-radius: 10px; border: 2px solid #ecf0f1; }
+        .answer-section h4 { text-align: center; color: #2c3e50; margin-bottom: 10px; font-size: 0.95rem; }
+        .dial-row { display: flex; justify-content: center; gap: 25px; align-items: flex-start; flex-wrap: wrap; }
+        .dial-group { text-align: center; }
+        .dial-group-label { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 5px; }
+        .dial-group-label .green { color: #27ae60; font-weight: bold; }
+        .dial-group-label .red { color: #e74c3c; font-weight: bold; }
+        .frac-dial { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .dial { display: flex; flex-direction: column; align-items: center; }
+        .dial button { width: 32px; height: 26px; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; background: #3498db; color: white; }
+        .dial button:hover { background: #2980b9; }
+        .dial .dial-value { font-size: 1.4rem; font-weight: bold; min-height: 32px; display: flex; align-items: center; justify-content: center; font-family: 'Courier New', monospace; min-width: 30px; }
+        .frac-line-dial { width: 40px; height: 3px; background: #2c3e50; margin: 2px 0; }
+        .int-dial .dial-value { color: #e74c3c; }
+
+        .check-btn { display: block; margin: 12px auto 0; background: #27ae60; color: white; border: none; padding: 10px 28px; font-size: 1rem; border-radius: 18px; cursor: pointer; }
+        .check-btn:hover { background: #219a52; }
+        .next-btn { background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 8px 20px; font-size: 0.95rem; border-radius: 16px; cursor: pointer; margin-top: 8px; }
+
+        .feedback { text-align: center; margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 1rem; }
+        .feedback.correct { background: #d4edda; color: #155724; }
+        .feedback.incorrect { background: #f8d7da; color: #721c24; }
+
+        /* Challenge mode */
+        .challenge-intro { background: linear-gradient(135deg, #fff3e0, #ffe0b2); padding: 15px; border-radius: 10px; margin-bottom: 12px; }
+        .challenge-intro h3 { color: #e65100; font-size: 1.1rem; margin-bottom: 8px; }
+        .challenge-intro p { color: #5d4037; font-size: 0.95rem; line-height: 1.5; }
+        .formula-box { background: white; padding: 12px; border-radius: 8px; margin: 10px 0; text-align: center; border-left: 4px solid #ff9800; }
+        .formula-box .formula { font-size: 1.5rem; font-family: 'Times New Roman', serif; color: #2c3e50; }
+        .formula-box .formula .green { color: #27ae60; }
+        .formula-box .formula .red { color: #e74c3c; }
+        .formula-box .formula .blue { color: #3498db; }
+        .step-box { background: #e3f2fd; padding: 10px; border-radius: 8px; margin: 8px 0; }
+        .step-box .step-num { display: inline-block; background: #1976d2; color: white; width: 24px; height: 24px; border-radius: 50%; text-align: center; line-height: 24px; font-size: 0.85rem; margin-right: 8px; }
+        .step-box .step-text { color: #1565c0; font-size: 0.95rem; }
+        .calculation-display { background: #f5f5f5; padding: 12px; border-radius: 8px; margin: 10px 0; font-family: 'Times New Roman', serif; font-size: 1.2rem; text-align: center; }
+
+        /* Celebration */
+        .celebration { text-align: center; padding: 20px; }
+        .celebration h2 { color: #2c3e50; margin-bottom: 10px; }
+        .trophy { font-size: 3rem; margin: 10px 0; }
+        .final-score { font-size: 2.5rem; font-weight: bold; color: #27ae60; }
+        .final-score.perfect { background: linear-gradient(135deg, #27ae60, #3498db, #e74c3c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="dots-logo" id="dotsLogo"></div>
+        <h1>Slope, y-intercept, Line</h1>
+        <p class="tagline">"Maths that meets you where you are"</p>
+        <div class="lo-badge"><code>A.2</code> Understand y = mx + c</div>
+    </div>
+
+    <div class="container">
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="explore">🔍 Explore</button>
+            <button class="mode-tab" data-mode="quiz">📝 Quiz</button>
+            <button class="mode-tab" data-mode="test">📋 Topic Test</button>
+            <button class="mode-tab" data-mode="challenge">⭐ Challenge</button>
+        </div>
+
+        <!-- EXPLORE MODE -->
+        <div id="exploreMode">
+            <div class="content-area">
+                <!-- FORMULA FIRST -->
+                <div class="formula-display">
+                    <div class="formula-label">Slope-Intercept Form</div>
+                    <div class="formula-main" id="formulaMain">
+                        y = <span class="val-box slope" id="eqSlope">1</span>x + <span class="val-box intercept" id="eqIntercept">0</span>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls-row">
+                    <div class="control-box">
+                        <h4>Slope <span class="green">m</span></h4>
+                        <input type="range" class="slope-slider" id="slopeSlider" min="0" max="26" value="20">
+                    </div>
+                    <div class="control-box">
+                        <h4>y-intercept <span class="red">c</span></h4>
+                        <div class="intercept-display" id="interceptDisplay">0</div>
+                        <div class="drag-hint">↕ Drag the red dot</div>
+                    </div>
+                </div>
+
+                <!-- Graph follows formula -->
+                <div class="canvas-container">
+                    <canvas id="exploreCanvas" width="420" height="420"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ MODE -->
+        <div id="quizMode" class="hidden">
+            <div class="content-area">
+                <div id="quizContainer"></div>
+            </div>
+        </div>
+
+        <!-- TEST MODE -->
+        <div id="testMode" class="hidden">
+            <div class="content-area">
+                <div id="testContainer"></div>
+            </div>
+        </div>
+
+        <!-- CHALLENGE MODE -->
+        <div id="challengeMode" class="hidden">
+            <div class="content-area">
+                <div id="challengeContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ SLOPE VALUES (ordered by value) ============
+        const SLOPES = [
+            {n: -3, d: 1}, {n: -2, d: 1}, {n: -3, d: 2}, {n: -4, d: 3}, {n: -1, d: 1},
+            {n: -4, d: 5}, {n: -3, d: 4}, {n: -2, d: 3}, {n: -1, d: 2}, {n: -2, d: 5},
+            {n: -1, d: 3}, {n: -1, d: 4}, {n: 0, d: 1},
+            {n: 1, d: 4}, {n: 1, d: 3}, {n: 2, d: 5}, {n: 1, d: 2}, {n: 2, d: 3},
+            {n: 3, d: 4}, {n: 4, d: 5}, {n: 1, d: 1}, {n: 4, d: 3}, {n: 3, d: 2},
+            {n: 2, d: 1}, {n: 5, d: 2}, {n: 3, d: 1}
+        ];
+
+        // Build header dots
+        const dotsLogo = document.getElementById('dotsLogo');
+        for (let i = 0; i < 16; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot-logo ' + ['green','blue','red','black'][i % 4];
+            dot.onclick = () => dotEffect(i);
+            dotsLogo.appendChild(dot);
+        }
+
+        function dotEffect(idx) {
+            const dots = document.querySelectorAll('#dotsLogo .dot-logo');
+            dots.forEach((d, i) => {
+                const dist = Math.abs(i - idx);
+                setTimeout(() => animateDot(d, 12 * Math.exp(-dist * 0.2)), dist * 25);
+            });
+        }
+
+        function animateDot(dot, amp) {
+            const start = performance.now();
+            (function frame(now) {
+                const t = now - start;
+                if (t > 1500) { dot.style.transform = 'translateY(0)'; return; }
+                const y = Math.sin(t * 0.02) * amp * Math.pow(0.99, t / 10);
+                dot.style.transform = `translateY(${-y}px)`;
+                requestAnimationFrame(frame);
+            })(start);
+        }
+
+        setTimeout(() => {
+            document.querySelectorAll('#dotsLogo .dot-logo').forEach((d, i) => 
+                setTimeout(() => animateDot(d, 6), i * 25));
+        }, 300);
+
+        // Mode switching
+        document.querySelectorAll('.mode-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const m = tab.dataset.mode;
+                document.getElementById('exploreMode').classList.toggle('hidden', m !== 'explore');
+                document.getElementById('quizMode').classList.toggle('hidden', m !== 'quiz');
+                document.getElementById('testMode').classList.toggle('hidden', m !== 'test');
+                document.getElementById('challengeMode').classList.toggle('hidden', m !== 'challenge');
+                if (m === 'explore') initExplore();
+                if (m === 'quiz') initQuiz();
+                if (m === 'test') initTest();
+                if (m === 'challenge') initChallenge();
+            });
+        });
+
+        // ============ EXPLORE MODE ============
+        let exploreState = { slopeIdx: 20, intercept: 0, dragging: false };
+
+        function initExplore() {
+            const canvas = document.getElementById('exploreCanvas');
+            document.getElementById('slopeSlider').value = exploreState.slopeIdx;
+            
+            // Dragging intercept
+            canvas.onmousedown = (e) => startInterceptDrag(e, canvas);
+            canvas.ontouchstart = (e) => { e.preventDefault(); startInterceptDrag(e.touches[0], canvas); };
+            canvas.onmousemove = (e) => moveInterceptDrag(e, canvas);
+            canvas.ontouchmove = (e) => { if (exploreState.dragging) { e.preventDefault(); moveInterceptDrag(e.touches[0], canvas); }};
+            canvas.onmouseup = canvas.ontouchend = canvas.onmouseleave = () => { exploreState.dragging = false; };
+            
+            updateExplore();
+        }
+
+        function startInterceptDrag(e, canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleY = canvas.height / rect.height;
+            const py = (e.clientY - rect.top) * scaleY;
+            const gy = pixelToGridY(py, canvas);
+            
+            // Check if near the y-intercept point
+            if (Math.abs(gy - exploreState.intercept) < 0.8) {
+                exploreState.dragging = true;
+            }
+        }
+
+        function moveInterceptDrag(e, canvas) {
+            if (!exploreState.dragging) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleY = canvas.height / rect.height;
+            const py = (e.clientY - rect.top) * scaleY;
+            let gy = pixelToGridY(py, canvas);
+            gy = Math.round(gy);
+            gy = Math.max(-5, Math.min(5, gy));
+            exploreState.intercept = gy;
+            updateExplore();
+        }
+
+        function pixelToGridY(py, canvas) {
+            const h = canvas.height;
+            const margin = 45;
+            return 5 - ((py - margin) / (h - 2 * margin)) * 10;
+        }
+
+        document.getElementById('slopeSlider').addEventListener('input', (e) => {
+            exploreState.slopeIdx = parseInt(e.target.value);
+            updateExplore();
+        });
+
+        function updateExplore() {
+            const slope = SLOPES[exploreState.slopeIdx];
+            const c = exploreState.intercept;
+            
+            // Update intercept display
+            document.getElementById('interceptDisplay').textContent = c;
+            
+            // Update formula display
+            const slopeHTML = formatSlopeHTML(slope.n, slope.d);
+            const formulaMain = document.getElementById('formulaMain');
+            if (c >= 0) {
+                formulaMain.innerHTML = `y = <span class="val-box slope">${slopeHTML}</span>x + <span class="val-box intercept">${c}</span>`;
+            } else {
+                formulaMain.innerHTML = `y = <span class="val-box slope">${slopeHTML}</span>x − <span class="val-box intercept">${-c}</span>`;
+            }
+            
+            drawExploreGraph();
+        }
+
+        function formatSlopeHTML(n, d) {
+            if (d === 1) return n.toString();
+            const sign = n < 0 ? '−' : '';
+            const absN = Math.abs(n);
+            return `${sign}<span class="frac"><span class="num">${absN}</span><span class="den">${d}</span></span>`;
+        }
+
+        function drawExploreGraph() {
+            const canvas = document.getElementById('exploreCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const margin = 45;
+            const slope = SLOPES[exploreState.slopeIdx];
+            const m = slope.n / slope.d;
+            const c = exploreState.intercept;
+
+            function gridToPixel(gx, gy) {
+                const px = margin + ((gx + 5) / 10) * (w - 2 * margin);
+                const py = margin + ((5 - gy) / 10) * (h - 2 * margin);
+                return [px, py];
+            }
+
+            // White background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            // Grid lines - light gray
+            ctx.strokeStyle = '#d0d0d0';
+            ctx.lineWidth = 1;
+            for (let i = -5; i <= 5; i++) {
+                const [px] = gridToPixel(i, 0);
+                const [, py] = gridToPixel(0, i);
+                ctx.beginPath(); ctx.moveTo(px, margin); ctx.lineTo(px, h - margin); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(margin, py); ctx.lineTo(w - margin, py); ctx.stroke();
+            }
+
+            // Lattice points - small black dots
+            ctx.fillStyle = '#2c3e50';
+            for (let x = -5; x <= 5; x++) {
+                for (let y = -5; y <= 5; y++) {
+                    const [px, py] = gridToPixel(x, y);
+                    ctx.beginPath();
+                    ctx.arc(px, py, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Axes - black, bold
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 2.5;
+            const [ox, oy] = gridToPixel(0, 0);
+            ctx.beginPath(); ctx.moveTo(margin, oy); ctx.lineTo(w - margin, oy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, margin); ctx.lineTo(ox, h - margin); ctx.stroke();
+
+            // Axis labels - bigger
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 15px Segoe UI';
+            ctx.textAlign = 'center';
+            for (let i = -5; i <= 5; i++) {
+                if (i === 0) continue;
+                const [px] = gridToPixel(i, 0);
+                ctx.fillText(i, px, oy + 18);
+                const [, py] = gridToPixel(0, i);
+                ctx.fillText(i, ox - 18, py + 5);
+            }
+            
+            // X and Y axis labels
+            ctx.font = 'bold 18px Segoe UI';
+            ctx.fillText('x', w - margin + 18, oy + 6);
+            ctx.fillText('y', ox, margin - 15);
+
+            // Draw line - RED
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const lineY = (x) => m * x + c;
+            const [lx1, ly1] = gridToPixel(-6, lineY(-6));
+            const [lx2, ly2] = gridToPixel(6, lineY(6));
+            ctx.moveTo(lx1, ly1);
+            ctx.lineTo(lx2, ly2);
+            ctx.stroke();
+
+            // Slope helper triangle - GREEN
+            if (slope.n !== 0) {
+                const x1 = 0, y1 = c;
+                const runDir = slope.d; // always positive run direction
+                const x2 = runDir;
+                const y2 = c + slope.n; // rise can be negative
+                
+                const [p1x, p1y] = gridToPixel(x1, y1);
+                const [p2x, p2y] = gridToPixel(x2, y2);
+                const [cx, cy] = gridToPixel(x2, y1); // corner
+
+                ctx.strokeStyle = '#27ae60';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 4]);
+                ctx.beginPath();
+                ctx.moveTo(p1x, p1y);
+                ctx.lineTo(cx, cy);
+                ctx.lineTo(p2x, p2y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Labels - rise shows actual signed value
+                ctx.font = 'bold 14px Segoe UI';
+                ctx.fillStyle = '#27ae60';
+                ctx.textAlign = 'center';
+                ctx.fillText(`run = ${runDir}`, (p1x + cx) / 2, cy + (slope.n >= 0 ? 18 : -8));
+                ctx.textAlign = 'left';
+                ctx.fillText(`rise = ${slope.n}`, cx + 8, (cy + p2y) / 2 + 5);
+            }
+
+            // y-intercept point - RED dot, draggable
+            const [cPx, cPy] = gridToPixel(0, c);
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(cPx, cPy, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#c0392b';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Label for y-intercept - positioned smartly
+            ctx.font = 'bold 16px Courier New';
+            ctx.fillStyle = '#e74c3c';
+            if (m >= 0) {
+                ctx.textAlign = 'right';
+                ctx.fillText(`(0, ${c})`, cPx - 14, cPy + 5);
+            } else {
+                ctx.textAlign = 'left';
+                ctx.fillText(`(0, ${c})`, cPx + 14, cPy + 5);
+            }
+
+            // Slope display on graph - BIGGER, GREEN
+            ctx.fillStyle = '#27ae60';
+            ctx.font = 'bold 18px Segoe UI';
+            ctx.textAlign = 'left';
+            const slopeX = margin + 8;
+            const slopeY = margin - 10;
+            
+            if (slope.d === 1) {
+                ctx.fillText(`m = ${slope.n}`, slopeX, slopeY);
+            } else {
+                const sign = slope.n < 0 ? '−' : '';
+                ctx.fillText('m =', slopeX, slopeY);
+                let offsetX = slopeX + 45;
+                if (sign) {
+                    ctx.fillText(sign, offsetX, slopeY);
+                    offsetX += 14;
+                }
+                // Stacked fraction
+                ctx.font = 'bold 15px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText(Math.abs(slope.n), offsetX + 8, slopeY - 8);
+                ctx.fillRect(offsetX, slopeY - 4, 16, 2);
+                ctx.fillText(slope.d, offsetX + 8, slopeY + 12);
+            }
+        }
+
+        // ============ QUIZ MODE ============
+        let quizState = { questions: [], current: 0, score: 0, results: [] };
+
+        function initQuiz() {
+            quizState = { questions: generateQuestions(6), current: 0, score: 0, results: [] };
+            renderQuizQuestion();
+        }
+
+        function generateQuestions(n) {
+            const questions = [];
+            // Use slopes with small denominators for clarity
+            const quizSlopes = SLOPES.filter(s => s.d <= 3 && Math.abs(s.n) <= 3);
+            for (let i = 0; i < n; i++) {
+                const slope = quizSlopes[Math.floor(Math.random() * quizSlopes.length)];
+                const c = Math.floor(Math.random() * 9) - 4;
+                questions.push({ slope, c });
+            }
+            return questions;
+        }
+
+        function renderQuizQuestion() {
+            const container = document.getElementById('quizContainer');
+            const q = quizState.questions[quizState.current];
+            
+            if (!q) { renderQuizComplete(); return; }
+
+            const dots = quizState.results.map((r, i) => 
+                `<div class="progress-dot ${r ? 'correct' : 'wrong'}"></div>`
+            ).join('') + 
+            `<div class="progress-dot current"></div>` +
+            Array(5 - quizState.current).fill('<div class="progress-dot"></div>').join('');
+
+            container.innerHTML = `
+                <div class="mini-dots" id="quizDots"></div>
+                <div class="score-bar">
+                    <span class="label">Q${quizState.current + 1}/6</span>
+                    <div class="progress-dots">${dots}</div>
+                    <span class="score">${quizState.score}/6</span>
+                </div>
+                <div class="question-box">
+                    <p class="prompt">Find the <span style="color:#27ae60;font-weight:bold">slope (m)</span> and <span style="color:#e74c3c;font-weight:bold">y-intercept (c)</span></p>
+                    <canvas id="quizCanvas" width="300" height="300"></canvas>
+                </div>
+                <div class="answer-section">
+                    <h4>Dial in your answer:</h4>
+                    <div class="dial-row">
+                        <div class="dial-group">
+                            <div class="dial-group-label">Slope <span class="green">m</span></div>
+                            <div class="frac-dial">
+                                <div class="dial">
+                                    <button onclick="adjustQuizDial('sNum', 1)">▲</button>
+                                    <span class="dial-value" id="qSlopeNum" style="color:#27ae60">1</span>
+                                    <button onclick="adjustQuizDial('sNum', -1)">▼</button>
+                                </div>
+                                <div class="frac-line-dial"></div>
+                                <div class="dial">
+                                    <button onclick="adjustQuizDial('sDen', 1)">▲</button>
+                                    <span class="dial-value" id="qSlopeDen" style="color:#27ae60">1</span>
+                                    <button onclick="adjustQuizDial('sDen', -1)">▼</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dial-group">
+                            <div class="dial-group-label">y-intercept <span class="red">c</span></div>
+                            <div class="dial int-dial">
+                                <button onclick="adjustQuizDial('c', 1)">▲</button>
+                                <span class="dial-value" id="qIntercept">0</span>
+                                <button onclick="adjustQuizDial('c', -1)">▼</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="check-btn" onclick="checkQuizAnswer()">Check Answer</button>
+                    <div class="feedback" id="quizFeedback"></div>
+                </div>
+            `;
+
+            buildMiniDots('quizDots');
+            quizState.userAnswer = { sNum: 1, sDen: 1, c: 0 };
+            drawQuizGraph(q);
+        }
+
+        function adjustQuizDial(prop, delta) {
+            if (prop === 'sNum') {
+                quizState.userAnswer.sNum = Math.max(-9, Math.min(9, quizState.userAnswer.sNum + delta));
+                document.getElementById('qSlopeNum').textContent = quizState.userAnswer.sNum;
+            } else if (prop === 'sDen') {
+                let newVal = quizState.userAnswer.sDen + delta;
+                if (newVal === 0) newVal += delta;
+                quizState.userAnswer.sDen = Math.max(-9, Math.min(9, newVal));
+                document.getElementById('qSlopeDen').textContent = quizState.userAnswer.sDen;
+            } else {
+                quizState.userAnswer.c = Math.max(-9, Math.min(9, quizState.userAnswer.c + delta));
+                document.getElementById('qIntercept').textContent = quizState.userAnswer.c;
+            }
+        }
+
+        function drawQuizGraph(q) {
+            const canvas = document.getElementById('quizCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const margin = 35;
+            const m = q.slope.n / q.slope.d;
+            const c = q.c;
+
+            function gridToPixel(gx, gy) {
+                const px = margin + ((gx + 5) / 10) * (w - 2 * margin);
+                const py = margin + ((5 - gy) / 10) * (h - 2 * margin);
+                return [px, py];
+            }
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            // Grid
+            ctx.strokeStyle = '#d0d0d0';
+            ctx.lineWidth = 1;
+            for (let i = -5; i <= 5; i++) {
+                const [px] = gridToPixel(i, 0);
+                const [, py] = gridToPixel(0, i);
+                ctx.beginPath(); ctx.moveTo(px, margin); ctx.lineTo(px, h - margin); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(margin, py); ctx.lineTo(w - margin, py); ctx.stroke();
+            }
+
+            // Lattice points
+            ctx.fillStyle = '#2c3e50';
+            for (let x = -5; x <= 5; x++) {
+                for (let y = -5; y <= 5; y++) {
+                    const [px, py] = gridToPixel(x, y);
+                    ctx.beginPath();
+                    ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Axes
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 2;
+            const [ox, oy] = gridToPixel(0, 0);
+            ctx.beginPath(); ctx.moveTo(margin, oy); ctx.lineTo(w - margin, oy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, margin); ctx.lineTo(ox, h - margin); ctx.stroke();
+
+            // Axis labels
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 12px Segoe UI';
+            ctx.textAlign = 'center';
+            for (let i = -5; i <= 5; i++) {
+                if (i === 0) continue;
+                const [px] = gridToPixel(i, 0);
+                ctx.fillText(i, px, oy + 14);
+                const [, py] = gridToPixel(0, i);
+                ctx.fillText(i, ox - 14, py + 4);
+            }
+            ctx.font = 'bold 14px Segoe UI';
+            ctx.fillText('x', w - margin + 12, oy + 4);
+            ctx.fillText('y', ox, margin - 10);
+
+            // Line - RED
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const lineY = (x) => m * x + c;
+            const [lx1, ly1] = gridToPixel(-6, lineY(-6));
+            const [lx2, ly2] = gridToPixel(6, lineY(6));
+            ctx.moveTo(lx1, ly1);
+            ctx.lineTo(lx2, ly2);
+            ctx.stroke();
+
+            // Helper triangle - GREEN
+            if (q.slope.n !== 0) {
+                const x1 = 0, y1 = c;
+                const x2 = q.slope.d;
+                const y2 = c + q.slope.n;
+                
+                const [p1x, p1y] = gridToPixel(x1, y1);
+                const [p2x, p2y] = gridToPixel(x2, y2);
+                const [cx, cy] = gridToPixel(x2, y1);
+
+                ctx.strokeStyle = '#27ae60';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 3]);
+                ctx.beginPath();
+                ctx.moveTo(p1x, p1y);
+                ctx.lineTo(cx, cy);
+                ctx.lineTo(p2x, p2y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Labels with signed rise
+                ctx.font = 'bold 11px Segoe UI';
+                ctx.fillStyle = '#27ae60';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${q.slope.d}`, (p1x + cx) / 2, cy + (q.slope.n >= 0 ? 14 : -6));
+                ctx.textAlign = 'left';
+                ctx.fillText(`${q.slope.n}`, cx + 5, (cy + p2y) / 2 + 4);
+            }
+
+            // y-intercept dot - RED
+            const [cPx, cPy] = gridToPixel(0, c);
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(cPx, cPy, 7, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Label for intercept
+            ctx.font = 'bold 12px Courier New';
+            ctx.fillStyle = '#e74c3c';
+            ctx.textAlign = m >= 0 ? 'right' : 'left';
+            const labelX = m >= 0 ? cPx - 10 : cPx + 10;
+            ctx.fillText(`(0, ${c})`, labelX, cPy + 4);
+        }
+
+        function checkQuizAnswer() {
+            const q = quizState.questions[quizState.current];
+            const ua = quizState.userAnswer;
+            
+            const correctM = q.slope.n / q.slope.d;
+            const userM = ua.sNum / ua.sDen;
+            const slopeCorrect = Math.abs(correctM - userM) < 0.001;
+            const interceptCorrect = ua.c === q.c;
+            const isCorrect = slopeCorrect && interceptCorrect;
+
+            quizState.results.push(isCorrect);
+            if (isCorrect) quizState.score++;
+
+            const fb = document.getElementById('quizFeedback');
+            const correctSlopeStr = q.slope.d === 1 ? q.slope.n : `${q.slope.n}/${q.slope.d}`;
+            
+            if (isCorrect) {
+                fb.className = 'feedback correct';
+                fb.innerHTML = '✓ Correct!';
+            } else {
+                fb.className = 'feedback incorrect';
+                fb.innerHTML = `✗ Answer: m = ${correctSlopeStr}, c = ${q.c}`;
+            }
+
+            document.querySelector('.check-btn').style.display = 'none';
+            fb.innerHTML += `<br><button class="next-btn" onclick="nextQuizQuestion()">Next →</button>`;
+        }
+
+        function nextQuizQuestion() {
+            quizState.current++;
+            renderQuizQuestion();
+        }
+
+        function renderQuizComplete() {
+            const container = document.getElementById('quizContainer');
+            const perfect = quizState.score === 6;
+            container.innerHTML = `
+                <div class="celebration">
+                    <div class="trophy">${perfect ? '🏆' : '👍'}</div>
+                    <h2>${perfect ? '🎉 PERFECT! 🎉' : 'Quiz Complete!'}</h2>
+                    <div class="final-score ${perfect ? 'perfect' : ''}">${quizState.score}/6</div>
+                    <div class="progress-dots" style="justify-content:center;margin:15px 0">
+                        ${quizState.results.map(r => `<div class="progress-dot ${r ? 'correct' : 'wrong'}"></div>`).join('')}
+                    </div>
+                    <button class="next-btn" onclick="initQuiz()">🔄 Try Again</button>
+                </div>
+            `;
+        }
+
+        // ============ TEST MODE ============
+        let testState = { questions: [], current: 0, answers: [] };
+
+        function initTest() {
+            testState = { questions: generateQuestions(6), current: 0, answers: [] };
+            renderTestQuestion();
+        }
+
+        function renderTestQuestion() {
+            const container = document.getElementById('testContainer');
+            const q = testState.questions[testState.current];
+            
+            if (!q) { renderTestResults(); return; }
+
+            const dots = Array(6).fill(0).map((_, i) => 
+                `<div class="progress-dot ${i < testState.current ? '' : i === testState.current ? 'current' : ''}"></div>`
+            ).join('');
+
+            container.innerHTML = `
+                <div class="mini-dots" id="testDots"></div>
+                <div class="score-bar">
+                    <span class="label">Question ${testState.current + 1}/6</span>
+                    <div class="progress-dots">${dots}</div>
+                    <span class="label" style="color:#e74c3c;font-weight:bold">Topic Test</span>
+                </div>
+                <div class="question-box">
+                    <p class="prompt">Find <span style="color:#27ae60;font-weight:bold">m</span> and <span style="color:#e74c3c;font-weight:bold">c</span></p>
+                    <canvas id="testCanvas" width="300" height="300"></canvas>
+                </div>
+                <div class="answer-section">
+                    <div class="dial-row">
+                        <div class="dial-group">
+                            <div class="dial-group-label">Slope <span class="green">m</span></div>
+                            <div class="frac-dial">
+                                <div class="dial">
+                                    <button onclick="adjustTestDial('sNum', 1)">▲</button>
+                                    <span class="dial-value" id="tSlopeNum" style="color:#27ae60">1</span>
+                                    <button onclick="adjustTestDial('sNum', -1)">▼</button>
+                                </div>
+                                <div class="frac-line-dial"></div>
+                                <div class="dial">
+                                    <button onclick="adjustTestDial('sDen', 1)">▲</button>
+                                    <span class="dial-value" id="tSlopeDen" style="color:#27ae60">1</span>
+                                    <button onclick="adjustTestDial('sDen', -1)">▼</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dial-group">
+                            <div class="dial-group-label">y-intercept <span class="red">c</span></div>
+                            <div class="dial int-dial">
+                                <button onclick="adjustTestDial('c', 1)">▲</button>
+                                <span class="dial-value" id="tIntercept">0</span>
+                                <button onclick="adjustTestDial('c', -1)">▼</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="check-btn" onclick="submitTestAnswer()">Submit →</button>
+                </div>
+            `;
+
+            buildMiniDots('testDots');
+            testState.userAnswer = { sNum: 1, sDen: 1, c: 0 };
+            drawTestGraph(q);
+        }
+
+        function adjustTestDial(prop, delta) {
+            if (prop === 'sNum') {
+                testState.userAnswer.sNum = Math.max(-9, Math.min(9, testState.userAnswer.sNum + delta));
+                document.getElementById('tSlopeNum').textContent = testState.userAnswer.sNum;
+            } else if (prop === 'sDen') {
+                let newVal = testState.userAnswer.sDen + delta;
+                if (newVal === 0) newVal += delta;
+                testState.userAnswer.sDen = Math.max(-9, Math.min(9, newVal));
+                document.getElementById('tSlopeDen').textContent = testState.userAnswer.sDen;
+            } else {
+                testState.userAnswer.c = Math.max(-9, Math.min(9, testState.userAnswer.c + delta));
+                document.getElementById('tIntercept').textContent = testState.userAnswer.c;
+            }
+        }
+
+        function drawTestGraph(q) {
+            // Same as quiz graph
+            const canvas = document.getElementById('testCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const margin = 35;
+            const m = q.slope.n / q.slope.d;
+            const c = q.c;
+
+            function gridToPixel(gx, gy) {
+                const px = margin + ((gx + 5) / 10) * (w - 2 * margin);
+                const py = margin + ((5 - gy) / 10) * (h - 2 * margin);
+                return [px, py];
+            }
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = '#d0d0d0';
+            ctx.lineWidth = 1;
+            for (let i = -5; i <= 5; i++) {
+                const [px] = gridToPixel(i, 0);
+                const [, py] = gridToPixel(0, i);
+                ctx.beginPath(); ctx.moveTo(px, margin); ctx.lineTo(px, h - margin); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(margin, py); ctx.lineTo(w - margin, py); ctx.stroke();
+            }
+
+            ctx.fillStyle = '#2c3e50';
+            for (let x = -5; x <= 5; x++) {
+                for (let y = -5; y <= 5; y++) {
+                    const [px, py] = gridToPixel(x, y);
+                    ctx.beginPath();
+                    ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 2;
+            const [ox, oy] = gridToPixel(0, 0);
+            ctx.beginPath(); ctx.moveTo(margin, oy); ctx.lineTo(w - margin, oy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, margin); ctx.lineTo(ox, h - margin); ctx.stroke();
+
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 12px Segoe UI';
+            ctx.textAlign = 'center';
+            for (let i = -5; i <= 5; i++) {
+                if (i === 0) continue;
+                const [px] = gridToPixel(i, 0);
+                ctx.fillText(i, px, oy + 14);
+                const [, py] = gridToPixel(0, i);
+                ctx.fillText(i, ox - 14, py + 4);
+            }
+            ctx.font = 'bold 14px Segoe UI';
+            ctx.fillText('x', w - margin + 12, oy + 4);
+            ctx.fillText('y', ox, margin - 10);
+
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const lineY = (x) => m * x + c;
+            const [lx1, ly1] = gridToPixel(-6, lineY(-6));
+            const [lx2, ly2] = gridToPixel(6, lineY(6));
+            ctx.moveTo(lx1, ly1);
+            ctx.lineTo(lx2, ly2);
+            ctx.stroke();
+
+            // Helper triangle
+            if (q.slope.n !== 0) {
+                const x1 = 0, y1 = c;
+                const x2 = q.slope.d;
+                const y2 = c + q.slope.n;
+                
+                const [p1x, p1y] = gridToPixel(x1, y1);
+                const [p2x, p2y] = gridToPixel(x2, y2);
+                const [cx, cy] = gridToPixel(x2, y1);
+
+                ctx.strokeStyle = '#27ae60';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 3]);
+                ctx.beginPath();
+                ctx.moveTo(p1x, p1y);
+                ctx.lineTo(cx, cy);
+                ctx.lineTo(p2x, p2y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.font = 'bold 11px Segoe UI';
+                ctx.fillStyle = '#27ae60';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${q.slope.d}`, (p1x + cx) / 2, cy + (q.slope.n >= 0 ? 14 : -6));
+                ctx.textAlign = 'left';
+                ctx.fillText(`${q.slope.n}`, cx + 5, (cy + p2y) / 2 + 4);
+            }
+
+            const [cPx, cPy] = gridToPixel(0, c);
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(cPx, cPy, 7, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.font = 'bold 12px Courier New';
+            ctx.fillStyle = '#e74c3c';
+            ctx.textAlign = m >= 0 ? 'right' : 'left';
+            ctx.fillText(`(0, ${c})`, m >= 0 ? cPx - 10 : cPx + 10, cPy + 4);
+        }
+
+        function submitTestAnswer() {
+            const q = testState.questions[testState.current];
+            const ua = {...testState.userAnswer};
+            
+            const correctM = q.slope.n / q.slope.d;
+            const userM = ua.sNum / ua.sDen;
+            const slopeCorrect = Math.abs(correctM - userM) < 0.001;
+            const interceptCorrect = ua.c === q.c;
+            
+            testState.answers.push({
+                question: q,
+                userAnswer: ua,
+                correct: slopeCorrect && interceptCorrect
+            });
+
+            testState.current++;
+            renderTestQuestion();
+        }
+
+        function renderTestResults() {
+            const container = document.getElementById('testContainer');
+            const score = testState.answers.filter(a => a.correct).length;
+            const perfect = score === 6;
+
+            let reviewHTML = testState.answers.map((a, i) => {
+                const correctSlopeStr = a.question.slope.d === 1 ? a.question.slope.n : `${a.question.slope.n}/${a.question.slope.d}`;
+                const userSlopeStr = a.userAnswer.sDen === 1 ? a.userAnswer.sNum : `${a.userAnswer.sNum}/${a.userAnswer.sDen}`;
+                return `<div style="padding:8px;background:${a.correct ? '#d4edda' : '#f8d7da'};border-radius:6px;margin:5px 0;font-size:0.9rem">
+                    <strong>Q${i+1}:</strong> m=${correctSlopeStr}, c=${a.question.c} 
+                    ${a.correct ? '✓' : `(You: m=${userSlopeStr}, c=${a.userAnswer.c})`}
+                </div>`;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="celebration">
+                    <div class="trophy">${perfect ? '🏆' : score >= 4 ? '🌟' : '📝'}</div>
+                    <h2>Topic Test Complete</h2>
+                    <div class="final-score ${perfect ? 'perfect' : ''}">${score}/6</div>
+                    <p style="color:#7f8c8d;margin:10px 0">${perfect ? 'Perfect score!' : score >= 4 ? 'Great work!' : 'Keep practicing!'}</p>
+                    <div style="max-width:320px;margin:15px auto;text-align:left">${reviewHTML}</div>
+                    <button class="next-btn" onclick="initTest()">🔄 Retake Test</button>
+                </div>
+            `;
+        }
+
+        // ============ CHALLENGE MODE ============
+        let challengeState = { phase: 'learn', question: null, streak: 0 };
+
+        function initChallenge() {
+            challengeState = { phase: 'learn', question: null, streak: 0 };
+            renderChallengeLearn();
+        }
+
+        function renderChallengeLearn() {
+            const container = document.getElementById('challengeContainer');
+            container.innerHTML = `
+                <div class="mini-dots" id="challengeDots"></div>
+                <div class="challenge-intro">
+                    <h3>⭐ Challenge: Find the y-intercept!</h3>
+                    <p>Sometimes you know a <strong>point on the line</strong> and the <strong>slope</strong>, but not where it crosses the y-axis. Can you find c?</p>
+                </div>
+                
+                <div class="formula-box">
+                    <div style="font-size:0.85rem;color:#7f8c8d;margin-bottom:5px">The Key Formula:</div>
+                    <div class="formula"><span class="red">c</span> = <span class="blue">y₁</span> − <span class="green">m</span> × <span class="blue">x₁</span></div>
+                </div>
+
+                <div class="step-box">
+                    <span class="step-num">1</span>
+                    <span class="step-text">Start with <strong>y = mx + c</strong></span>
+                </div>
+                <div class="step-box">
+                    <span class="step-num">2</span>
+                    <span class="step-text">The point (x₁, y₁) is on the line, so: <strong>y₁ = m × x₁ + c</strong></span>
+                </div>
+                <div class="step-box">
+                    <span class="step-num">3</span>
+                    <span class="step-text">Rearrange: <strong>c = y₁ − m × x₁</strong></span>
+                </div>
+
+                <div style="background:#e8f5e9;padding:12px;border-radius:8px;margin:12px 0">
+                    <h4 style="color:#2e7d32;margin-bottom:8px">📝 Example:</h4>
+                    <p style="color:#1b5e20;font-size:0.95rem;line-height:1.6">
+                        Given: Point <strong style="color:#3498db">(4, 5)</strong> and slope <strong style="color:#27ae60">m = ½</strong><br><br>
+                        c = y₁ − m × x₁<br>
+                        c = 5 − ½ × 4<br>
+                        c = 5 − 2<br>
+                        <strong style="color:#e74c3c">c = 3</strong>
+                    </p>
+                    <p style="color:#388e3c;margin-top:8px">The equation is: <strong>y = ½x + 3</strong></p>
+                </div>
+
+                <button class="check-btn" onclick="startChallengePractice()" style="background:#ff9800">Start Challenge Practice →</button>
+            `;
+            buildMiniDots('challengeDots');
+        }
+
+        function startChallengePractice() {
+            challengeState.phase = 'practice';
+            generateChallengeQuestion();
+        }
+
+        function generateChallengeQuestion() {
+            const denOptions = [1, 2, 3];
+            const den = denOptions[Math.floor(Math.random() * denOptions.length)];
+            const num = Math.floor(Math.random() * 5) - 2;
+            if (num === 0 && Math.random() > 0.2) return generateChallengeQuestion();
+            
+            // x1 divisible by denominator
+            const x1Opts = [-4, -3, -2, -1, 0, 1, 2, 3, 4].filter(x => x % den === 0 || den === 1);
+            const x1 = x1Opts[Math.floor(Math.random() * x1Opts.length)];
+            
+            const c = Math.floor(Math.random() * 9) - 4;
+            const m = num / den;
+            const y1 = m * x1 + c;
+
+            if (!Number.isInteger(y1) || y1 < -5 || y1 > 5) return generateChallengeQuestion();
+
+            challengeState.question = { slope: {n: num, d: den}, x1, y1, c };
+            renderChallengeQuestion();
+        }
+
+        function renderChallengeQuestion() {
+            const container = document.getElementById('challengeContainer');
+            const q = challengeState.question;
+            const slopeStr = q.slope.d === 1 ? q.slope.n : `${q.slope.n}/${q.slope.d}`;
+
+            container.innerHTML = `
+                <div class="mini-dots" id="challengeDots"></div>
+                <div class="score-bar">
+                    <span class="label">Challenge Practice</span>
+                    <span class="score">🔥 Streak: ${challengeState.streak}</span>
+                </div>
+                
+                <div class="question-box">
+                    <p class="prompt">Find <span style="color:#e74c3c;font-weight:bold">c</span> (the y-intercept)</p>
+                    <div style="font-size:1.15rem;margin:10px 0">
+                        Point: <strong style="color:#3498db">(${q.x1}, ${q.y1})</strong><br>
+                        Slope: <strong style="color:#27ae60">m = ${slopeStr}</strong>
+                    </div>
+                    <canvas id="challengeCanvas" width="240" height="240"></canvas>
+                </div>
+
+                <div class="formula-box" style="border-left-color:#3498db;background:#e3f2fd;padding:8px">
+                    <div style="font-size:0.85rem;color:#1565c0">c = y₁ − m × x₁</div>
+                </div>
+
+                <div class="answer-section">
+                    <h4>What is c?</h4>
+                    <div class="dial-row">
+                        <div class="dial-group">
+                            <div class="dial int-dial">
+                                <button onclick="adjustChallengeDial(1)">▲</button>
+                                <span class="dial-value" id="cAnswer" style="color:#e74c3c;font-size:1.8rem">0</span>
+                                <button onclick="adjustChallengeDial(-1)">▼</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="check-btn" onclick="checkChallengeAnswer()">Check</button>
+                    <div class="feedback" id="challengeFeedback"></div>
+                </div>
+            `;
+
+            buildMiniDots('challengeDots');
+            challengeState.userAnswer = 0;
+            drawChallengeGraph(q);
+        }
+
+        function adjustChallengeDial(delta) {
+            challengeState.userAnswer = Math.max(-9, Math.min(9, challengeState.userAnswer + delta));
+            document.getElementById('cAnswer').textContent = challengeState.userAnswer;
+        }
+
+        function drawChallengeGraph(q) {
+            const canvas = document.getElementById('challengeCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const margin = 30;
+            const m = q.slope.n / q.slope.d;
+            const c = q.c;
+
+            function gridToPixel(gx, gy) {
+                const px = margin + ((gx + 5) / 10) * (w - 2 * margin);
+                const py = margin + ((5 - gy) / 10) * (h - 2 * margin);
+                return [px, py];
+            }
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = -5; i <= 5; i++) {
+                const [px] = gridToPixel(i, 0);
+                const [, py] = gridToPixel(0, i);
+                ctx.beginPath(); ctx.moveTo(px, margin); ctx.lineTo(px, h - margin); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(margin, py); ctx.lineTo(w - margin, py); ctx.stroke();
+            }
+
+            ctx.fillStyle = '#2c3e50';
+            for (let x = -5; x <= 5; x++) {
+                for (let y = -5; y <= 5; y++) {
+                    const [px, py] = gridToPixel(x, y);
+                    ctx.beginPath();
+                    ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 2;
+            const [ox, oy] = gridToPixel(0, 0);
+            ctx.beginPath(); ctx.moveTo(margin, oy); ctx.lineTo(w - margin, oy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, margin); ctx.lineTo(ox, h - margin); ctx.stroke();
+
+            // Dashed line showing where it would be
+            ctx.strokeStyle = 'rgba(231, 76, 60, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            const lineY = (x) => m * x + c;
+            const [lx1, ly1] = gridToPixel(-6, lineY(-6));
+            const [lx2, ly2] = gridToPixel(6, lineY(6));
+            ctx.moveTo(lx1, ly1);
+            ctx.lineTo(lx2, ly2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Given point - BLUE
+            const [px, py] = gridToPixel(q.x1, q.y1);
+            ctx.fillStyle = '#3498db';
+            ctx.beginPath();
+            ctx.arc(px, py, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Question mark at y-intercept
+            const [cx, cy] = gridToPixel(0, c);
+            ctx.fillStyle = '#e74c3c';
+            ctx.font = 'bold 18px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('?', cx, cy + 6);
+        }
+
+        function checkChallengeAnswer() {
+            const q = challengeState.question;
+            const isCorrect = challengeState.userAnswer === q.c;
+
+            const fb = document.getElementById('challengeFeedback');
+            
+            if (isCorrect) {
+                challengeState.streak++;
+                fb.className = 'feedback correct';
+                fb.innerHTML = `✓ Correct! c = ${q.c}`;
+                setTimeout(generateChallengeQuestion, 1200);
+            } else {
+                challengeState.streak = 0;
+                const slopeStr = q.slope.d === 1 ? q.slope.n : `${q.slope.n}/${q.slope.d}`;
+                const mTimesX = q.slope.n * q.x1 / q.slope.d;
+                fb.className = 'feedback incorrect';
+                fb.innerHTML = `
+                    ✗ Let's work it out:<br>
+                    <div class="calculation-display" style="margin-top:8px;font-size:1rem">
+                        c = ${q.y1} − (${slopeStr}) × ${q.x1}<br>
+                        c = ${q.y1} − ${mTimesX}<br>
+                        <strong style="color:#e74c3c">c = ${q.c}</strong>
+                    </div>
+                    <button class="next-btn" onclick="generateChallengeQuestion()">Try Another →</button>
+                `;
+            }
+        }
+
+        function buildMiniDots(id) {
+            const container = document.getElementById(id);
+            if (!container) return;
+            container.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot-logo ' + ['green','blue','red','black'][i % 4];
+                container.appendChild(dot);
+            }
+        }
+
+        // Initialize
+        window.onload = initExplore;
+    </script>
+</body>
+</html>

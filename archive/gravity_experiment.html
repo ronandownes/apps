@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceleration Due to Gravity Experiment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            overflow: hidden;
+        }
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .slide-1 { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+        .slide-2 { background: linear-gradient(135deg, #16213e 0%, #0f3460 100%); }
+        .slide-3 { background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%); }
+        .slide-4 { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+        .slide-5 { background: linear-gradient(135deg, #16213e 0%, #0f3460 100%); }
+        
+        h1 {
+            font-size: 3rem;
+            color: #e94560;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h2 {
+            font-size: 2.2rem;
+            color: #0ea5e9;
+            margin-bottom: 25px;
+        }
+        .subtitle {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        p, li {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+        }
+        .context-box {
+            background: rgba(255,255,255,0.05);
+            border-left: 4px solid #e94560;
+            padding: 30px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            max-width: 900px;
+            margin: 30px auto;
+            border-collapse: collapse;
+            font-size: 1.3rem;
+        }
+        th, td {
+            padding: 18px 25px;
+            text-align: center;
+            border: 2px solid #334155;
+        }
+        th {
+            background: #e94560;
+            color: white;
+            font-weight: 600;
+        }
+        td {
+            background: rgba(255,255,255,0.03);
+        }
+        tr:hover td {
+            background: rgba(233, 69, 96, 0.1);
+        }
+        .question-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .question-list li {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border-left: 4px solid #0ea5e9;
+        }
+        .question-list li strong {
+            color: #0ea5e9;
+        }
+        .marks {
+            float: right;
+            color: #e94560;
+            font-weight: bold;
+        }
+        .sub-question {
+            margin-left: 30px;
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+        .nav button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #e94560;
+            color: white;
+            transition: all 0.3s;
+        }
+        .nav button:hover {
+            background: #f472b6;
+            transform: scale(1.05);
+        }
+        .nav button:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .slide-counter {
+            position: fixed;
+            bottom: 35px;
+            left: 40px;
+            font-size: 1.1rem;
+            color: #64748b;
+        }
+        .total-marks {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #e94560;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+        .center-content {
+            text-align: center;
+        }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container" id="slideContainer">
+        <!-- Slide 1: Title -->
+        <div class="slide slide-1">
+            <div class="center-content">
+                <div class="icon">⚡</div>
+                <h1>Acceleration Due to Gravity</h1>
+                <p class="subtitle">Mandatory Experiment</p>
+                <p class="subtitle" style="margin-top: 40px; font-size: 1.2rem;">Leaving Certificate Physics</p>
+                <p class="subtitle" style="font-size: 1.1rem; color: #64748b;">40 marks</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Context -->
+        <div class="slide slide-2">
+            <h2>Experiment Overview</h2>
+            <div class="context-box">
+                <p>In an experiment to measure the acceleration due to gravity <em>g</em>, the time <em>t</em> for a small, dense sphere to fall from rest through a height <em>s</em> was measured.</p>
+                <br>
+                <p>The procedure was repeated for a number of different heights.</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Data -->
+        <div class="slide slide-3">
+            <h2>Recorded Data</h2>
+            <table>
+                <tr>
+                    <th><em>s</em> (cm)</th>
+                    <td>25</td>
+                    <td>35</td>
+                    <td>45</td>
+                    <td>55</td>
+                    <td>65</td>
+                    <td>75</td>
+                    <td>85</td>
+                </tr>
+                <tr>
+                    <th><em>t</em> (ms)</th>
+                    <td>226</td>
+                    <td>267</td>
+                    <td>303</td>
+                    <td>335</td>
+                    <td>365</td>
+                    <td>391</td>
+                    <td>416</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Slide 4: Questions Part 1 -->
+        <div class="slide slide-4">
+            <h2>Questions</h2>
+            <ul class="question-list">
+                <li>
+                    <strong>(i)</strong> Draw a labelled diagram of the arrangement of the apparatus used in this experiment.
+                    <span class="marks">(12)</span>
+                </li>
+                <li>
+                    <strong>(ii)</strong> Explain why a small, dense sphere was used in this experiment.
+                </li>
+                <li>
+                    <strong>(iii)</strong> Draw a suitable graph, on graph paper, to show the relationship between <em>s</em> and <em>t</em>.
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 5: Questions Part 2 -->
+        <div class="slide slide-5">
+            <h2>Questions (continued)</h2>
+            <ul class="question-list">
+                <li>
+                    <strong>(iv)</strong> Use the graph to calculate a value for <em>g</em>.
+                    <span class="marks">(21)</span>
+                </li>
+                <li>
+                    <strong>(v)</strong> State a possible source of error in measuring:
+                    <div class="sub-question">(a) the height, <em>s</em></div>
+                    <div class="sub-question">(b) the time, <em>t</em></div>
+                    <span class="marks">(7)</span>
+                </li>
+            </ul>
+            <p class="total-marks">Total: 40 marks</p>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">5</span>
+    </div>
+
+    <div class="nav">
+        <button id="prevBtn" onclick="changeSlide(-1)">◀ Previous</button>
+        <button id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 5;
+        const container = document.getElementById('slideContainer');
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+            
+            container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        changeSlide(0);
+    </script>
+</body>
+</html>

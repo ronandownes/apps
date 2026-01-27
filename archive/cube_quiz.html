@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cube Quiz</title>
+<style>
+:root{--ink:#000;--line:#cfcfcf;--blue:#2563eb;--green:#16a34a;--red:#dc2626}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:var(--ink)}
+.wrap{max-width:500px;margin:10px auto;padding:0 12px}
+h1{text-align:center;margin:8px 0;font-size:20px}
+
+.quiz-container{border:1px solid var(--line);border-radius:10px;padding:12px}
+
+.diagram-container{display:flex;justify-content:center;padding:0;margin:0}
+.diagram-container svg{max-width:280px;width:100%;height:auto}
+
+.question-section{margin:8px 0}
+.question-title{font-size:16px;font-weight:bold;margin-bottom:8px;color:var(--blue);text-align:center}
+
+.options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.option-btn{border:2px solid var(--line);border-radius:6px;padding:10px 14px;font-size:18px;font-family:"Times New Roman",Times,serif;font-weight:bold;background:#fff;cursor:pointer;transition:all 0.2s}
+.option-btn:hover{background:#f5f5f5;border-color:#999}
+.option-btn.selected{border-color:var(--blue);background:#e8f0fe}
+.option-btn.correct{border-color:var(--green);background:#dcfce7}
+.option-btn.incorrect{border-color:var(--red);background:#fee2e2}
+.option-btn:disabled{cursor:not-allowed}
+
+.feedback{padding:10px 12px;border-radius:6px;margin:8px 0;font-size:14px;display:none}
+.feedback.show{display:block}
+.feedback.correct{background:#dcfce7;border:1px solid var(--green);color:#166534}
+.feedback.incorrect{background:#fee2e2;border:1px solid var(--red);color:#991b1b}
+
+.btn-row{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.action-btn{border:2px solid var(--blue);border-radius:6px;padding:8px 20px;font-size:14px;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
+.action-btn:hover{background:#1d4ed8}
+.action-btn.secondary{background:#fff;color:var(--blue)}
+.action-btn.secondary:hover{background:#e8f0fe}
+
+.score-display{text-align:center;font-size:15px;margin-bottom:10px;padding:8px;background:#f8f9fa;border-radius:6px}
+.score-display strong{color:var(--blue)}
+
+.quiz-type-row{display:flex;gap:6px;justify-content:center;margin-bottom:8px;flex-wrap:wrap}
+.type-btn{border:2px solid var(--line);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;background:#fff;cursor:pointer}
+.type-btn:hover{background:#f5f5f5}
+.type-btn.active{border-color:var(--blue);background:var(--blue);color:#fff}
+
+.difficulty-row{display:flex;gap:6px;justify-content:center;margin-bottom:8px}
+.diff-btn{border:2px solid var(--line);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;background:#fff;cursor:pointer}
+.diff-btn:hover{background:#f5f5f5}
+.diff-btn.active.easy{border-color:#16a34a;background:#16a34a;color:#fff}
+.diff-btn.active.medium{border-color:#f59e0b;background:#f59e0b;color:#fff}
+.diff-btn.active.hard{border-color:#dc2626;background:#dc2626;color:#fff}
+
+.calc-note{text-align:center;font-size:11px;color:#666;margin-bottom:8px;font-style:italic}
+
+.milestone{padding:12px;border-radius:8px;text-align:center;margin:10px 0;display:none}
+.milestone.show{display:block}
+.milestone.halfway{background:#fef3c7;border:2px solid #f59e0b}
+.milestone.complete{background:#dcfce7;border:2px solid var(--green)}
+.milestone h2{margin:0 0 6px 0;font-size:18px}
+.milestone p{margin:4px 0;font-size:13px}
+
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🎲 Cube & Cuboid Quiz</h1>
+
+<div class="quiz-container">
+  <div class="score-display">
+    Score: <strong><span id="score">0</span> / <span id="total">0</span></strong> <span id="progressText">(10 questions)</span>
+  </div>
+  
+  <div class="milestone halfway" id="halfwayMsg">
+    <h2>⭐ Halfway there!</h2>
+    <p><strong>Perseverance and stamina</strong> are key in Maths.</p>
+    <p>You're doing great — keep going! 💪</p>
+  </div>
+  
+  <div class="milestone complete" id="completeMsg">
+    <h2>🎉 Quiz Complete!</h2>
+    <p id="finalScore">You scored 8 out of 10!</p>
+    <p id="finalMessage">Excellent work!</p>
+  </div>
+  
+  <div id="quizContent">
+    <div class="difficulty-row">
+      <button class="diff-btn easy active" id="diffEasy">Easy (1-3)</button>
+      <button class="diff-btn medium" id="diffMedium">Medium (4-6)</button>
+      <button class="diff-btn hard" id="diffHard">Hard (7-9)</button>
+    </div>
+    
+    <div class="calc-note" id="calcNote"></div>
+    
+    <div class="quiz-type-row">
+      <button class="type-btn" id="typeCubeSA">Cube SA</button>
+      <button class="type-btn" id="typeCubeVol">Cube Vol</button>
+      <button class="type-btn active" id="typeCuboidSA">Cuboid SA</button>
+      <button class="type-btn" id="typeCuboidVol">Cuboid Vol</button>
+      <button class="type-btn" id="typeMix">Mixed</button>
+    </div>
+    
+    <div class="diagram-container" id="diagramContainer"></div>
+    
+    <div class="question-section">
+      <div class="question-title" id="questionText">Find the surface area.</div>
+      
+      <div class="options" id="optionsContainer">
+        <button class="option-btn" id="opt0"></button>
+        <button class="option-btn" id="opt1"></button>
+        <button class="option-btn" id="opt2"></button>
+        <button class="option-btn" id="opt3"></button>
+      </div>
+      
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+  
+  <div class="btn-row">
+    <button class="action-btn" id="nextBtn">Next Question</button>
+    <button class="action-btn secondary" id="resetBtn">New Quiz</button>
+  </div>
+</div>
+</div>
+
+<script>
+let w = 2, h = 3, d = 4;
+let correctAnswer = 0;
+let score = 0;
+let total = 0;
+let quizType = 'cuboidSA'; // 'cubeSA', 'cubeVol', 'cuboidSA', 'cuboidVol', 'mix'
+let currentQuestionType = 'cuboidSA';
+let difficulty = 'easy'; // 'easy', 'medium', 'hard'
+let answered = false;
+let quizComplete = false;
+const MAX_QUESTIONS = 10;
+
+function getDifficultyRange() {
+  if(difficulty === 'easy') return [1, 2, 3];
+  if(difficulty === 'medium') return [4, 5, 6];
+  return [7, 8, 9];
+}
+
+function randomFromRange() {
+  const range = getDifficultyRange();
+  return range[Math.floor(Math.random() * range.length)];
+}
+
+function makeCubeSVG(sideVal) {
+  const svgW = 220, svgH = 160;
+  const wPx = 90, hPx = 90, dPx = 60;
+  
+  const angle = 30;
+  const rad = angle * Math.PI / 180;
+  const dx = dPx * Math.cos(rad);
+  const dy = dPx * Math.sin(rad);
+  
+  const baseX = 50;
+  const baseY = svgH - 30;
+  
+  const p1 = {x: baseX, y: baseY};
+  const p2 = {x: baseX + wPx, y: baseY};
+  const p3 = {x: baseX + wPx, y: baseY - hPx};
+  const p4 = {x: baseX, y: baseY - hPx};
+  const p5 = {x: baseX + dx, y: baseY - dy};
+  const p6 = {x: baseX + wPx + dx, y: baseY - dy};
+  const p7 = {x: baseX + wPx + dx, y: baseY - hPx - dy};
+  const p8 = {x: baseX + dx, y: baseY - hPx - dy};
+
+  let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">`;
+  
+  svg += `<line x1="${p5.x}" y1="${p5.y}" x2="${p8.x}" y2="${p8.y}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  svg += `<line x1="${p5.x}" y1="${p5.y}" x2="${p1.x}" y2="${p1.y}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  svg += `<line x1="${p5.x}" y1="${p5.y}" x2="${p6.x}" y2="${p6.y}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  
+  svg += `<polygon points="${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y} ${p4.x},${p4.y}" fill="#f5f5f5" stroke="#000" stroke-width="2"/>`;
+  svg += `<polygon points="${p2.x},${p2.y} ${p6.x},${p6.y} ${p7.x},${p7.y} ${p3.x},${p3.y}" fill="#d0d0d0" stroke="#000" stroke-width="2"/>`;
+  svg += `<polygon points="${p4.x},${p4.y} ${p3.x},${p3.y} ${p7.x},${p7.y} ${p8.x},${p8.y}" fill="#dcdcdc" stroke="#000" stroke-width="2"/>`;
+  
+  const labelX = (p1.x + p2.x) / 2;
+  const labelY = p1.y + 22;
+  svg += `<text x="${labelX}" y="${labelY}" font-size="18" font-family="Times New Roman" fill="#000" text-anchor="middle"><tspan font-weight="bold" font-style="italic">s</tspan> = ${sideVal} cm</text>`;
+  
+  svg += `</svg>`;
+  return svg;
+}
+
+function makeCuboidSVG(wVal, hVal, dVal) {
+  const svgW = 280, svgH = 180;
+  const wPx = 120, hPx = 70, dPx = 60;
+  
+  const angle = 30;
+  const rad = angle * Math.PI / 180;
+  const dx = dPx * Math.cos(rad);
+  const dy = dPx * Math.sin(rad);
+  
+  const baseX = 40;
+  const baseY = svgH - 35;
+  
+  const p1 = {x: baseX, y: baseY};
+  const p2 = {x: baseX + wPx, y: baseY};
+  const p3 = {x: baseX + wPx, y: baseY - hPx};
+  const p4 = {x: baseX, y: baseY - hPx};
+  const p5 = {x: baseX + dx, y: baseY - dy};
+  const p6 = {x: baseX + wPx + dx, y: baseY - dy};
+  const p7 = {x: baseX + wPx + dx, y: baseY - hPx - dy};
+  const p8 = {x: baseX + dx, y: baseY - hPx - dy};
+
+  let svg = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">`;
+  
+  svg += `<line x1="${p5.x}" y1="${p5.y}" x2="${p8.x}" y2="${p8.y}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  svg += `<line x1="${p5.x}" y1="${p5.y}" x2="${p1.x}" y2="${p1.y}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  svg += `<line x1="${p5.x}" y1="${p5.y}" x2="${p6.x}" y2="${p6.y}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  
+  svg += `<polygon points="${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y} ${p4.x},${p4.y}" fill="#f5f5f5" stroke="#000" stroke-width="2"/>`;
+  svg += `<polygon points="${p2.x},${p2.y} ${p6.x},${p6.y} ${p7.x},${p7.y} ${p3.x},${p3.y}" fill="#d0d0d0" stroke="#000" stroke-width="2"/>`;
+  svg += `<polygon points="${p4.x},${p4.y} ${p3.x},${p3.y} ${p7.x},${p7.y} ${p8.x},${p8.y}" fill="#dcdcdc" stroke="#000" stroke-width="2"/>`;
+  
+  // Width label below
+  const wLabelX = (p1.x + p2.x) / 2;
+  const wLabelY = p1.y + 20;
+  svg += `<text x="${wLabelX}" y="${wLabelY}" font-size="16" font-family="Times New Roman" fill="#000" text-anchor="middle"><tspan font-weight="bold" font-style="italic">w</tspan> = ${wVal} cm</text>`;
+  
+  // Height label left
+  const hLabelX = p1.x - 8;
+  const hLabelY = (p1.y + p4.y) / 2 + 4;
+  svg += `<text x="${hLabelX}" y="${hLabelY}" font-size="16" font-family="Times New Roman" fill="#000" text-anchor="end"><tspan font-weight="bold" font-style="italic">h</tspan> = ${hVal}</text>`;
+  
+  // Depth label on slanted edge
+  const dLabelX = (p2.x + p6.x) / 2 + 10;
+  const dLabelY = (p2.y + p6.y) / 2 + 16;
+  svg += `<text x="${dLabelX}" y="${dLabelY}" font-size="16" font-family="Times New Roman" fill="#000"><tspan font-weight="bold" font-style="italic">d</tspan> = ${dVal}</text>`;
+  
+  svg += `</svg>`;
+  return svg;
+}
+
+function shuffle(arr) {
+  for(let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function generateQuestion() {
+  if(total >= MAX_QUESTIONS) {
+    showComplete();
+    return;
+  }
+  
+  answered = false;
+  document.getElementById("halfwayMsg").classList.remove("show");
+  
+  // Update calculator note
+  if(difficulty === 'hard') {
+    document.getElementById("calcNote").textContent = "🧮 Calculator recommended";
+  } else if(difficulty === 'medium') {
+    document.getElementById("calcNote").textContent = "🧮 Calculator may help";
+  } else {
+    document.getElementById("calcNote").textContent = "";
+  }
+  
+  // Random dimensions from difficulty range
+  w = randomFromRange();
+  h = randomFromRange();
+  d = randomFromRange();
+  const s = randomFromRange(); // for cube
+  
+  // Decide question type
+  if(quizType === 'mix') {
+    const types = ['cubeSA', 'cubeVol', 'cuboidSA', 'cuboidVol'];
+    currentQuestionType = types[Math.floor(Math.random() * types.length)];
+  } else {
+    currentQuestionType = quizType;
+  }
+  
+  // Draw shape and calculate answer
+  const isCube = currentQuestionType.startsWith('cube');
+  const isSA = currentQuestionType.includes('SA');
+  
+  if(isCube) {
+    document.getElementById("diagramContainer").innerHTML = makeCubeSVG(s);
+    if(isSA) {
+      correctAnswer = 6 * s * s;
+      document.getElementById("questionText").textContent = "Find the surface area of this cube.";
+    } else {
+      correctAnswer = s * s * s;
+      document.getElementById("questionText").textContent = "Find the volume of this cube.";
+    }
+    // Store s for feedback
+    w = s; h = s; d = s;
+  } else {
+    document.getElementById("diagramContainer").innerHTML = makeCuboidSVG(w, h, d);
+    if(isSA) {
+      correctAnswer = 2 * (w*h + w*d + h*d);
+      document.getElementById("questionText").textContent = "Find the surface area of this cuboid.";
+    } else {
+      correctAnswer = w * h * d;
+      document.getElementById("questionText").textContent = "Find the volume of this cuboid.";
+    }
+  }
+  
+  // Generate wrong answers
+  const unit = isSA ? ' cm²' : ' cm³';
+  let options = [correctAnswer];
+  
+  if(isCube) {
+    if(isSA) {
+      options.push(w * w); // forgot ×6
+      options.push(w * w * w); // volume instead
+      options.push(4 * w * w);
+      options.push(6 * w);
+    } else {
+      options.push(6 * w * w); // SA instead
+      options.push(w * w);
+      options.push(3 * w);
+    }
+  } else {
+    if(isSA) {
+      options.push(w * h * d); // volume instead
+      options.push(w*h + w*d + h*d); // forgot ×2
+      options.push(2 * w * h + 2 * h * d); // missing one pair
+      options.push(6 * w * h); // wrong formula
+    } else {
+      options.push(2 * (w*h + w*d + h*d)); // SA instead
+      options.push(w + h + d); // added instead
+      options.push(w * h + d); // partial
+    }
+  }
+  
+  // Add some random nearby values
+  options.push(correctAnswer + Math.floor(Math.random() * 20) + 5);
+  options.push(correctAnswer - Math.floor(Math.random() * 15) - 3);
+  
+  let wrongOptions = [...new Set(options.filter(x => x !== correctAnswer && x > 0))];
+  shuffle(wrongOptions);
+  wrongOptions = wrongOptions.slice(0, 3);
+  
+  while(wrongOptions.length < 3) {
+    let randWrong = correctAnswer + Math.floor(Math.random() * 100) - 50;
+    if(randWrong > 0 && randWrong !== correctAnswer && !wrongOptions.includes(randWrong)) {
+      wrongOptions.push(randWrong);
+    }
+  }
+  
+  let allOptions = [correctAnswer, ...wrongOptions];
+  shuffle(allOptions);
+  
+  for(let i = 0; i < 4; i++) {
+    const btn = document.getElementById("opt" + i);
+    btn.textContent = allOptions[i] + unit;
+    btn.dataset.value = allOptions[i];
+    btn.className = "option-btn";
+    btn.disabled = false;
+  }
+  
+  document.getElementById("feedback").className = "feedback";
+  document.getElementById("progressText").textContent = `(Question ${total + 1} of ${MAX_QUESTIONS})`;
+}
+
+function checkAnswer(selectedValue) {
+  if(answered || quizComplete) return;
+  answered = true;
+  total++;
+  
+  const isCube = currentQuestionType.startsWith('cube');
+  const isSA = currentQuestionType.includes('SA');
+  const unit = isSA ? ' cm²' : ' cm³';
+  
+  let formula;
+  if(isCube) {
+    if(isSA) {
+      formula = `6 × ${w}² = 6 × ${w*w} = ${correctAnswer}`;
+    } else {
+      formula = `${w}³ = ${w}×${w}×${w} = ${correctAnswer}`;
+    }
+  } else {
+    if(isSA) {
+      formula = `2(${w}×${h} + ${w}×${d} + ${h}×${d}) = 2(${w*h} + ${w*d} + ${h*d}) = ${correctAnswer}`;
+    } else {
+      formula = `${w} × ${h} × ${d} = ${correctAnswer}`;
+    }
+  }
+  
+  for(let i = 0; i < 4; i++) {
+    const btn = document.getElementById("opt" + i);
+    btn.disabled = true;
+    
+    if(parseInt(btn.dataset.value) === correctAnswer) {
+      btn.classList.add("correct");
+    } else if(parseInt(btn.dataset.value) === selectedValue) {
+      btn.classList.add("incorrect");
+    }
+  }
+  
+  const feedback = document.getElementById("feedback");
+  if(selectedValue === correctAnswer) {
+    score++;
+    feedback.className = "feedback show correct";
+    feedback.innerHTML = `✓ Correct! ${formula}${unit}`;
+  } else {
+    feedback.className = "feedback show incorrect";
+    feedback.innerHTML = `✗ Answer: ${formula}${unit}`;
+  }
+  
+  document.getElementById("score").textContent = score;
+  document.getElementById("total").textContent = total;
+  
+  if(total === 5) {
+    setTimeout(() => {
+      document.getElementById("halfwayMsg").classList.add("show");
+    }, 800);
+  }
+  
+  if(total >= MAX_QUESTIONS) {
+    document.getElementById("nextBtn").textContent = "See Results";
+  }
+}
+
+function showComplete() {
+  quizComplete = true;
+  document.getElementById("quizContent").classList.add("hidden");
+  document.getElementById("halfwayMsg").classList.remove("show");
+  
+  const completeMsg = document.getElementById("completeMsg");
+  completeMsg.classList.add("show");
+  
+  document.getElementById("finalScore").textContent = `You scored ${score} out of ${MAX_QUESTIONS}!`;
+  
+  let message = "";
+  if(score === 10) {
+    message = "🌟 PERFECT! You're a cube master! 🌟";
+  } else if(score >= 8) {
+    message = "Excellent work! Nearly perfect!";
+  } else if(score >= 6) {
+    message = "Great job! Keep practising!";
+  } else if(score >= 4) {
+    message = "Good effort! Review the formulas and try again.";
+  } else {
+    message = "Keep going! Remember: SA = 6s², V = s³";
+  }
+  document.getElementById("finalMessage").textContent = message;
+  
+  document.getElementById("nextBtn").classList.add("hidden");
+}
+
+function resetQuiz() {
+  score = 0;
+  total = 0;
+  quizComplete = false;
+  document.getElementById("score").textContent = 0;
+  document.getElementById("total").textContent = 0;
+  document.getElementById("quizContent").classList.remove("hidden");
+  document.getElementById("completeMsg").classList.remove("show");
+  document.getElementById("halfwayMsg").classList.remove("show");
+  document.getElementById("nextBtn").classList.remove("hidden");
+  document.getElementById("nextBtn").textContent = "Next Question";
+  generateQuestion();
+}
+
+// Option button clicks
+for(let i = 0; i < 4; i++) {
+  document.getElementById("opt" + i).onclick = function() {
+    checkAnswer(parseInt(this.dataset.value));
+  };
+}
+
+// Next question
+document.getElementById("nextBtn").onclick = generateQuestion;
+
+// Reset quiz
+document.getElementById("resetBtn").onclick = resetQuiz;
+
+// Difficulty buttons
+document.getElementById("diffEasy").onclick = function() {
+  document.querySelectorAll(".diff-btn").forEach(b => b.classList.remove("active"));
+  this.classList.add("active", "easy");
+  difficulty = 'easy';
+  resetQuiz();
+};
+
+document.getElementById("diffMedium").onclick = function() {
+  document.querySelectorAll(".diff-btn").forEach(b => b.classList.remove("active"));
+  this.classList.add("active", "medium");
+  difficulty = 'medium';
+  resetQuiz();
+};
+
+document.getElementById("diffHard").onclick = function() {
+  document.querySelectorAll(".diff-btn").forEach(b => b.classList.remove("active"));
+  this.classList.add("active", "hard");
+  difficulty = 'hard';
+  resetQuiz();
+};
+
+// Quiz type buttons
+document.getElementById("typeCubeSA").onclick = function() {
+  document.querySelectorAll(".type-btn").forEach(b => b.classList.remove("active"));
+  this.classList.add("active");
+  quizType = 'cubeSA';
+  resetQuiz();
+};
+
+document.getElementById("typeCubeVol").onclick = function() {
+  document.querySelectorAll(".type-btn").forEach(b => b.classList.remove("active"));
+  this.classList.add("active");
+  quizType = 'cubeVol';
+  resetQuiz();
+};
+
+document.getElementById("typeCuboidSA").onclick = function() {
+  document.querySelectorAll(".type-btn").forEach(b => b.classList.remove("active"));
+  this.classList.add("active");
+  quizType = 'cuboidSA';
+  resetQuiz();
+};
+
+document.getElementById("typeCuboidVol").onclick = function() {
+  document.querySelectorAll(".type-btn").forEach(b => b.classList.remove("active"));
+  this.classList.add("active");
+  quizType = 'cuboidVol';
+  resetQuiz();
+};
+
+document.getElementById("typeMix").onclick = function() {
+  document.querySelectorAll(".type-btn").forEach(b => b.classList.remove("active"));
+  this.classList.add("active");
+  quizType = 'mix';
+  resetQuiz();
+};
+
+// Keyboard support
+document.addEventListener('keydown', function(e) {
+  if(quizComplete) {
+    if(e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      resetQuiz();
+    }
+    return;
+  }
+  if(e.key >= '1' && e.key <= '4' && !answered) {
+    const idx = parseInt(e.key) - 1;
+    document.getElementById("opt" + idx).click();
+  }
+  if(e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
+    if(answered) {
+      e.preventDefault();
+      generateQuestion();
+    }
+  }
+});
+
+// Start
+generateQuestion();
+</script>
+</body>
+</html>

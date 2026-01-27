@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6 Impacts and Collisions - Exercise 6.A</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 17px; line-height: 1.5; color: #333; background: #f5f5f5; }
+        .topbar { background: #e8e8e8; padding: 10px 20px; border-bottom: 3px solid transparent; border-image: linear-gradient(90deg, #22c55e, #3b82f6, #ef4444, #1a1a1a) 1; position: sticky; top: 0; z-index: 1000; }
+        .topbar-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .brand { display: flex; align-items: center; gap: 8px; }
+        .brand-text { font-weight: 700; font-size: 1.2em; color: #1a1a1a; }
+        .tagline { color: #555; font-size: 0.85em; }
+        .mark { display: flex; gap: 4px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot.green { background: #22c55e; } .dot.blue { background: #3b82f6; } .dot.red { background: #ef4444; } .dot.black { background: #1a1a1a; }
+        .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .chapter-info { display: flex; align-items: center; gap: 8px; }
+        .chapter-badge { background: #00a6a0; color: white; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 0.85em; }
+        .chapter-name { color: #1a1a1a; font-weight: 600; font-size: 0.9em; }
+        .exercise-name { background: rgba(0,166,160,0.15); border: 1px solid #00a6a0; color: #007a75; padding: 3px 10px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
+        .page-badge { background: #f0f0f0; color: #555; padding: 3px 10px; border-radius: 4px; font-size: 0.8em; border: 1px solid #ccc; }
+        .slide-nav { display: flex; gap: 5px; flex-wrap: wrap; }
+        .slide-btn { background: #e0e0e0; color: #666; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75em; font-weight: 600; transition: all 0.2s; }
+        .slide-btn:hover { background: #ccc; color: #333; }
+        .slide-btn.active { background: #00a6a0; color: white; }
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 15px; }
+        .slide { display: none; }
+        .slide.active { display: block; }
+        .question-box { background: white; border: 2px solid #00a6a0; border-radius: 10px; padding: 20px; resize: both; overflow: auto; min-height: 80px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .question { display: flex; align-items: flex-start; gap: 12px; }
+        .q-number { background: #00a6a0; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+        .q-content { flex: 1; font-size: 1.05em; line-height: 1.6; }
+        .sub-questions { margin-top: 12px; }
+        .sub-q { display: flex; gap: 6px; margin-bottom: 4px; }
+        .sub-q-label { color: #666; min-width: 35px; }
+        .toggle-row { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd; display: flex; gap: 8px; flex-wrap: wrap; }
+        .toggle-btn { background: none; border: 1px solid #ccc; color: #888; padding: 4px 12px; border-radius: 15px; cursor: pointer; font-size: 0.75em; transition: all 0.2s; }
+        .toggle-btn:hover { border-color: #00a6a0; color: #00a6a0; }
+        .toggle-btn.active { background: #00a6a0; border-color: #00a6a0; color: white; }
+        .solution-btn { background: #3b82f6; border: none; color: white; padding: 6px 16px; border-radius: 15px; cursor: pointer; font-size: 0.8em; font-weight: 600; }
+        .solution-btn:hover { background: #2563eb; }
+        .solution-btn.active { background: #1d4ed8; }
+        .reworded, .solution { display: none; margin-top: 15px; padding: 15px; border-radius: 8px; line-height: 1.7; }
+        .reworded { background: #f0fafa; border-left: 3px solid #00a6a0; }
+        .solution { background: #f8fafc; border: 1px solid #e2e8f0; }
+        .reworded.show, .solution.show { display: block; }
+        .section-label { font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
+        .reworded .section-label { color: #00a6a0; }
+        .solution .section-label { color: #3b82f6; }
+        .formula-box { background: #fff8e6; border: 1px solid #f0c36d; border-radius: 8px; padding: 12px 15px; margin: 15px 0; }
+        .formula-title { font-size: 0.75em; color: #b8860b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
+        .formula-content { font-size: 1.05em; text-align: center; }
+        .step { margin-bottom: 12px; padding: 12px 15px; background: white; border-radius: 8px; border-left: 3px solid #3b82f6; }
+        .step-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .step-title { font-weight: 600; color: #1e40af; font-size: 0.95em; }
+        .step-toggle { color: #3b82f6; font-size: 0.8em; }
+        .step-content { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e2e8f0; line-height: 1.8; }
+        .step-content.show { display: block; }
+        .math-line { margin: 6px 0; padding-left: 15px; }
+        .answer-box { background: #dcfce7; border: 1px solid #86efac; border-radius: 6px; padding: 10px 15px; margin-top: 10px; font-weight: 600; color: #166534; }
+        .collision-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.95em; }
+        .collision-table th, .collision-table td { border: 1px solid #ddd; padding: 8px 12px; text-align: center; }
+        .collision-table th { background: #f0f0f0; font-weight: 600; }
+        .resize-hint { text-align: right; font-size: 0.7em; color: #bbb; margin-top: 8px; }
+        strong { font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="mark"><span class="dot green"></span><span class="dot blue"></span><span class="dot red"></span><span class="dot black"></span></span>
+                <span class="brand-text">Mr Downes Maths</span>
+                <span class="mark"><span class="dot green"></span><span class="dot blue"></span><span class="dot red"></span><span class="dot black"></span></span>
+                <span class="tagline">— Learn maths smarter</span>
+            </div>
+            <div class="header-right">
+                <div class="chapter-info">
+                    <span class="chapter-badge">6</span>
+                    <span class="chapter-name">Impacts & Collisions</span>
+                    <span class="exercise-name">Exercise 6.A</span>
+                </div>
+                <nav class="slide-nav" id="nav"></nav>
+                <span class="page-badge">p.109</span>
+            </div>
+        </div>
+    </header>
+    <div class="main-content" id="content"></div>
+
+<script>
+const questions = [
+{n:1, q:`A ball of mass 2 kg falls vertically onto horizontal ground. Before impact its velocity is \\(-10\\vec{j}\\) m/s. If the coefficient of restitution \\(e\\) is \\(\\frac{3}{5}\\), find
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> its velocity immediately after impact</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> the impulse imparted to the ball</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> the loss in kinetic energy.</div>
+</div>`,
+r:`A 2 kg ball <strong>drops straight down</strong> at 10 m/s and hits the floor.<br>Bounciness \\(e = \\frac{3}{5} = 0.6\\)<br><br>Find: new velocity (up), impulse from ground, energy lost in bounce.`,
+f:`\\(\\displaystyle\\frac{\\text{New}}{\\text{Old}}=-e\\) &nbsp;|&nbsp; \\(\\vec{I}=m\\vec{v}-m\\vec{u}\\) &nbsp;|&nbsp; K.E.\\(=\\frac{1}{2}mv^2\\)`,
+s:[
+{t:"(i) Velocity after impact", c:`<div class="math-line">Using \\(\\displaystyle\\frac{\\text{New}}{\\text{Old}}=-e\\):</div>
+<div class="math-line">\\(\\displaystyle\\frac{p}{-10}=-\\frac{3}{5}\\)</div>
+<div class="math-line">\\(p = (-10)\\times\\left(-\\frac{3}{5}\\right) = 6\\)</div>
+<div class="answer-box">Velocity after = \\(+6\\vec{j}\\) m/s (upward)</div>`},
+{t:"(ii) Impulse", c:`<div class="math-line">\\(\\vec{I} = m\\vec{v} - m\\vec{u}\\)</div>
+<div class="math-line">\\(= 2(6\\vec{j}) - 2(-10\\vec{j})\\)</div>
+<div class="math-line">\\(= 12\\vec{j} + 20\\vec{j}\\)</div>
+<div class="answer-box">Impulse = \\(32\\vec{j}\\) N s</div>`},
+{t:"(iii) Loss in K.E.", c:`<div class="math-line">K.E.<sub>before</sub> \\(= \\frac{1}{2}(2)(10)^2 = 100\\) J</div>
+<div class="math-line">K.E.<sub>after</sub> \\(= \\frac{1}{2}(2)(6)^2 = 36\\) J</div>
+<div class="answer-box">Loss = 100 − 36 = 64 J</div>`}
+]},
+
+{n:2, q:`A tennis ball of mass 0.2 kg falls vertically with speed 20 m/s. The coefficient of restitution is 0.5. Find
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> its speed immediately after impact</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> the magnitude of the impulse due to the impact</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> the loss in kinetic energy of the ball.</div>
+</div>`,
+r:`Tennis ball (0.2 kg) falls at 20 m/s. \\(e = 0.5\\) means it bounces back at <strong>half the speed</strong>.`,
+f:`Speed after = \\(e \\times\\) Speed before`,
+s:[
+{t:"(i) Speed after", c:`<div class="math-line">Speed after \\(= e \\times\\) speed before</div>
+<div class="math-line">\\(= 0.5 \\times 20\\)</div>
+<div class="answer-box">Speed after = 10 m/s</div>`},
+{t:"(ii) Impulse", c:`<div class="math-line">\\(I = m(v - u) = 0.2(10 - (-20))\\)</div>
+<div class="math-line">\\(= 0.2 \\times 30\\)</div>
+<div class="answer-box">Impulse = 6 N s</div>`},
+{t:"(iii) K.E. loss", c:`<div class="math-line">K.E.<sub>before</sub> \\(= \\frac{1}{2}(0.2)(20)^2 = 40\\) J</div>
+<div class="math-line">K.E.<sub>after</sub> \\(= \\frac{1}{2}(0.2)(10)^2 = 10\\) J</div>
+<div class="answer-box">Loss = 30 J</div>`}
+]},
+
+{n:3, q:`A ball of mass 1 kg is dropped from rest at a height 2.5 m above horizontal ground. If the coefficient of restitution is \\(\\frac{4}{7}\\), find
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> its speed just before impact</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> its speed just after impact</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> the impulse imparted to the ball</div>
+<div class="sub-q"><span class="sub-q-label">(iv)</span> the loss in kinetic energy.</div>
+</div>`,
+r:`Ball <strong>dropped from height</strong> — first find speed using kinematics \\(v^2 = u^2 + 2as\\), then apply bounce formula.`,
+f:`\\(v^2 = u^2 + 2as\\) &nbsp;|&nbsp; Speed after \\(= e \\times\\) Speed before`,
+s:[
+{t:"(i) Speed before (kinematics)", c:`<div class="math-line">\\(v^2 = u^2 + 2as = 0 + 2(10)(2.5) = 50\\)</div>
+<div class="math-line">\\(v = \\sqrt{50} = 5\\sqrt{2}\\)</div>
+<div class="answer-box">Speed before = \\(5\\sqrt{2} \\approx 7.07\\) m/s</div>`},
+{t:"(ii) Speed after", c:`<div class="math-line">Speed after \\(= \\frac{4}{7} \\times 5\\sqrt{2} = \\frac{20\\sqrt{2}}{7}\\)</div>
+<div class="answer-box">Speed after \\(\\approx 4.04\\) m/s</div>`},
+{t:"(iii) Impulse", c:`<div class="math-line">\\(I = m(v-u) = 1\\left(\\frac{20\\sqrt{2}}{7} + 5\\sqrt{2}\\right)\\)</div>
+<div class="math-line">\\(= \\frac{20\\sqrt{2} + 35\\sqrt{2}}{7} = \\frac{55\\sqrt{2}}{7}\\)</div>
+<div class="answer-box">Impulse \\(\\approx 11.1\\) N s</div>`},
+{t:"(iv) K.E. loss", c:`<div class="math-line">K.E.<sub>before</sub> \\(= \\frac{1}{2}(1)(50) = 25\\) J</div>
+<div class="math-line">K.E.<sub>after</sub> \\(= \\frac{1}{2}(1)\\left(\\frac{800}{49}\\right) = \\frac{400}{49}\\) J</div>
+<div class="answer-box">Loss \\(= \\frac{825}{49} \\approx 16.84\\) J</div>`}
+]},
+
+{n:4, q:`A shot-putt of mass 6 kg falls to the ground from a height of 10 m. The coefficient of restitution is zero (i.e. the impact is perfectly inelastic, and the ball stays on the ground). Find
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> the speed of the ball just before impact</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> the impulse imparted to the ball</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> the loss in kinetic energy.</div>
+</div>`,
+r:`\\(e = 0\\) means <strong>no bounce at all</strong> — the ball stops dead on impact. All kinetic energy is lost.`,
+f:`When \\(e = 0\\): final velocity = 0`,
+s:[
+{t:"(i) Speed before", c:`<div class="math-line">\\(v^2 = 2(10)(10) = 200\\)</div>
+<div class="math-line">\\(v = \\sqrt{200} = 10\\sqrt{2}\\)</div>
+<div class="answer-box">Speed \\(= 10\\sqrt{2} \\approx 14.14\\) m/s</div>`},
+{t:"(ii) Impulse", c:`<div class="math-line">Ball stops, so \\(v = 0\\)</div>
+<div class="math-line">\\(I = m(v-u) = 6(0 - (-10\\sqrt{2})) = 60\\sqrt{2}\\)</div>
+<div class="answer-box">Impulse \\(= 60\\sqrt{2} \\approx 84.85\\) N s</div>`},
+{t:"(iii) K.E. loss", c:`<div class="math-line">K.E.<sub>before</sub> \\(= \\frac{1}{2}(6)(200) = 600\\) J</div>
+<div class="math-line">K.E.<sub>after</sub> \\(= 0\\) J (ball stationary)</div>
+<div class="answer-box">Loss = 600 J (all of it!)</div>`}
+]},
+
+{n:5, q:`A ball of mass 0.1 kg is dropped from rest at a height 22.5 m above horizontal ground. If the coefficient of restitution is \\(\\frac{5}{7}\\), find
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> its speed just before impact</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> its speed just after impact</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> the impulse imparted to the ball</div>
+<div class="sub-q"><span class="sub-q-label">(iv)</span> the loss in kinetic energy.</div>
+</div>`,
+r:`Same pattern: kinematics first, then apply \\(e\\).`,
+f:`\\(v^2 = 2gh\\) then multiply by \\(e\\)`,
+s:[
+{t:"(i) Speed before", c:`<div class="math-line">\\(v^2 = 2(10)(22.5) = 450\\)</div>
+<div class="answer-box">Speed \\(= 15\\sqrt{2} \\approx 21.21\\) m/s</div>`},
+{t:"(ii) Speed after", c:`<div class="math-line">\\(= \\frac{5}{7} \\times 15\\sqrt{2} = \\frac{75\\sqrt{2}}{7}\\)</div>
+<div class="answer-box">Speed \\(\\approx 15.15\\) m/s</div>`},
+{t:"(iii) Impulse", c:`<div class="math-line">\\(I = 0.1\\left(\\frac{75\\sqrt{2}}{7} + 15\\sqrt{2}\\right) = \\frac{18\\sqrt{2}}{7}\\)</div>
+<div class="answer-box">Impulse \\(\\approx 3.64\\) N s</div>`},
+{t:"(iv) K.E. loss", c:`<div class="math-line">Before: 22.5 J, After: \\(\\frac{562.5}{49}\\) J</div>
+<div class="answer-box">Loss \\(= \\frac{540}{49} \\approx 11.02\\) J</div>`}
+]},
+
+{n:6, q:`A ball of mass 2 kg is moving with velocity \\(5\\vec{i} - 8\\vec{j}\\) m/s when it hits a smooth barrier along the \\(\\vec{i}\\)-axis. The coefficient of restitution is \\(\\frac{3}{4}\\). Find
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> the new velocity of the ball</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> the loss in kinetic energy</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> the impulse imparted to the ball by the impact.</div>
+</div>`,
+r:`<strong>Key insight:</strong> Wall along \\(\\vec{i}\\)-axis means only the \\(\\vec{j}\\) component bounces!<br>The \\(\\vec{i}\\) component (parallel to wall) stays the same.`,
+f:`Apply \\(e\\) only to the component perpendicular to the wall`,
+s:[
+{t:"(i) New velocity", c:`<div class="math-line">\\(\\vec{i}\\) component stays: \\(5\\vec{i}\\)</div>
+<div class="math-line">For \\(\\vec{j}\\): \\(\\displaystyle\\frac{p}{-8} = -\\frac{3}{4}\\)</div>
+<div class="math-line">\\(p = 6\\)</div>
+<div class="answer-box">New velocity = \\(5\\vec{i} + 6\\vec{j}\\) m/s</div>`},
+{t:"(ii) K.E. loss", c:`<div class="math-line">\\(u^2 = 5^2 + 8^2 = 89\\)</div>
+<div class="math-line">\\(v^2 = 5^2 + 6^2 = 61\\)</div>
+<div class="math-line">Loss \\(= \\frac{1}{2}(2)(89-61) = 28\\)</div>
+<div class="answer-box">Loss = 28 J</div>`},
+{t:"(iii) Impulse", c:`<div class="math-line">\\(\\vec{I} = m\\vec{v} - m\\vec{u}\\)</div>
+<div class="math-line">\\(= 2(5\\vec{i}+6\\vec{j}) - 2(5\\vec{i}-8\\vec{j})\\)</div>
+<div class="math-line">\\(= 10\\vec{i}+12\\vec{j} - 10\\vec{i}+16\\vec{j}\\)</div>
+<div class="answer-box">Impulse = \\(28\\vec{j}\\) N s</div>`}
+]},
+
+{n:7, q:`A ball of mass 0.2 kg is moving with velocity \\(8\\vec{i} - 15\\vec{j}\\) m/s when it hits a smooth barrier along the \\(\\vec{i}\\)-axis. The coefficient of restitution is \\(\\frac{2}{5}\\).
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> Find the new velocity of the ball.</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> Show that the speed of the ball falls by 7 m/s on impact.</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> Find the loss in kinetic energy.</div>
+</div>`,
+r:`Same as Q6: \\(\\vec{i}\\) part (8) unchanged, \\(\\vec{j}\\) part (−15) bounces with \\(e = \\frac{2}{5}\\).`,
+f:`Wall along \\(\\vec{i}\\)-axis → only \\(\\vec{j}\\) changes`,
+s:[
+{t:"(i) New velocity", c:`<div class="math-line">\\(\\displaystyle\\frac{p}{-15} = -\\frac{2}{5}\\)</div>
+<div class="math-line">\\(p = 6\\)</div>
+<div class="answer-box">New velocity = \\(8\\vec{i} + 6\\vec{j}\\) m/s</div>`},
+{t:"(ii) Speed falls by 7 m/s", c:`<div class="math-line">Before: \\(|\\vec{u}| = \\sqrt{64+225} = \\sqrt{289} = 17\\) m/s</div>
+<div class="math-line">After: \\(|\\vec{v}| = \\sqrt{64+36} = \\sqrt{100} = 10\\) m/s</div>
+<div class="answer-box">Difference = 17 − 10 = 7 m/s ✓</div>`},
+{t:"(iii) K.E. loss", c:`<div class="math-line">K.E.<sub>before</sub> \\(= \\frac{1}{2}(0.2)(289) = 28.9\\) J</div>
+<div class="math-line">K.E.<sub>after</sub> \\(= \\frac{1}{2}(0.2)(100) = 10\\) J</div>
+<div class="answer-box">Loss = 18.9 J</div>`}
+]},
+
+{n:8, q:`A sphere of mass 4 kg hits a smooth barrier along the \\(\\vec{i}\\)-axis. Before impact, its velocity was \\(8\\vec{i} - 6\\vec{j}\\) m/s; after impact it is \\(8\\vec{i} + 4\\vec{j}\\) m/s. Find
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> the coefficient of restitution</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> the percentage loss in kinetic energy</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> the ratio \\(\\frac{\\tan B}{\\tan A}\\), where \\(A\\) and \\(B\\) are the acute angles which the lines of motion make with the \\(\\vec{i}\\)-axis before and after impact.</div>
+</div>`,
+r:`This time you're <strong>given both velocities</strong> — work backwards to find \\(e\\).`,
+f:`\\(\\displaystyle\\frac{\\text{new }j}{\\text{old }j} = -e\\)`,
+s:[
+{t:"(i) Find e", c:`<div class="math-line">\\(\\displaystyle\\frac{4}{-6} = -e\\)</div>
+<div class="answer-box">\\(e = \\frac{2}{3}\\)</div>`},
+{t:"(ii) % K.E. loss", c:`<div class="math-line">\\(u^2 = 64+36 = 100\\), \\(v^2 = 64+16 = 80\\)</div>
+<div class="math-line">K.E.<sub>before</sub> = 200 J, K.E.<sub>after</sub> = 160 J</div>
+<div class="math-line">Loss = 40 J</div>
+<div class="answer-box">Percentage = \\(\\frac{40}{200} \\times 100 = 20\\%\\)</div>`},
+{t:"(iii) Ratio of tangents", c:`<div class="math-line">\\(\\tan A = \\frac{6}{8} = \\frac{3}{4}\\) (before)</div>
+<div class="math-line">\\(\\tan B = \\frac{4}{8} = \\frac{1}{2}\\) (after)</div>
+<div class="math-line">\\(\\displaystyle\\frac{\\tan B}{\\tan A} = \\frac{1/2}{3/4} = \\frac{2}{3}\\)</div>
+<div class="answer-box">\\(\\displaystyle\\frac{\\tan B}{\\tan A} = \\frac{2}{3} = e\\) (always true!)</div>`}
+]},
+
+{n:9, q:`A sphere of mass 0.2 kg hits a smooth barrier along the \\(\\vec{j}\\)-axis. Before impact, its velocity is \\(4\\vec{i} + 3\\vec{j}\\) m/s. The coefficient of restitution is 0.75. Find
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> the velocity after impact</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> the percentage loss in kinetic energy.</div>
+</div>`,
+r:`<strong>Different!</strong> Wall along \\(\\vec{j}\\)-axis means the \\(\\vec{i}\\) component bounces and \\(\\vec{j}\\) stays the same.`,
+f:`Perpendicular component bounces`,
+s:[
+{t:"(i) Velocity after", c:`<div class="math-line">\\(\\vec{j}\\) stays: \\(3\\vec{j}\\)</div>
+<div class="math-line">\\(\\displaystyle\\frac{p}{4} = -0.75\\)</div>
+<div class="math-line">\\(p = -3\\)</div>
+<div class="answer-box">Velocity = \\(-3\\vec{i} + 3\\vec{j}\\) m/s</div>`},
+{t:"(ii) % K.E. loss", c:`<div class="math-line">\\(u^2 = 16+9 = 25\\), \\(v^2 = 9+9 = 18\\)</div>
+<div class="math-line">K.E.<sub>before</sub> = 2.5 J, K.E.<sub>after</sub> = 1.8 J</div>
+<div class="answer-box">Percentage = \\(\\frac{0.7}{2.5} \\times 100 = 28\\%\\)</div>`}
+]},
+
+{n:10, q:`A ball of mass 1 kg falls from a height of 40 m onto horizontal ground. The coefficient of restitution is \\(\\frac{1}{2}\\). Find
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> its speed on hitting the ground</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> the speed with which it first rises from the ground</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> the height it reaches after the first bounce.</div>
+</div>`,
+r:`After bouncing, height reached = \\(e^2 \\times\\) original height.<br>This is a useful shortcut!`,
+f:`Height after bounce \\(= e^2 h\\)`,
+s:[
+{t:"(i) Speed hitting ground", c:`<div class="math-line">\\(v^2 = 2(10)(40) = 800\\)</div>
+<div class="answer-box">Speed \\(= 20\\sqrt{2} \\approx 28.28\\) m/s</div>`},
+{t:"(ii) Speed rising", c:`<div class="math-line">\\(= \\frac{1}{2} \\times 20\\sqrt{2} = 10\\sqrt{2}\\)</div>
+<div class="answer-box">Speed \\(= 10\\sqrt{2} \\approx 14.14\\) m/s</div>`},
+{t:"(iii) Height after bounce", c:`<div class="math-line">Using \\(v^2 = u^2 + 2as\\) with \\(v=0\\):</div>
+<div class="math-line">\\(0 = 200 - 20s\\)</div>
+<div class="math-line">\\(s = 10\\)</div>
+<div class="math-line">Or: \\(h = e^2 \\times 40 = \\frac{1}{4} \\times 40\\)</div>
+<div class="answer-box">Height = 10 m</div>`}
+]},
+
+{n:11, q:`(a) A ball of mass \\(m\\) falls from a height of \\(h\\) metres. The coefficient of restitution is \\(e\\). Find (in terms of \\(g, h, e\\)):
+<div class="sub-questions">
+<div class="sub-q"><span class="sub-q-label">(i)</span> speed on hitting ground</div>
+<div class="sub-q"><span class="sub-q-label">(ii)</span> speed rising from ground</div>
+<div class="sub-q"><span class="sub-q-label">(iii)</span> height after first bounce</div>
+</div>
+(b) Ball: 4 m → 1 m. Find \\(e\\).<br>
+(c) Ball from 25 m, \\(e = 0.8\\). Find heights after 1, 2 bounces; least bounces to rise < 1 m.<br>
+(d) Tennis ball: 2 m → 1 m. Find \\(e\\) to 1 d.p.`,
+r:`<strong>Key formula:</strong> Height after \\(n\\) bounces = \\(h \\cdot e^{2n}\\)<br>To find \\(e\\) from heights: \\(e = \\sqrt{\\frac{h_{\\text{after}}}{h_{\\text{before}}}}\\)`,
+f:`\\(h_n = h \\cdot e^{2n}\\) &nbsp;|&nbsp; \\(e = \\sqrt{\\frac{h_{\\text{after}}}{h_{\\text{before}}}}\\)`,
+s:[
+{t:"(a) General formulas", c:`<div class="math-line">(i) Speed hitting: \\(v = \\sqrt{2gh}\\)</div>
+<div class="math-line">(ii) Speed rising: \\(= e\\sqrt{2gh}\\)</div>
+<div class="answer-box">(iii) Height after bounce = \\(e^2 h\\)</div>`},
+{t:"(b) Find e from heights", c:`<div class="math-line">\\(e^2 = \\frac{1}{4}\\)</div>
+<div class="answer-box">\\(e = \\frac{1}{2}\\)</div>`},
+{t:"(c) Multiple bounces", c:`<div class="math-line">(i) After 1: \\(25 \\times 0.64 = 16\\) m</div>
+<div class="math-line">(ii) After 2: \\(25 \\times 0.4096 = 10.24\\) m</div>
+<div class="math-line">(iii) Need \\(25(0.8)^{2n} < 1\\)</div>
+<div class="math-line">\\(n > 7.2\\)</div>
+<div class="answer-box">(i) 16 m (ii) 10.24 m (iii) 8 bounces</div>`},
+{t:"(d) Tennis ball", c:`<div class="math-line">\\(e^2 = \\frac{1}{2} = 0.5\\)</div>
+<div class="math-line">\\(e = \\sqrt{0.5} \\approx 0.707\\)</div>
+<div class="answer-box">\\(e \\approx 0.7\\)</div>`}
+]}
+];
+
+// Build navigation
+const nav = document.getElementById('nav');
+questions.forEach((q, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'slide-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = 'Q' + q.n;
+    btn.onclick = () => showSlide(i);
+    nav.appendChild(btn);
+});
+
+// Build slides
+const content = document.getElementById('content');
+questions.forEach((q, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'slide' + (i === 0 ? ' active' : '');
+    slide.id = 'slide-' + i;
+    
+    let stepsHtml = q.s.map((step, si) => `
+        <div class="step">
+            <div class="step-header" onclick="toggleStep(${i},${si})">
+                <span class="step-title">${step.t}</span>
+                <span class="step-toggle" id="toggle-${i}-${si}">▼</span>
+            </div>
+            <div class="step-content" id="step-${i}-${si}">${step.c}</div>
+        </div>
+    `).join('');
+    
+    slide.innerHTML = `
+        <div class="question-box">
+            <div class="question">
+                <div class="q-number">${q.n}</div>
+                <div class="q-content">${q.q}</div>
+            </div>
+            <div class="toggle-row">
+                <button class="toggle-btn" onclick="toggleReword(${i})">Reword</button>
+                <button class="solution-btn" onclick="toggleSolution(${i})">Show Solution</button>
+            </div>
+            <div class="reworded" id="reworded-${i}">
+                <div class="section-label">Simpler version</div>
+                ${q.r}
+            </div>
+            <div class="formula-box">
+                <div class="formula-title">Key Formulae</div>
+                <div class="formula-content">${q.f}</div>
+            </div>
+            <div class="solution" id="solution-${i}">
+                <div class="section-label">Step-by-Step Solution</div>
+                ${stepsHtml}
+            </div>
+            <div class="resize-hint">↘ Drag corner to resize</div>
+        </div>
+    `;
+    content.appendChild(slide);
+});
+
+function showSlide(index) {
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.slide-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('slide-' + index).classList.add('active');
+    document.querySelectorAll('.slide-btn')[index].classList.add('active');
+    renderMathInElement(document.body, {delimiters: [{left: "\\(", right: "\\)", display: false},{left: "\\[", right: "\\]", display: true}]});
+}
+
+function toggleReword(i) {
+    const el = document.getElementById('reworded-' + i);
+    const btn = el.previousElementSibling.previousElementSibling.querySelector('.toggle-btn');
+    el.classList.toggle('show');
+    btn.classList.toggle('active');
+    btn.textContent = el.classList.contains('show') ? 'Hide' : 'Reword';
+}
+
+function toggleSolution(i) {
+    const el = document.getElementById('solution-' + i);
+    const btn = el.previousElementSibling.previousElementSibling.querySelector('.solution-btn');
+    el.classList.toggle('show');
+    btn.classList.toggle('active');
+    btn.textContent = el.classList.contains('show') ? 'Hide Solution' : 'Show Solution';
+    if(el.classList.contains('show')) renderMathInElement(el, {delimiters: [{left: "\\(", right: "\\)", display: false},{left: "\\[", right: "\\]", display: true}]});
+}
+
+function toggleStep(i, si) {
+    const el = document.getElementById('step-' + i + '-' + si);
+    const tog = document.getElementById('toggle-' + i + '-' + si);
+    el.classList.toggle('show');
+    tog.textContent = el.classList.contains('show') ? '▲' : '▼';
+    if(el.classList.contains('show')) renderMathInElement(el, {delimiters: [{left: "\\(", right: "\\)", display: false},{left: "\\[", right: "\\]", display: true}]});
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+    const btns = document.querySelectorAll('.slide-btn');
+    const current = Array.from(btns).findIndex(b => b.classList.contains('active'));
+    if(e.key === 'ArrowRight' && current < btns.length - 1) showSlide(current + 1);
+    if(e.key === 'ArrowLeft' && current > 0) showSlide(current - 1);
+});
+
+// Initial render
+document.addEventListener("DOMContentLoaded", () => {
+    renderMathInElement(document.body, {delimiters: [{left: "\\(", right: "\\)", display: false},{left: "\\[", right: "\\]", display: true}]});
+});
+</script>
+</body>
+</html>

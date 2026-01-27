@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr Downes's Free Virtual Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: #f8f8f8;
+            border-radius: 25px;
+            padding: 25px 30px 30px 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            max-width: 420px;
+            width: 100%;
+            border: 2px solid #ddd;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .brand {
+            color: #000;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .model {
+            color: #000;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .product-line {
+            text-align: center;
+            color: #7b1fa2;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .display-container {
+            background: #e8e8e8;
+            border: 3px solid #333;
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 15px;
+        }
+
+        .display-inner {
+            background: #d4e8d4;
+            border: 2px solid #555;
+            border-radius: 6px;
+            padding: 10px;
+            min-height: 80px;
+        }
+
+        .mode-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .display {
+            color: #000;
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            text-align: right;
+            min-height: 35px;
+            word-break: break-all;
+        }
+
+        .display-small {
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 4px;
+            min-height: 14px;
+            text-align: right;
+        }
+
+        /* Control row with SHIFT, ALPHA, nav pad, MENU, ON */
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+
+        .ctrl-btn {
+            background: #f0f0f0;
+            color: #555;
+            border: 2px solid #333;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            font-size: 9px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .ctrl-btn:active {
+            transform: scale(0.95);
+            background: #ddd;
+        }
+
+        .ctrl-btn.shift {
+            color: #d4a017;
+        }
+
+        .ctrl-btn.alpha {
+            color: #c41e3a;
+        }
+
+        .nav-pad {
+            width: 100px;
+            height: 80px;
+            position: relative;
+            border: 3px solid #333;
+            border-radius: 30px;
+            background: #f0f0f0;
+        }
+
+        .nav-btn {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #333;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:active {
+            background: #ddd;
+        }
+
+        .nav-up { top: 5px; left: 50%; transform: translateX(-50%); }
+        .nav-down { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .nav-left { left: 8px; top: 50%; transform: translateY(-50%); }
+        .nav-right { right: 8px; top: 50%; transform: translateY(-50%); }
+        .nav-center { 
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 28px; height: 28px;
+            border-radius: 6px;
+        }
+
+        /* Main keypad */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .keypad-5col {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .key {
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 8px 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+        }
+
+        .key:active {
+            transform: scale(0.96);
+            background: #eee;
+        }
+
+        .key-top {
+            position: absolute;
+            top: 2px;
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        .key-top.shift {
+            color: #d4a017;
+        }
+
+        .key-top.alpha, .key-bottom.alpha {
+            color: #c41e3a;
+        }
+
+        .key-bottom {
+            position: absolute;
+            bottom: 2px;
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        .key-main {
+            font-size: 14px;
+        }
+
+        /* Special key colors */
+        .key.number {
+            background: #fff;
+        }
+
+        .key.operator {
+            background: #fff;
+        }
+
+        .key.del-ac {
+            background: #f5f5f5;
+        }
+
+        .key.equals {
+            background: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 15px;
+            }
+            .key {
+                min-height: 42px;
+                padding: 6px 2px;
+            }
+            .key-main {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="header">
+            <div class="brand">Mr Downes's Free Virtual Calculator</div>
+            <div class="model"></div>
+        </div>
+        <div class="product-line">Number · x² · f(x) · Trig · Geom · x̄=11.2 · P(win)=0.9</div>
+
+        <div class="display-container">
+            <div class="display-inner">
+                <div class="mode-bar">
+                    <span id="modeIndicator">COMP</span>
+                    <span id="shiftIndicator"></span>
+                    <span id="angleIndicator">D</span>
+                </div>
+                <div class="display-small" id="previousDisplay"></div>
+                <div class="display" id="display">0</div>
+            </div>
+        </div>
+
+        <!-- Control Row: SHIFT, ALPHA, Nav Pad, MENU SETUP, ON -->
+        <div class="control-row">
+            <button class="ctrl-btn shift" onclick="toggleShift()">SHIFT</button>
+            <button class="ctrl-btn alpha" onclick="toggleAlpha()">ALPHA</button>
+            <div class="nav-pad">
+                <button class="nav-btn nav-up" onclick="navUp()">▲</button>
+                <button class="nav-btn nav-down" onclick="navDown()">▼</button>
+                <button class="nav-btn nav-left" onclick="navLeft()">◄</button>
+                <button class="nav-btn nav-right" onclick="navRight()">►</button>
+                <button class="nav-btn nav-center" onclick="navOK()"></button>
+            </div>
+            <button class="ctrl-btn" onclick="menuSetup()">MENU<br><span style="font-size:7px;">SETUP</span></button>
+            <button class="ctrl-btn" onclick="turnOn()">ON</button>
+        </div>
+
+        <!-- Row 1: OPTN, x³, [spacer], Abs, log■ -->
+        <div class="keypad" style="grid-template-columns: 1fr 1fr 1.5fr 1fr 1fr; margin-bottom: 8px;">
+            <button class="key" onclick="handleOPTN()">
+                <span class="key-top shift">:</span>
+                <span class="key-main">OPTN</span>
+            </button>
+            <button class="key" onclick="handleCube()">
+                <span class="key-top shift">³√</span>
+                <span class="key-main"><i>x</i>³</span>
+            </button>
+            <div></div>
+            <button class="key" onclick="handleAbs()">
+                <span class="key-main">Abs</span>
+            </button>
+            <button class="key" onclick="handleLogBox()">
+                <span class="key-top shift">10<sup>■</sup></span>
+                <span class="key-main">log<sub>■</sub></span>
+            </button>
+        </div>
+
+        <!-- Row 2: ■/□ (fraction), √, x², x^■, log, ln -->
+        <div class="keypad">
+            <button class="key" onclick="handleFraction()">
+                <span class="key-top shift">■/□</span>
+                <span class="key-main" style="font-size:16px;">▭<br>▭</span>
+            </button>
+            <button class="key" onclick="handleSqrt()">
+                <span class="key-top shift">³√</span>
+                <span class="key-main">√▭</span>
+            </button>
+            <button class="key" onclick="handleSquare()">
+                <span class="key-top shift">√▭</span>
+                <span class="key-main"><i>x</i>²</span>
+            </button>
+            <button class="key" onclick="handlePower()">
+                <span class="key-top shift"><sup>■</sup>√</span>
+                <span class="key-main"><i>x</i><sup>■</sup></span>
+            </button>
+            <button class="key" onclick="handleLog()">
+                <span class="key-top shift">10<sup>■</sup></span>
+                <span class="key-main">log</span>
+            </button>
+            <button class="key" onclick="handleLn()">
+                <span class="key-top shift"><i>e</i><sup>■</sup></span>
+                <span class="key-main">ln</span>
+            </button>
+        </div>
+
+        <!-- Row 3: (-), °'", x⁻¹, sin, cos, tan -->
+        <div class="keypad">
+            <button class="key" onclick="handleNegative()">
+                <span class="key-bottom alpha">A</span>
+                <span class="key-main">(−)</span>
+            </button>
+            <button class="key" onclick="handleDMS()">
+                <span class="key-top shift">FACT</span>
+                <span class="key-bottom alpha">B</span>
+                <span class="key-main">°'"</span>
+            </button>
+            <button class="key" onclick="handleReciprocal()">
+                <span class="key-top shift"><i>x</i>!</span>
+                <span class="key-bottom alpha">C</span>
+                <span class="key-main"><i>x</i><sup>−1</sup></span>
+            </button>
+            <button class="key" onclick="handleSin()">
+                <span class="key-top shift">sin<sup>−1</sup></span>
+                <span class="key-bottom alpha">D</span>
+                <span class="key-main">sin</span>
+            </button>
+            <button class="key" onclick="handleCos()">
+                <span class="key-top shift">cos<sup>−1</sup></span>
+                <span class="key-bottom alpha">E</span>
+                <span class="key-main">cos</span>
+            </button>
+            <button class="key" onclick="handleTan()">
+                <span class="key-top shift">tan<sup>−1</sup></span>
+                <span class="key-bottom alpha">F</span>
+                <span class="key-main">tan</span>
+            </button>
+        </div>
+
+        <!-- Row 4: STO, ENG, (, ), S⇔D, M+ -->
+        <div class="keypad">
+            <button class="key" onclick="handleSTO()">
+                <span class="key-top shift">RCL</span>
+                <span class="key-main">STO</span>
+            </button>
+            <button class="key" onclick="handleENG()">
+                <span class="key-top shift">←</span>
+                <span class="key-main">ENG</span>
+            </button>
+            <button class="key" onclick="handleOpenParen()">
+                <span class="key-top shift">,</span>
+                <span class="key-main">(</span>
+            </button>
+            <button class="key" onclick="handleCloseParen()">
+                <span class="key-bottom alpha"><i>x</i></span>
+                <span class="key-main">)</span>
+            </button>
+            <button class="key" onclick="handleSD()">
+                <span class="key-top shift" style="font-size:6px;">a<sup>b</sup>/<sub>c</sub>⇔<sup>d</sup>/<sub>e</sub></span>
+                <span class="key-bottom alpha"><i>y</i></span>
+                <span class="key-main" style="font-size:12px;">S⇔D</span>
+            </button>
+            <button class="key" onclick="handleMPlus()">
+                <span class="key-top shift">M−</span>
+                <span class="key-bottom alpha">M</span>
+                <span class="key-main">M+</span>
+            </button>
+        </div>
+
+        <!-- Number pad: 5 columns -->
+        <div class="keypad keypad-5col">
+            <!-- Row 5: 7, 8, 9, DEL, AC -->
+            <button class="key number" onclick="inputDigit('7')">
+                <span class="key-main">7</span>
+            </button>
+            <button class="key number" onclick="inputDigit('8')">
+                <span class="key-main">8</span>
+            </button>
+            <button class="key number" onclick="handleNine()">
+                <span class="key-top shift">RESET</span>
+                <span class="key-main">9</span>
+            </button>
+            <button class="key del-ac" onclick="handleDEL()">
+                <span class="key-top shift">INS</span>
+                <span class="key-bottom alpha">UNDO</span>
+                <span class="key-main">DEL</span>
+            </button>
+            <button class="key del-ac" onclick="handleAC()">
+                <span class="key-top shift">OFF</span>
+                <span class="key-main">AC</span>
+            </button>
+
+            <!-- Row 6: 4, 5, 6, ×, ÷ -->
+            <button class="key number" onclick="inputDigit('4')">
+                <span class="key-main">4</span>
+            </button>
+            <button class="key number" onclick="inputDigit('5')">
+                <span class="key-main">5</span>
+            </button>
+            <button class="key number" onclick="inputDigit('6')">
+                <span class="key-main">6</span>
+            </button>
+            <button class="key operator" onclick="handleMultiply()">
+                <span class="key-top shift">nPr</span>
+                <span class="key-main">×</span>
+            </button>
+            <button class="key operator" onclick="handleDivide()">
+                <span class="key-top shift">nCr</span>
+                <span class="key-main">÷</span>
+            </button>
+
+            <!-- Row 7: 1, 2, 3, +, − -->
+            <button class="key number" onclick="inputDigit('1')">
+                <span class="key-main">1</span>
+            </button>
+            <button class="key number" onclick="inputDigit('2')">
+                <span class="key-main">2</span>
+            </button>
+            <button class="key number" onclick="inputDigit('3')">
+                <span class="key-main">3</span>
+            </button>
+            <button class="key operator" onclick="handlePlus()">
+                <span class="key-top shift">Pol</span>
+                <span class="key-main">+</span>
+            </button>
+            <button class="key operator" onclick="handleMinus()">
+                <span class="key-top shift">Rec</span>
+                <span class="key-main">−</span>
+            </button>
+
+            <!-- Row 8: 0, ., ×10^x, Ans, = -->
+            <button class="key number" onclick="handleZero()">
+                <span class="key-top shift">Rnd</span>
+                <span class="key-main">0</span>
+            </button>
+            <button class="key number" onclick="handleDot()">
+                <span class="key-top shift">Ran#</span>
+                <span class="key-bottom alpha">RanInt</span>
+                <span class="key-main">.</span>
+            </button>
+            <button class="key" onclick="handleExp()">
+                <span class="key-top shift">π</span>
+                <span class="key-bottom alpha"><i>e</i></span>
+                <span class="key-main" style="font-size:11px;">×10<sup><i>x</i></sup></span>
+            </button>
+            <button class="key" onclick="handleAns()">
+                <span class="key-top shift">%</span>
+                <span class="key-main">Ans</span>
+            </button>
+            <button class="key equals" onclick="handleEquals()">
+                <span class="key-top shift">≈</span>
+                <span class="key-main">=</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Calculator state
+        let display = '';
+        let previousDisplay = '';
+        let shiftMode = false;
+        let alphaMode = false;
+        let stoMode = false;
+        let rclMode = false;
+        let angleMode = 'deg'; // deg, rad, gra
+        let lastAnswer = 0;
+        let memoryM = 0;
+        let variables = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, X: 0, Y: 0, M: 0 };
+        let calcHistory = [];
+        let historyIndex = -1;
+
+        function updateDisplay() {
+            document.getElementById('display').textContent = display || '0';
+            document.getElementById('previousDisplay').textContent = previousDisplay;
+            document.getElementById('shiftIndicator').textContent = shiftMode ? 'S' : (alphaMode ? 'A' : '');
+            document.getElementById('angleIndicator').textContent = angleMode === 'deg' ? 'D' : (angleMode === 'rad' ? 'R' : 'G');
+        }
+
+        function toggleShift() {
+            shiftMode = !shiftMode;
+            alphaMode = false;
+            updateDisplay();
+        }
+
+        function toggleAlpha() {
+            alphaMode = !alphaMode;
+            shiftMode = false;
+            updateDisplay();
+        }
+
+        function clearModes() {
+            shiftMode = false;
+            alphaMode = false;
+            stoMode = false;
+            rclMode = false;
+        }
+
+        // Input functions
+        function inputDigit(d) {
+            if (display === '0' || display === 'Math Error' || display === 'Syntax Error') {
+                display = d;
+            } else {
+                display += d;
+            }
+            updateDisplay();
+        }
+
+        function inputChar(c) {
+            if (display === 'Math Error' || display === 'Syntax Error') {
+                display = c;
+            } else {
+                display += c;
+            }
+            updateDisplay();
+        }
+
+        // Navigation
+        function navUp() { historyIndex = Math.max(0, historyIndex - 1); }
+        function navDown() { historyIndex = Math.min(calcHistory.length - 1, historyIndex + 1); }
+        function navLeft() { }
+        function navRight() { }
+        function navOK() { }
+        function menuSetup() { }
+        function turnOn() { handleAC(); }
+
+        // Row 1 handlers
+        function handleOPTN() {
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleCube() {
+            if (shiftMode) {
+                inputChar('∛(');
+            } else {
+                inputChar('^3');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleAbs() {
+            inputChar('Abs(');
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleLogBox() {
+            if (shiftMode) {
+                inputChar('10^(');
+            } else {
+                inputChar('log_(');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        // Row 2 handlers
+        function handleFraction() {
+            if (shiftMode) {
+                // Convert to improper fraction - toggle
+            } else {
+                inputChar('/');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleSqrt() {
+            if (shiftMode) {
+                inputChar('∛(');
+            } else {
+                inputChar('√(');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleSquare() {
+            if (shiftMode) {
+                inputChar('√(');
+            } else {
+                inputChar('^2');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handlePower() {
+            if (shiftMode) {
+                // nth root
+                inputChar('√(');
+            } else {
+                inputChar('^(');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleLog() {
+            if (shiftMode) {
+                inputChar('10^(');
+            } else {
+                inputChar('log(');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleLn() {
+            if (shiftMode) {
+                inputChar('e^(');
+            } else {
+                inputChar('ln(');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        // Row 3 handlers
+        function handleNegative() {
+            if (alphaMode || stoMode || rclMode) {
+                handleVariable('A');
+            } else {
+                inputChar('(-');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleDMS() {
+            if (shiftMode) {
+                // Prime factorization
+                primeFactorize();
+            } else if (alphaMode || stoMode || rclMode) {
+                handleVariable('B');
+            } else {
+                inputChar('°');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleReciprocal() {
+            if (shiftMode) {
+                inputChar('!');
+            } else if (alphaMode || stoMode || rclMode) {
+                handleVariable('C');
+            } else {
+                inputChar('^(-1)');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleSin() {
+            if (shiftMode) {
+                inputChar('sin⁻¹(');
+            } else if (alphaMode || stoMode || rclMode) {
+                handleVariable('D');
+            } else {
+                inputChar('sin(');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleCos() {
+            if (shiftMode) {
+                inputChar('cos⁻¹(');
+            } else if (alphaMode || stoMode || rclMode) {
+                handleVariable('E');
+            } else {
+                inputChar('cos(');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleTan() {
+            if (shiftMode) {
+                inputChar('tan⁻¹(');
+            } else if (alphaMode || stoMode || rclMode) {
+                handleVariable('F');
+            } else {
+                inputChar('tan(');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        // Row 4 handlers
+        function handleSTO() {
+            if (shiftMode) {
+                rclMode = true;
+                previousDisplay = 'RCL: Press variable key';
+            } else {
+                stoMode = true;
+                previousDisplay = 'STO: Press variable key';
+            }
+            shiftMode = false;
+            updateDisplay();
+        }
+
+        function handleENG() {
+            if (shiftMode) {
+                // ENG backwards
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleOpenParen() {
+            if (shiftMode) {
+                inputChar(',');
+            } else {
+                inputChar('(');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleCloseParen() {
+            if (alphaMode || stoMode || rclMode) {
+                handleVariable('X');
+            } else {
+                inputChar(')');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleSD() {
+            if (shiftMode) {
+                // Mixed fraction toggle
+            } else if (alphaMode || stoMode || rclMode) {
+                handleVariable('Y');
+            } else {
+                // Toggle S⇔D (exact/decimal)
+                toggleDecimal();
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleMPlus() {
+            if (shiftMode) {
+                // M-
+                try {
+                    let val = evaluateExpression(display);
+                    memoryM -= val;
+                    previousDisplay = 'M- → M=' + memoryM;
+                } catch(e) {}
+            } else if (alphaMode || stoMode || rclMode) {
+                handleVariable('M');
+            } else {
+                // M+
+                try {
+                    let val = evaluateExpression(display);
+                    memoryM += val;
+                    previousDisplay = 'M+ → M=' + memoryM;
+                } catch(e) {}
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        // Number pad handlers
+        function handleNine() {
+            if (shiftMode) {
+                // RESET
+                if (confirm('Reset calculator?')) {
+                    handleAC();
+                    memoryM = 0;
+                    variables = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, X: 0, Y: 0, M: 0 };
+                    lastAnswer = 0;
+                }
+            } else {
+                inputDigit('9');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleDEL() {
+            if (shiftMode) {
+                // INS mode - not implemented
+            } else if (alphaMode) {
+                // UNDO - not implemented
+            } else {
+                if (display.length > 0) {
+                    // Handle multi-char deletions
+                    const multiChar = ['sin⁻¹(', 'cos⁻¹(', 'tan⁻¹(', 'sin(', 'cos(', 'tan(', 
+                                       'log(', 'ln(', 'Abs(', '10^(', 'e^(', '√(', '∛(', 
+                                       'log_(', 'Pol(', 'Rec(', 'Ran#', 'RanInt(', 'Rnd('];
+                    let deleted = false;
+                    for (let mc of multiChar) {
+                        if (display.endsWith(mc)) {
+                            display = display.slice(0, -mc.length);
+                            deleted = true;
+                            break;
+                        }
+                    }
+                    if (!deleted) {
+                        display = display.slice(0, -1);
+                    }
+                }
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleAC() {
+            display = '';
+            previousDisplay = '';
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleMultiply() {
+            if (shiftMode) {
+                inputChar('P');  // nPr
+            } else {
+                inputChar('×');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleDivide() {
+            if (shiftMode) {
+                inputChar('C');  // nCr (will need context to distinguish from variable C)
+            } else {
+                inputChar('÷');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handlePlus() {
+            if (shiftMode) {
+                inputChar('Pol(');
+            } else {
+                inputChar('+');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleMinus() {
+            if (shiftMode) {
+                inputChar('Rec(');
+            } else {
+                inputChar('-');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleZero() {
+            if (shiftMode) {
+                inputChar('Rnd(');
+            } else {
+                inputDigit('0');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleDot() {
+            if (shiftMode) {
+                inputChar('Ran#');
+            } else if (alphaMode) {
+                inputChar('RanInt(');
+            } else {
+                inputChar('.');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleExp() {
+            if (shiftMode) {
+                inputChar('π');
+            } else if (alphaMode) {
+                inputChar('e');
+            } else {
+                inputChar('×10^');
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleAns() {
+            if (shiftMode) {
+                inputChar('%');
+            } else {
+                inputChar(lastAnswer.toString());
+            }
+            clearModes();
+            updateDisplay();
+        }
+
+        function handleEquals() {
+            if (shiftMode) {
+                // Decimal approximation
+                calculateDecimal();
+            } else {
+                // Exact/fraction result
+                calculateExact();
+            }
+            clearModes();
+        }
+
+        // Variable handling
+        function handleVariable(v) {
+            if (stoMode) {
+                try {
+                    let val = evaluateExpression(display);
+                    variables[v] = val;
+                    previousDisplay = v + ' = ' + val;
+                } catch(e) {
+                    previousDisplay = 'Error storing';
+                }
+                stoMode = false;
+            } else if (rclMode) {
+                inputChar(variables[v].toString());
+                rclMode = false;
+            } else {
+                inputChar(v);
+            }
+        }
+
+        // Calculation functions
+        function calculateExact() {
+            try {
+                previousDisplay = display + ' =';
+                
+                // Auto-close brackets
+                let expr = display;
+                const openCount = (expr.match(/\(/g) || []).length;
+                const closeCount = (expr.match(/\)/g) || []).length;
+                if (openCount > closeCount) {
+                    expr += ')'.repeat(openCount - closeCount);
+                }
+                
+                let result = evaluateExpression(expr);
+                
+                if (isNaN(result) || !isFinite(result)) {
+                    display = 'Math Error';
+                } else {
+                    lastAnswer = result;
+                    calcHistory.push({ expr: display, result: result });
+                    
+                    // Try to display as fraction
+                    if (Math.abs(result) < 1e10 && Math.abs(result) > 1e-10 || result === 0) {
+                        display = decimalToFraction(result);
+                    } else {
+                        display = formatScientific(result);
+                    }
+                }
+            } catch (e) {
+                display = 'Math Error';
+            }
+            updateDisplay();
+        }
+
+        function calculateDecimal() {
+            try {
+                previousDisplay = display + ' ≈';
+                
+                let expr = display;
+                const openCount = (expr.match(/\(/g) || []).length;
+                const closeCount = (expr.match(/\)/g) || []).length;
+                if (openCount > closeCount) {
+                    expr += ')'.repeat(openCount - closeCount);
+                }
+                
+                let result = evaluateExpression(expr);
+                
+                if (isNaN(result) || !isFinite(result)) {
+                    display = 'Math Error';
+                } else {
+                    lastAnswer = result;
+                    display = formatScientific(result);
+                }
+            } catch (e) {
+                display = 'Math Error';
+            }
+            updateDisplay();
+        }
+
+        function toggleDecimal() {
+            // Toggle between fraction and decimal display
+            try {
+                let val = evaluateExpression(display);
+                if (display.includes('/')) {
+                    display = val.toString();
+                } else {
+                    display = decimalToFraction(val);
+                }
+            } catch(e) {}
+            updateDisplay();
+        }
+
+        function evaluateExpression(expr) {
+            let e = expr;
+            
+            // Handle scientific notation first
+            e = e.replace(/(\d+\.?\d*)×10\^(-?\d+)/g, '$1e$2');
+            e = e.replace(/×10\^/g, 'e');
+            
+            // Handle custom base log: log_a(b) = log(b)/log(a)
+            e = e.replace(/log_(\d+(?:\.\d+)?)\(([^)]+)\)/g, '(Math.log10($2)/Math.log10($1))');
+            
+            // Handle nPr and nCr
+            e = e.replace(/(\d+)P(\d+)/g, '(fact($1)/fact($1-$2))');
+            e = e.replace(/(\d+)C(\d+)/g, '(fact($1)/(fact($2)*fact($1-$2)))');
+            
+            // Handle factorial
+            e = e.replace(/(\d+)!/g, 'fact($1)');
+            
+            // Handle percentage
+            e = e.replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
+            
+            // Handle random
+            e = e.replace(/Ran#/g, 'Math.random()');
+            e = e.replace(/RanInt\((\d+),(\d+)\)/g, '(Math.floor(Math.random()*($2-$1+1))+$1)');
+            e = e.replace(/Rnd\(([^)]+)\)/g, 'Math.round(($1)*1e10)/1e10');
+            
+            // Handle Pol and Rec
+            e = e.replace(/Pol\(([^,]+),([^)]+)\)/g, 'Math.sqrt(($1)**2+($2)**2)');
+            e = e.replace(/Rec\(([^,]+),([^)]+)\)/g, '($1*Math.cos(($2)*Math.PI/180))');
+            
+            // Constants
+            e = e.replace(/π/g, 'Math.PI');
+            e = e.replace(/(?<![a-zA-Z])e(?![a-zA-Z0-9^])/g, 'Math.E');
+            
+            // Operators
+            e = e.replace(/×/g, '*');
+            e = e.replace(/÷/g, '/');
+            e = e.replace(/−/g, '-');
+            
+            // Functions
+            e = e.replace(/√\(/g, 'Math.sqrt(');
+            e = e.replace(/∛\(/g, 'Math.cbrt(');
+            e = e.replace(/log\(/g, 'Math.log10(');
+            e = e.replace(/ln\(/g, 'Math.log(');
+            e = e.replace(/10\^\(/g, '(10**(');
+            e = e.replace(/e\^\(/g, 'Math.exp(');
+            e = e.replace(/Abs\(/g, 'Math.abs(');
+            e = e.replace(/\^/g, '**');
+            
+            // Trig with degree conversion
+            if (angleMode === 'deg') {
+                e = e.replace(/sin⁻¹\(([^)]+)\)/g, '(Math.asin($1)*180/Math.PI)');
+                e = e.replace(/cos⁻¹\(([^)]+)\)/g, '(Math.acos($1)*180/Math.PI)');
+                e = e.replace(/tan⁻¹\(([^)]+)\)/g, '(Math.atan($1)*180/Math.PI)');
+                e = e.replace(/sin\(([^)]+)\)/g, 'Math.sin(($1)*Math.PI/180)');
+                e = e.replace(/cos\(([^)]+)\)/g, 'Math.cos(($1)*Math.PI/180)');
+                e = e.replace(/tan\(([^)]+)\)/g, 'Math.tan(($1)*Math.PI/180)');
+            } else {
+                e = e.replace(/sin⁻¹\(/g, 'Math.asin(');
+                e = e.replace(/cos⁻¹\(/g, 'Math.acos(');
+                e = e.replace(/tan⁻¹\(/g, 'Math.atan(');
+                e = e.replace(/sin\(/g, 'Math.sin(');
+                e = e.replace(/cos\(/g, 'Math.cos(');
+                e = e.replace(/tan\(/g, 'Math.tan(');
+            }
+            
+            // Variables
+            for (let v of ['A','B','C','D','E','F','X','Y','M']) {
+                const regex = new RegExp('(?<![a-zA-Z])' + v + '(?![a-zA-Z])', 'g');
+                e = e.replace(regex, `(${variables[v]})`);
+            }
+            
+            // Factorial function
+            const fact = (n) => {
+                if (n < 0 || !Number.isInteger(n)) return NaN;
+                if (n === 0 || n === 1) return 1;
+                if (n > 170) return Infinity;
+                let r = 1;
+                for (let i = 2; i <= n; i++) r *= i;
+                return r;
+            };
+            
+            return eval(e);
+        }
+
+        function decimalToFraction(decimal) {
+            if (Number.isInteger(decimal)) return decimal.toString();
+            
+            const sign = decimal < 0 ? '-' : '';
+            decimal = Math.abs(decimal);
+            
+            const tolerance = 1e-10;
+            let num = 1, den = 1;
+            let frac = num / den;
+            
+            while (Math.abs(frac - decimal) > tolerance && den < 10000) {
+                if (frac < decimal) num++;
+                else { den++; num = Math.round(decimal * den); }
+                frac = num / den;
+            }
+            
+            // GCD simplification
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const d = gcd(num, den);
+            num /= d;
+            den /= d;
+            
+            if (den === 1) return sign + num;
+            if (den > 1000) return sign + decimal.toPrecision(10);
+            return sign + num + '/' + den;
+        }
+
+        function formatScientific(n) {
+            if (Math.abs(n) >= 1e10 || (Math.abs(n) < 1e-4 && n !== 0)) {
+                return n.toExponential(9).replace(/e\+?/, '×10^');
+            }
+            return parseFloat(n.toPrecision(10)).toString();
+        }
+
+        function primeFactorize() {
+            try {
+                let num = Math.abs(Math.round(evaluateExpression(display)));
+                if (num < 2 || num > 9999999999) {
+                    display = 'Math Error';
+                    updateDisplay();
+                    return;
+                }
+                
+                previousDisplay = display + ' =';
+                let factors = [];
+                let d = 2;
+                let temp = num;
+                
+                while (d * d <= temp) {
+                    while (temp % d === 0) {
+                        factors.push(d);
+                        temp /= d;
+                    }
+                    d++;
+                }
+                if (temp > 1) factors.push(temp);
+                
+                // Format as prime powers
+                let counts = {};
+                factors.forEach(f => counts[f] = (counts[f] || 0) + 1);
+                
+                display = Object.entries(counts)
+                    .map(([base, exp]) => exp > 1 ? base + '^' + exp : base)
+                    .join('×');
+            } catch(e) {
+                display = 'Math Error';
+            }
+            updateDisplay();
+        }
+
+        // Initialize
+        updateDisplay();
+    </script>
+</body>
+</html>
