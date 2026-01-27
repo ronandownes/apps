@@ -176,7 +176,7 @@
                     <strong>Rotate</strong> (drag) the <span style="color:#27ae60">slope point</span> to change the slope.
                 </div>
                 <div class="canvas-container">
-                    <canvas id="exploreCanvas" width="400" height="400"></canvas>
+                    <canvas id="exploreCanvas" width="420" height="420"></canvas>
                 </div>
             </div>
         </div>
@@ -384,7 +384,7 @@
 
         function pixelToGrid(px, py, canvas) {
             const w = canvas.width, h = canvas.height;
-            const margin = 40;
+            const margin = 45;
             const gridW = w - 2 * margin;
             const gridH = h - 2 * margin;
             const gx = ((px - margin) / gridW) * 10 - 5;
@@ -394,7 +394,7 @@
 
         function gridToPixel(gx, gy, canvas) {
             const w = canvas.width, h = canvas.height;
-            const margin = 40;
+            const margin = 45;
             const gridW = w - 2 * margin;
             const gridH = h - 2 * margin;
             const px = margin + ((gx + 5) / 10) * gridW;
@@ -406,14 +406,14 @@
             const canvas = document.getElementById('exploreCanvas');
             const ctx = canvas.getContext('2d');
             const w = canvas.width, h = canvas.height;
-            const margin = 40;
+            const margin = 45;
             
             // Pure white background
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, w, h);
 
             // Darker grid lines
-            ctx.strokeStyle = '#bdc3c7';
+            ctx.strokeStyle = '#aab7c4';
             ctx.lineWidth = 1;
             for (let i = -5; i <= 5; i++) {
                 const [px] = gridToPixel(i, 0, canvas);
@@ -424,27 +424,27 @@
 
             // Axes - bold black
             ctx.strokeStyle = '#2c3e50';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 2.5;
             const [ox, oy] = gridToPixel(0, 0, canvas);
             ctx.beginPath(); ctx.moveTo(margin, oy); ctx.lineTo(w - margin, oy); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(ox, margin); ctx.lineTo(ox, h - margin); ctx.stroke();
 
-            // Axis labels - bigger and darker
+            // Axis labels - BIGGER and darker
             ctx.fillStyle = '#2c3e50';
-            ctx.font = 'bold 13px Segoe UI';
+            ctx.font = 'bold 16px Segoe UI';
             ctx.textAlign = 'center';
             for (let i = -5; i <= 5; i++) {
                 if (i === 0) continue;
                 const [px] = gridToPixel(i, 0, canvas);
-                ctx.fillText(i, px, oy + 16);
+                ctx.fillText(i, px, oy + 20);
                 const [, py] = gridToPixel(0, i, canvas);
-                ctx.fillText(i, ox - 16, py + 5);
+                ctx.fillText(i, ox - 18, py + 5);
             }
             
             // Axis names
-            ctx.font = 'bold 14px Segoe UI';
-            ctx.fillText('x', w - margin + 15, oy + 5);
-            ctx.fillText('y', ox, margin - 12);
+            ctx.font = 'bold 18px Segoe UI';
+            ctx.fillText('x', w - margin + 18, oy + 6);
+            ctx.fillText('y', ox, margin - 15);
 
             const { x1, y1, x2, y2 } = exploreState;
             const rise = y2 - y1;
@@ -464,6 +464,22 @@
                 ctx.stroke();
             }
 
+            // Calculate intermediate grid points (shows slope reduction)
+            const g = gcd(Math.abs(rise), Math.abs(run));
+            if (g > 1 && run !== 0) {
+                const stepX = run / g;
+                const stepY = rise / g;
+                ctx.fillStyle = '#2c3e50';
+                for (let i = 1; i < g; i++) {
+                    const intX = x1 + stepX * i;
+                    const intY = y1 + stepY * i;
+                    const [ipx, ipy] = gridToPixel(intX, intY, canvas);
+                    ctx.beginPath();
+                    ctx.arc(ipx, ipy, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
             // Slope triangle
             if (run !== 0 && (rise !== 0 || run !== 0)) {
                 const [p1px, p1py] = gridToPixel(x1, y1, canvas);
@@ -480,42 +496,42 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Rise/Run labels
-                ctx.font = 'bold 12px Segoe UI';
+                // Rise/Run labels - bigger
+                ctx.font = 'bold 14px Segoe UI';
                 ctx.fillStyle = '#27ae60';
                 
                 const runLabelX = (p1px + cornerX) / 2;
-                const runLabelY = y1 >= 0 ? cornerY + 16 : cornerY - 8;
+                const runLabelY = y1 >= 0 ? cornerY + 18 : cornerY - 10;
                 ctx.textAlign = 'center';
                 ctx.fillText(`run=${run}`, runLabelX, runLabelY);
                 
-                const riseLabelX = run > 0 ? cornerX + 8 : cornerX - 8;
+                const riseLabelX = run > 0 ? cornerX + 10 : cornerX - 10;
                 const riseLabelY = (cornerY + p2py) / 2;
                 ctx.textAlign = run > 0 ? 'left' : 'right';
-                ctx.fillText(`rise=${rise}`, riseLabelX, riseLabelY + 4);
+                ctx.fillText(`rise=${rise}`, riseLabelX, riseLabelY + 5);
             }
 
-            // Points - smaller
+            // Points - colored endpoints
             const [p1px, p1py] = gridToPixel(x1, y1, canvas);
             const [p2px, p2py] = gridToPixel(x2, y2, canvas);
 
             // Red point (x1, y1) - translation point
             ctx.fillStyle = '#e74c3c';
             ctx.beginPath();
-            ctx.arc(p1px, p1py, 6, 0, Math.PI * 2);
+            ctx.arc(p1px, p1py, 7, 0, Math.PI * 2);
             ctx.fill();
 
             // Green point (slope control) - rotation point
             ctx.fillStyle = '#27ae60';
             ctx.beginPath();
-            ctx.arc(p2px, p2py, 6, 0, Math.PI * 2);
+            ctx.arc(p2px, p2py, 7, 0, Math.PI * 2);
             ctx.fill();
 
-            // Coordinate labels - color coded
-            ctx.font = 'bold 14px Courier New';
+            // Coordinate labels - BIGGER, color coded
+            ctx.font = 'bold 16px Courier New';
             
             // Red point label
-            const labelOffset = 20;
+            const labelOffset = 22;
             let label1X, label1Y;
             if (m >= 0) {
                 label1X = x1 <= 0 ? p1px + labelOffset : p1px - labelOffset;
@@ -531,41 +547,39 @@
             // Green point label
             let label2X, label2Y;
             label2Y = y2 > y1 ? p2py - labelOffset + 5 : p2py + labelOffset;
-            label2X = x2 > x1 ? p2px + 10 : p2px - 10;
+            label2X = x2 > x1 ? p2px + 12 : p2px - 12;
             ctx.textAlign = x2 > x1 ? 'left' : 'right';
             ctx.fillStyle = '#27ae60';
             ctx.fillText(`(${x2}, ${y2})`, label2X, label2Y);
 
-            // Slope display - green, stacked fraction
-            let mDisplay = '', mHTML = '';
+            // Slope display - green, stacked fraction, sign BEFORE fraction
+            let mHTML = '';
             if (run === 0) {
-                mDisplay = 'undefined';
                 mHTML = 'undefined';
             } else {
-                const g = gcd(Math.abs(rise), Math.abs(run));
                 let numR = rise / g;
                 let denR = run / g;
                 if (denR < 0) { numR = -numR; denR = -denR; }
                 if (denR === 1) {
-                    mDisplay = numR.toString();
                     mHTML = `<span class="val-m">${numR}</span>`;
                 } else {
-                    mDisplay = numR + '/' + denR;
-                    mHTML = `<span class="val-m frac"><span class="num">${numR}</span><span class="den">${denR}</span></span>`;
+                    // Sign before fraction
+                    const sign = numR < 0 ? '−' : '';
+                    const absNum = Math.abs(numR);
+                    mHTML = `<span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${denR}</span></span></span>`;
                 }
             }
 
-            // Draw slope as stacked fraction on canvas
+            // Draw slope on canvas - BIGGER, sign before fraction
             ctx.fillStyle = '#27ae60';
-            ctx.font = 'bold 14px Segoe UI';
+            ctx.font = 'bold 16px Segoe UI';
             ctx.textAlign = 'left';
             const slopeX = margin + 5;
-            const slopeY = margin - 5;
+            const slopeY = margin - 8;
             
             if (run === 0) {
                 ctx.fillText('m = undefined', slopeX, slopeY);
             } else {
-                const g = gcd(Math.abs(rise), Math.abs(run));
                 let numR = rise / g;
                 let denR = run / g;
                 if (denR < 0) { numR = -numR; denR = -denR; }
@@ -573,14 +587,24 @@
                 ctx.fillText('m =', slopeX, slopeY);
                 
                 if (denR === 1) {
-                    ctx.fillText(numR.toString(), slopeX + 32, slopeY);
+                    ctx.fillText(numR.toString(), slopeX + 38, slopeY);
                 } else {
+                    // Sign BEFORE fraction
+                    const sign = numR < 0 ? '−' : '';
+                    const absNum = Math.abs(numR);
+                    let offsetX = slopeX + 38;
+                    
+                    if (sign) {
+                        ctx.fillText(sign, offsetX, slopeY);
+                        offsetX += 12;
+                    }
+                    
                     // Draw stacked fraction
-                    ctx.font = 'bold 12px Segoe UI';
+                    ctx.font = 'bold 14px Segoe UI';
                     ctx.textAlign = 'center';
-                    ctx.fillText(numR.toString(), slopeX + 42, slopeY - 6);
-                    ctx.fillRect(slopeX + 32, slopeY - 3, 20, 2);
-                    ctx.fillText(denR.toString(), slopeX + 42, slopeY + 10);
+                    ctx.fillText(absNum.toString(), offsetX + 8, slopeY - 7);
+                    ctx.fillRect(offsetX, slopeY - 3, 16, 2);
+                    ctx.fillText(denR.toString(), offsetX + 8, slopeY + 11);
                 }
             }
 
@@ -648,9 +672,14 @@
             let sDen = mDen / g;
             if (sDen < 0) { sNum = -sNum; sDen = -sDen; }
             
-            let mPart = sDen === 1 
-                ? `<span class="val-m">${sNum}</span>`
-                : `<span class="val-m frac"><span class="num">${sNum}</span><span class="den">${sDen}</span></span>`;
+            let mPart;
+            if (sDen === 1) {
+                mPart = `<span class="val-m">${sNum}</span>`;
+            } else {
+                const sign = sNum < 0 ? '−' : '';
+                const absNum = Math.abs(sNum);
+                mPart = `<span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${sDen}</span></span></span>`;
+            }
             
             document.getElementById('calcEquation').innerHTML = `${yPart} = ${mPart}${xPart}`;
         }
@@ -665,7 +694,7 @@
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, w, h);
 
-            ctx.strokeStyle = '#bdc3c7';
+            ctx.strokeStyle = '#aab7c4';
             ctx.lineWidth = 1;
             for (let i = -5; i <= 5; i++) {
                 const [px] = gridToPixelCalc(i, 0, canvas);
@@ -776,7 +805,9 @@
 
         function formatSlopeFrac(num, den) {
             if (den === 1) return `<span class="val-m">${num}</span>`;
-            return `<span class="val-m frac"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+            const sign = num < 0 ? '−' : '';
+            const absNum = Math.abs(num);
+            return `<span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${den}</span></span></span>`;
         }
 
         function formatSlopeAnswer(num, den) {
@@ -898,15 +929,20 @@
         function formatOptionDisplay(opt, type) {
             if (type === 'findSlope' && opt.includes('/')) {
                 const [n, d] = opt.split('/');
-                return `<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
+                const num = parseInt(n);
+                const sign = num < 0 ? '−' : '';
+                const absNum = Math.abs(num);
+                return `<span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${d}</span></span></span>`;
             }
             // Color the slope in equation options
             if (type === 'findEq') {
-                // Find the slope part and color it green
                 return opt.replace(/= (-?\d+(?:\/\d+)?)\(/, (match, slope) => {
                     if (slope.includes('/')) {
                         const [n, d] = slope.split('/');
-                        return `= <span class="val-m frac"><span class="num">${n}</span><span class="den">${d}</span></span>(`;
+                        const num = parseInt(n);
+                        const sign = num < 0 ? '−' : '';
+                        const absNum = Math.abs(num);
+                        return `= <span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${d}</span></span></span>(`;
                     }
                     return `= <span class="val-m">${slope}</span>(`;
                 });
@@ -1020,7 +1056,6 @@
         function generatePracticeQuestion() {
             practiceState.attempts = 0;
             
-            // Removed 'reverse' type - no y = mx + b conversion
             const types = ['writeEq', 'findM', 'findPoint'];
             const type = types[Math.floor(Math.random() * types.length)];
             
