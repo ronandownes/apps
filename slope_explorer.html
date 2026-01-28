@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slope Explorer - Rise Before Run</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg: #ffffff;
+            --panel: #f8fafc;
+            --grid: #e2e8f0;
+            --border: #cbd5e1;
+            --axis: #1e293b;
+            --line1: #dc2626;
+            --point-a: #dc2626;
+            --point-b: #2563eb;
+            --rise: #16a34a;
+            --run: #2563eb;
+            --text: #1e293b;
+            --muted: #64748b;
+            --accent: #f59e0b;
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .controls {
+            width: 320px;
+            background: var(--panel);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border-right: 2px solid var(--border);
+            overflow-y: auto;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+        
+        .section {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .point-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .input-group label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .input-group input {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--axis);
+        }
+        
+        .input-group.point-a input { border-color: var(--point-a); }
+        .input-group.point-b input { border-color: var(--point-b); }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .checkbox-item input {
+            display: none;
+        }
+        
+        .checkbox-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+        
+        .checkbox-item input:checked + .checkbox-box {
+            background: var(--axis);
+            border-color: var(--axis);
+        }
+        
+        .checkbox-box svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .checkbox-item input:checked + .checkbox-box svg {
+            opacity: 1;
+        }
+        
+        .formula-display {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid var(--border);
+        }
+        
+        .formula-label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .formula {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+        }
+        
+        .formula .rise { color: var(--rise); font-weight: 600; }
+        .formula .run { color: var(--run); font-weight: 600; }
+        
+        .slope-value {
+            margin-top: 12px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        .slope-status {
+            margin-top: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+            font-weight: 600;
+        }
+        
+        .slope-status.positive { background: #dcfce7; color: #166534; }
+        .slope-status.negative { background: #fee2e2; color: #991b1b; }
+        .slope-status.zero { background: #f1f5f9; color: #475569; }
+        .slope-status.undefined { background: #f3e8ff; color: #7c3aed; }
+        
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+            cursor: crosshair;
+        }
+        
+        .animate-btn {
+            background: var(--rise);
+            border: none;
+            border-radius: 10px;
+            padding: 14px 20px;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .animate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(22,163,74,0.3);
+        }
+        
+        .animate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .legend {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .instructions {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+        
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 4px;
+        }
+        
+        .fraction-num, .fraction-den {
+            padding: 2px 8px;
+        }
+        
+        .fraction-bar {
+            width: 100%;
+            height: 2px;
+            background: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <div>
+            <h1>Slope Explorer</h1>
+            <p class="subtitle">Rise Before Run</p>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Point A (drag on graph)</div>
+            <div class="point-inputs">
+                <div class="input-group point-a">
+                    <label>x₁</label>
+                    <input type="number" id="ax" value="-5" step="1">
+                </div>
+                <div class="input-group point-a">
+                    <label>y₁</label>
+                    <input type="number" id="ay" value="2" step="1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Point B (drag on graph)</div>
+            <div class="point-inputs">
+                <div class="input-group point-b">
+                    <label>x₂</label>
+                    <input type="number" id="bx" value="3" step="1">
+                </div>
+                <div class="input-group point-b">
+                    <label>y₂</label>
+                    <input type="number" id="by" value="6" step="1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Display Options</div>
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" id="showGrid" checked>
+                    <span class="checkbox-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                    <span>Show grid</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="showAxes" checked>
+                    <span class="checkbox-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                    <span>Show axes</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="showTriangle" checked>
+                    <span class="checkbox-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                    <span>Show slope triangle</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="showLabels" checked>
+                    <span class="checkbox-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                    <span>Show rise/run labels</span>
+                </label>
+            </div>
+        </div>
+        
+        <button class="animate-btn" id="animateBtn">▶ Animate Rise → Run</button>
+        
+        <div class="formula-display">
+            <div class="formula-label">Slope Formula (m)</div>
+            <div class="formula">
+                m = <span class="fraction">
+                    <span class="fraction-num rise">rise</span>
+                    <span class="fraction-bar"></span>
+                    <span class="fraction-den run">run</span>
+                </span> = <span class="fraction">
+                    <span class="fraction-num rise" id="riseCalc">y₂ − y₁</span>
+                    <span class="fraction-bar"></span>
+                    <span class="fraction-den run" id="runCalc">x₂ − x₁</span>
+                </span>
+            </div>
+            <div class="slope-value" id="slopeValue">m = ½</div>
+            <div class="slope-status positive" id="slopeStatus">Increasing ↗</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Legend</div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--point-a)"></div>
+                    <span>Point A</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--point-b)"></div>
+                    <span>Point B</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--rise)"></div>
+                    <span>Rise (Δy)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--run)"></div>
+                    <span>Run (Δx)</span>
+                </div>
+            </div>
+        </div>
+        
+        <p class="instructions">
+            Drag points A or B on the graph to explore different slopes. 
+            The animation always shows <strong>rise first</strong>, then <strong>run</strong>.
+        </p>
+    </div>
+    
+    <div class="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // State
+        let pointA = { x: -5, y: 2 };
+        let pointB = { x: 3, y: 6 };
+        let dragging = null;
+        let animationProgress = 2;
+        let animationId = null;
+        
+        // Settings
+        const settings = {
+            showGrid: true,
+            showAxes: true,
+            showTriangle: true,
+            showLabels: true
+        };
+        
+        // Canvas setup
+        let scale = 40;
+        let originX, originY;
+        
+        function resize() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth * window.devicePixelRatio;
+            canvas.height = container.clientHeight * window.devicePixelRatio;
+            canvas.style.width = container.clientWidth + 'px';
+            canvas.style.height = container.clientHeight + 'px';
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            originX = container.clientWidth / 2;
+            originY = container.clientHeight / 2;
+            draw();
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+        
+        // Coordinate conversion
+        function toCanvas(x, y) {
+            return {
+                x: originX + x * scale,
+                y: originY - y * scale
+            };
+        }
+        
+        function toGraph(cx, cy) {
+            return {
+                x: Math.round((cx - originX) / scale),
+                y: Math.round((originY - cy) / scale)
+            };
+        }
+        
+        // GCD for fraction reduction
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                [a, b] = [b, a % b];
+            }
+            return a;
+        }
+        
+        // Drawing functions
+        function draw() {
+            const w = canvas.width / window.devicePixelRatio;
+            const h = canvas.height / window.devicePixelRatio;
+            
+            // Clear - white background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+            
+            // Grid
+            if (settings.showGrid) {
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 1;
+                
+                const gridSize = scale;
+                const startX = originX % gridSize;
+                const startY = originY % gridSize;
+                
+                ctx.beginPath();
+                for (let x = startX; x < w; x += gridSize) {
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                }
+                for (let y = startY; y < h; y += gridSize) {
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                }
+                ctx.stroke();
+            }
+            
+            // Axes
+            if (settings.showAxes) {
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                ctx.moveTo(0, originY);
+                ctx.lineTo(w, originY);
+                ctx.moveTo(originX, 0);
+                ctx.lineTo(originX, h);
+                ctx.stroke();
+                
+                // Axis arrows
+                ctx.fillStyle = '#1e293b';
+                // X arrow
+                ctx.beginPath();
+                ctx.moveTo(w - 5, originY);
+                ctx.lineTo(w - 15, originY - 6);
+                ctx.lineTo(w - 15, originY + 6);
+                ctx.closePath();
+                ctx.fill();
+                // Y arrow
+                ctx.beginPath();
+                ctx.moveTo(originX, 5);
+                ctx.lineTo(originX - 6, 15);
+                ctx.lineTo(originX + 6, 15);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Axis labels
+                ctx.fillStyle = '#64748b';
+                ctx.font = 'bold 16px "Outfit", sans-serif';
+                ctx.fillText('x', w - 25, originY - 12);
+                ctx.fillText('y', originX + 12, 25);
+                
+                // Tick marks and numbers
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px "JetBrains Mono", monospace';
+                ctx.textAlign = 'center';
+                for (let i = -10; i <= 10; i++) {
+                    if (i === 0) continue;
+                    const p = toCanvas(i, 0);
+                    if (p.x > 20 && p.x < w - 20) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, originY - 4);
+                        ctx.lineTo(p.x, originY + 4);
+                        ctx.stroke();
+                        ctx.fillText(i.toString(), p.x, originY + 18);
+                    }
+                }
+                ctx.textAlign = 'right';
+                for (let i = -10; i <= 10; i++) {
+                    if (i === 0) continue;
+                    const py = toCanvas(0, i);
+                    if (py.y > 20 && py.y < h - 20) {
+                        ctx.beginPath();
+                        ctx.moveTo(originX - 4, py.y);
+                        ctx.lineTo(originX + 4, py.y);
+                        ctx.stroke();
+                        ctx.fillText(i.toString(), originX - 10, py.y + 4);
+                    }
+                }
+                ctx.textAlign = 'left';
+            }
+            
+            // Line through points
+            const pA = toCanvas(pointA.x, pointA.y);
+            const pB = toCanvas(pointB.x, pointB.y);
+            
+            if (pointA.x !== pointB.x) {
+                const slope = (pointB.y - pointA.y) / (pointB.x - pointA.x);
+                const b = pointA.y - slope * pointA.x;
+                
+                const leftX = -originX / scale;
+                const rightX = (w - originX) / scale;
+                const leftY = slope * leftX + b;
+                const rightY = slope * rightX + b;
+                
+                const start = toCanvas(leftX, leftY);
+                const end = toCanvas(rightX, rightY);
+                
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                ctx.stroke();
+            } else {
+                // Vertical line
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(pA.x, 0);
+                ctx.lineTo(pA.x, h);
+                ctx.stroke();
+            }
+            
+            // Slope triangle (always rise before run)
+            if (settings.showTriangle && animationProgress > 0) {
+                const startPoint = pointA.x <= pointB.x ? pointA : pointB;
+                const endPoint = pointA.x <= pointB.x ? pointB : pointA;
+                
+                const rise = endPoint.y - startPoint.y;
+                const run = endPoint.x - startPoint.x;
+                
+                const cornerX = startPoint.x;
+                const cornerY = endPoint.y;
+                
+                const pStart = toCanvas(startPoint.x, startPoint.y);
+                const pEnd = toCanvas(endPoint.x, endPoint.y);
+                const pCorner = toCanvas(cornerX, cornerY);
+                
+                // Rise animation (0 to 1)
+                if (animationProgress > 0) {
+                    const riseProgress = Math.min(animationProgress, 1);
+                    const currentRiseY = startPoint.y + (cornerY - startPoint.y) * riseProgress;
+                    const pCurrentRise = toCanvas(startPoint.x, currentRiseY);
+                    
+                    // Draw rise line
+                    ctx.strokeStyle = '#16a34a';
+                    ctx.lineWidth = 5;
+                    ctx.setLineDash([]);
+                    ctx.beginPath();
+                    ctx.moveTo(pStart.x, pStart.y);
+                    ctx.lineTo(pCurrentRise.x, pCurrentRise.y);
+                    ctx.stroke();
+                    
+                    // Rise arrow
+                    if (riseProgress > 0.1 && Math.abs(rise) > 0) {
+                        const arrowDir = rise >= 0 ? -1 : 1;
+                        drawArrow(pCurrentRise.x, pCurrentRise.y, arrowDir * Math.PI / 2, '#16a34a');
+                    }
+                    
+                    // Rise label
+                    if (settings.showLabels && riseProgress > 0.5) {
+                        ctx.fillStyle = '#16a34a';
+                        ctx.font = 'bold 18px "JetBrains Mono", monospace';
+                        const labelX = pStart.x - 40;
+                        const labelY = (pStart.y + pCurrentRise.y) / 2 + 6;
+                        ctx.fillText(rise.toString(), labelX, labelY);
+                    }
+                }
+                
+                // Run animation (1 to 2)
+                if (animationProgress > 1) {
+                    const runProgress = animationProgress - 1;
+                    const currentRunX = cornerX + (endPoint.x - cornerX) * runProgress;
+                    const pCurrentRun = toCanvas(currentRunX, cornerY);
+                    
+                    // Draw run line
+                    ctx.strokeStyle = '#2563eb';
+                    ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    ctx.moveTo(pCorner.x, pCorner.y);
+                    ctx.lineTo(pCurrentRun.x, pCurrentRun.y);
+                    ctx.stroke();
+                    
+                    // Run arrow
+                    if (runProgress > 0.1 && Math.abs(run) > 0) {
+                        drawArrow(pCurrentRun.x, pCurrentRun.y, 0, '#2563eb');
+                    }
+                    
+                    // Run label
+                    if (settings.showLabels && runProgress > 0.5) {
+                        ctx.fillStyle = '#2563eb';
+                        ctx.font = 'bold 18px "JetBrains Mono", monospace';
+                        const labelX = (pCorner.x + pCurrentRun.x) / 2 - 10;
+                        const labelY = pCorner.y + 28;
+                        ctx.fillText(run.toString(), labelX, labelY);
+                    }
+                }
+                
+                // Triangle fill when complete
+                if (animationProgress >= 2) {
+                    ctx.fillStyle = 'rgba(251, 191, 36, 0.2)';
+                    ctx.beginPath();
+                    ctx.moveTo(pStart.x, pStart.y);
+                    ctx.lineTo(pCorner.x, pCorner.y);
+                    ctx.lineTo(pEnd.x, pEnd.y);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+            
+            // Points
+            drawPoint(pA.x, pA.y, '#dc2626', 'A');
+            drawPoint(pB.x, pB.y, '#2563eb', 'B');
+            
+            // Point coordinates
+            if (settings.showAxes) {
+                ctx.font = 'bold 14px "JetBrains Mono", monospace';
+                ctx.fillStyle = '#dc2626';
+                ctx.fillText(`(${pointA.x}, ${pointA.y})`, pA.x + 15, pA.y - 15);
+                ctx.fillStyle = '#2563eb';
+                ctx.fillText(`(${pointB.x}, ${pointB.y})`, pB.x + 15, pB.y - 15);
+            }
+        }
+        
+        function drawPoint(x, y, color, label) {
+            // Outer ring
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Inner fill
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Label
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px "Outfit", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, x, y);
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+        }
+        
+        function drawArrow(x, y, angle, color) {
+            const size = 14;
+            ctx.fillStyle = color;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-size, -size / 2);
+            ctx.lineTo(-size, size / 2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        function updateFormula() {
+            const rise = pointB.y - pointA.y;
+            const run = pointB.x - pointA.x;
+            
+            document.getElementById('riseCalc').textContent = `${pointB.y} − ${pointA.y} = ${rise}`;
+            document.getElementById('runCalc').textContent = `${pointB.x} − ${pointA.x} = ${run}`;
+            
+            const slopeValue = document.getElementById('slopeValue');
+            const slopeStatus = document.getElementById('slopeStatus');
+            
+            if (run === 0) {
+                slopeValue.textContent = 'm = undefined';
+                slopeStatus.textContent = 'Vertical ↕';
+                slopeStatus.className = 'slope-status undefined';
+            } else {
+                const g = gcd(rise, run);
+                const numReduced = rise / g;
+                const denReduced = Math.abs(run / g);
+                const sign = (rise * run < 0) ? '-' : '';
+                
+                if (denReduced === 1) {
+                    slopeValue.textContent = `m = ${numReduced}`;
+                } else if (numReduced === 0) {
+                    slopeValue.textContent = 'm = 0';
+                } else {
+                    slopeValue.textContent = `m = ${sign}${Math.abs(numReduced)}/${denReduced}`;
+                }
+                
+                if (rise > 0 && run > 0 || rise < 0 && run < 0) {
+                    slopeStatus.textContent = 'Increasing ↗';
+                    slopeStatus.className = 'slope-status positive';
+                } else if (rise === 0) {
+                    slopeStatus.textContent = 'Horizontal →';
+                    slopeStatus.className = 'slope-status zero';
+                } else {
+                    slopeStatus.textContent = 'Decreasing ↘';
+                    slopeStatus.className = 'slope-status negative';
+                }
+            }
+        }
+        
+        // Animation
+        function animate() {
+            if (animationProgress < 2) {
+                animationProgress += 0.03;
+                draw();
+                animationId = requestAnimationFrame(animate);
+            } else {
+                animationProgress = 2;
+                draw();
+            }
+        }
+        
+        document.getElementById('animateBtn').addEventListener('click', () => {
+            if (animationId) cancelAnimationFrame(animationId);
+            animationProgress = 0;
+            animate();
+        });
+        
+        // Input handlers
+        ['ax', 'ay', 'bx', 'by'].forEach(id => {
+            document.getElementById(id).addEventListener('input', (e) => {
+                const val = parseInt(e.target.value) || 0;
+                if (id === 'ax') pointA.x = val;
+                if (id === 'ay') pointA.y = val;
+                if (id === 'bx') pointB.x = val;
+                if (id === 'by') pointB.y = val;
+                animationProgress = 2;
+                updateFormula();
+                draw();
+            });
+        });
+        
+        // Checkbox handlers
+        ['showGrid', 'showAxes', 'showTriangle', 'showLabels'].forEach(id => {
+            document.getElementById(id).addEventListener('change', (e) => {
+                settings[id] = e.target.checked;
+                draw();
+            });
+        });
+        
+        // Mouse drag
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            
+            const pA = toCanvas(pointA.x, pointA.y);
+            const pB = toCanvas(pointB.x, pointB.y);
+            
+            const distA = Math.hypot(mx - pA.x, my - pA.y);
+            const distB = Math.hypot(mx - pB.x, my - pB.y);
+            
+            if (distA < 20) dragging = 'A';
+            else if (distB < 20) dragging = 'B';
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (!dragging) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const p = toGraph(mx, my);
+            
+            if (dragging === 'A') {
+                pointA.x = p.x;
+                pointA.y = p.y;
+                document.getElementById('ax').value = p.x;
+                document.getElementById('ay').value = p.y;
+            } else {
+                pointB.x = p.x;
+                pointB.y = p.y;
+                document.getElementById('bx').value = p.x;
+                document.getElementById('by').value = p.y;
+            }
+            
+            animationProgress = 2;
+            updateFormula();
+            draw();
+        });
+        
+        canvas.addEventListener('mouseup', () => dragging = null);
+        canvas.addEventListener('mouseleave', () => dragging = null);
+        
+        // Touch support
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const mx = touch.clientX - rect.left;
+            const my = touch.clientY - rect.top;
+            
+            const pA = toCanvas(pointA.x, pointA.y);
+            const pB = toCanvas(pointB.x, pointB.y);
+            
+            const distA = Math.hypot(mx - pA.x, my - pA.y);
+            const distB = Math.hypot(mx - pB.x, my - pB.y);
+            
+            if (distA < 30) dragging = 'A';
+            else if (distB < 30) dragging = 'B';
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            if (!dragging) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const mx = touch.clientX - rect.left;
+            const my = touch.clientY - rect.top;
+            const p = toGraph(mx, my);
+            
+            if (dragging === 'A') {
+                pointA.x = p.x;
+                pointA.y = p.y;
+                document.getElementById('ax').value = p.x;
+                document.getElementById('ay').value = p.y;
+            } else {
+                pointB.x = p.x;
+                pointB.y = p.y;
+                document.getElementById('bx').value = p.x;
+                document.getElementById('by').value = p.y;
+            }
+            
+            animationProgress = 2;
+            updateFormula();
+            draw();
+        });
+        
+        canvas.addEventListener('touchend', () => dragging = null);
+        
+        // Zoom with scroll
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            scale *= e.deltaY > 0 ? 0.95 : 1.05;
+            scale = Math.max(20, Math.min(100, scale));
+            draw();
+        });
+        
+        // Initial state
+        updateFormula();
+        draw();
+    </script>
+</body>
+</html>
