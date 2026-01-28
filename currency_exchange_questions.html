@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Exchange - Mr Downes Maths</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #f8f8f8;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: visible;
+            border: 2px solid #ddd;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e8e8e8 0%, #f0f0f0 100%);
+            color: #333;
+            padding: 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            max-height: 60px;
+            min-height: 60px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border-bottom: 2px solid #ddd;
+            border-radius: 23px 23px 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .brand-name {
+            font-size: 20px;
+            font-weight: 900;
+            color: #1a1a1a;
+            line-height: 1.2;
+        }
+        
+        .brand-sub {
+            font-size: 12px;
+            font-weight: 700;
+            color: #3b82f6;
+            line-height: 1.2;
+        }
+        
+        .brand-ref {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.2;
+        }
+        
+        .header-dots {
+            display: grid;
+            grid-template-columns: repeat(2, 8px);
+            grid-template-rows: repeat(4, 8px);
+            gap: 2px;
+            flex-shrink: 0;
+        }
+        
+        .header-dots .hdot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .hdot.blue { background: #3b82f6; }
+        .hdot.red { background: #ef4444; }
+        .hdot.green { background: #22c55e; }
+        .hdot.black { background: #1a1a1a; }
+        
+        .content {
+            padding: 32px;
+        }
+        
+        .question {
+            margin-bottom: 28px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #ddd;
+            position: relative;
+        }
+        
+        .question:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .q-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        
+        /* Subitized dot patterns for question numbers */
+        .q-dots {
+            display: grid;
+            gap: 4px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        
+        .q-dots .qdot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        
+        .q-dots .qdot:hover {
+            transform: scale(1.2);
+        }
+        
+        .qdot.blue { background: #3b82f6; }
+        .qdot.red { background: #ef4444; }
+        .qdot.green { background: #22c55e; }
+        .qdot.black { background: #1a1a1a; }
+        
+        /* 2 dots: vertical */
+        .q-dots.dots-2 {
+            grid-template-columns: 14px;
+            grid-template-rows: repeat(2, 14px);
+        }
+        
+        /* 4 dots: 2x2 square */
+        .q-dots.dots-4 {
+            grid-template-columns: repeat(2, 14px);
+            grid-template-rows: repeat(2, 14px);
+        }
+        
+        /* 6 dots: 2x3 */
+        .q-dots.dots-6 {
+            grid-template-columns: repeat(2, 14px);
+            grid-template-rows: repeat(3, 14px);
+        }
+        
+        /* 8 dots: 2x4 */
+        .q-dots.dots-8 {
+            grid-template-columns: repeat(2, 14px);
+            grid-template-rows: repeat(4, 14px);
+        }
+        
+        /* 10 dots: 2x5 */
+        .q-dots.dots-10 {
+            grid-template-columns: repeat(2, 14px);
+            grid-template-rows: repeat(5, 14px);
+        }
+        
+        .q-text {
+            font-size: 1.15rem;
+            color: #333;
+            line-height: 1.6;
+            flex: 1;
+        }
+        
+        .sub-parts {
+            margin-top: 12px;
+            margin-left: 52px;
+        }
+        
+        .sub-part {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            color: #444;
+        }
+        
+        .sub-part span {
+            color: #3b82f6;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .table-container {
+            margin: 16px 0 16px 52px;
+            overflow-x: auto;
+        }
+        
+        table {
+            border-collapse: collapse;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+        
+        td {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            font-size: 1.05rem;
+        }
+        
+        td:first-child {
+            background: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .footer {
+            background: #e0e0e0;
+            padding: 12px 24px;
+            text-align: center;
+            color: #666;
+            font-size: 0.85rem;
+            border-top: 2px solid #ddd;
+        }
+        
+        /* Feedback area */
+        .feedback-area {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            width: 50px;
+            height: 60px;
+        }
+        
+        /* Flying dots for Brownian motion */
+        .flying-dot {
+            position: fixed;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* Tick made of green dots */
+        .tick-container {
+            position: relative;
+            width: 40px;
+            height: 50px;
+            display: none;
+        }
+        
+        .tick-container.show {
+            display: block;
+        }
+        
+        .tick-container .tdot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+        
+        /* Cross made of red dots */
+        .cross-container {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: none;
+        }
+        
+        .cross-container.show {
+            display: block;
+        }
+        
+        .cross-container .xdot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brand-text">
+                <span class="brand-name">Mr Downes</span>
+                <span class="brand-sub">Currency Exchange</span>
+                <span class="brand-ref">pg 226 AM1</span>
+            </div>
+            <div class="header-dots">
+                <div class="hdot blue"></div>
+                <div class="hdot red"></div>
+                <div class="hdot green"></div>
+                <div class="hdot black"></div>
+                <div class="hdot red"></div>
+                <div class="hdot green"></div>
+                <div class="hdot black"></div>
+                <div class="hdot blue"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Question 2 -->
+            <div class="question" id="q2">
+                <div class="q-header">
+                    <div class="q-dots dots-2" onclick="handleDotClick(event, 'q2')">
+                        <div class="qdot red"></div>
+                        <div class="qdot green"></div>
+                    </div>
+                    <div class="q-text">On a day when €1 = $1·34, find:</div>
+                </div>
+                <div class="sub-parts">
+                    <div class="sub-part"><span>(i)</span> The value in dollars of €350</div>
+                    <div class="sub-part"><span>(ii)</span> The value in euro of $871</div>
+                </div>
+                <div class="feedback-area" id="feedback-q2"></div>
+            </div>
+            
+            <!-- Question 4 -->
+            <div class="question" id="q4">
+                <div class="q-header">
+                    <div class="q-dots dots-4" onclick="handleDotClick(event, 'q4')">
+                        <div class="qdot red"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot red"></div>
+                    </div>
+                    <div class="q-text">Joshua buys an electric pump on the internet for £15·95. The currency conversion rate is €1 = £0·90. Convert £15.95 to euro. Give your answer correct to the nearest cent.</div>
+                </div>
+                <div class="feedback-area" id="feedback-q4"></div>
+            </div>
+            
+            <!-- Question 6 -->
+            <div class="question" id="q6">
+                <div class="q-header">
+                    <div class="q-dots dots-6" onclick="handleDotClick(event, 'q6')">
+                        <div class="qdot red"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot red"></div>
+                        <div class="qdot red"></div>
+                        <div class="qdot green"></div>
+                    </div>
+                    <div class="q-text">Ali returns from the USA and has $1,100. A bank buys dollars at a rate of €1 = $1·38. How much will he get in euro?</div>
+                </div>
+                <div class="feedback-area" id="feedback-q6"></div>
+            </div>
+            
+            <!-- Question 8 -->
+            <div class="question" id="q8">
+                <div class="q-header">
+                    <div class="q-dots dots-8" onclick="handleDotClick(event, 'q8')">
+                        <div class="qdot red"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot red"></div>
+                        <div class="qdot red"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot red"></div>
+                    </div>
+                    <div class="q-text">If €1 = $1·42 (Australian dollar), €1 = ¥111·87 (Japanese yen) and €1 = £0·87:</div>
+                </div>
+                <div class="sub-parts">
+                    <div class="sub-part"><span>(a)</span> How many Australian dollars would you get for €60?</div>
+                    <div class="sub-part"><span>(b)</span> How many Japanese yen would you get for €150?</div>
+                    <div class="sub-part"><span>(c)</span> How many pounds would you get for €50?</div>
+                    <div class="sub-part"><span>(d)</span> How many euro would you get for ¥67,122?</div>
+                    <div class="sub-part"><span>(e)</span> How many euro would you get for $106·50?</div>
+                    <div class="sub-part"><span>(f)</span> Are you better off if you have ¥44,748 or £347?</div>
+                </div>
+                <div class="feedback-area" id="feedback-q8"></div>
+            </div>
+            
+            <!-- Question 10 -->
+            <div class="question" id="q10">
+                <div class="q-header">
+                    <div class="q-dots dots-10" onclick="handleDotClick(event, 'q10')">
+                        <div class="qdot red"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot red"></div>
+                        <div class="qdot red"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot green"></div>
+                        <div class="qdot red"></div>
+                        <div class="qdot red"></div>
+                        <div class="qdot green"></div>
+                    </div>
+                    <div class="q-text">A bank quotes the exchange rates for euro shown in the table:</div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <tr><td>€1</td><td>Sterling £0·85</td></tr>
+                        <tr><td>€1</td><td>US dollar $1·38</td></tr>
+                        <tr><td>€1</td><td>Yen ¥118</td></tr>
+                    </table>
+                </div>
+                <div class="sub-parts">
+                    <div class="sub-part"><span>(a)</span> Niall has €850. How much will he get in sterling?</div>
+                    <div class="sub-part"><span>(b)</span> Albert has ¥4,248. How much will he get in euro?</div>
+                    <div class="sub-part"><span>(c)</span> Chloe has £51·09. How much will she get in euro?</div>
+                    <div class="sub-part"><span>(d)</span> Ben has $8,970. How much will he get in euro?</div>
+                </div>
+                <div class="feedback-area" id="feedback-q10"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Click: <span style="color:#22c55e">●</span> Green = ✓ | <span style="color:#ef4444">●</span> Red = ✗ | Others = 2s Brownian chaos!
+        </div>
+    </div>
+    
+    <script>
+        function handleDotClick(event, questionId) {
+            const dot = event.target;
+            if (!dot.classList.contains('qdot')) return;
+            
+            const feedbackArea = document.getElementById('feedback-' + questionId);
+            feedbackArea.innerHTML = '';
+            
+            if (dot.classList.contains('green')) {
+                showGreenTick(feedbackArea);
+            } else if (dot.classList.contains('red')) {
+                showRedCross(feedbackArea);
+            } else {
+                // Blue or black - Brownian motion
+                const color = dot.classList.contains('blue') ? '#3b82f6' : '#1a1a1a';
+                startBrownianChaos(color, questionId);
+            }
+        }
+        
+        function showGreenTick(container) {
+            const tick = document.createElement('div');
+            tick.className = 'tick-container show';
+            
+            // Tick shape using 8 green dots
+            const positions = [
+                {x: 0, y: 25},
+                {x: 8, y: 33},
+                {x: 16, y: 41},
+                {x: 24, y: 33},
+                {x: 24, y: 25},
+                {x: 24, y: 17},
+                {x: 24, y: 9},
+                {x: 24, y: 1}
+            ];
+            
+            positions.forEach(pos => {
+                const tdot = document.createElement('div');
+                tdot.className = 'tdot';
+                tdot.style.left = pos.x + 'px';
+                tdot.style.top = pos.y + 'px';
+                tick.appendChild(tdot);
+            });
+            
+            container.appendChild(tick);
+        }
+        
+        function showRedCross(container) {
+            const cross = document.createElement('div');
+            cross.className = 'cross-container show';
+            
+            // X shape using 8 red dots
+            const positions = [
+                {x: 0, y: 0},
+                {x: 30, y: 0},
+                {x: 7, y: 7},
+                {x: 23, y: 7},
+                {x: 15, y: 15},
+                {x: 7, y: 23},
+                {x: 23, y: 23},
+                {x: 0, y: 30},
+                {x: 30, y: 30}
+            ];
+            
+            positions.forEach(pos => {
+                const xdot = document.createElement('div');
+                xdot.className = 'xdot';
+                xdot.style.left = pos.x + 'px';
+                xdot.style.top = pos.y + 'px';
+                cross.appendChild(xdot);
+            });
+            
+            container.appendChild(cross);
+        }
+        
+        function startBrownianChaos(color, questionId) {
+            const question = document.getElementById(questionId);
+            const qDots = question.querySelector('.q-dots');
+            const dots = qDots.querySelectorAll('.qdot');
+            const qRect = qDots.getBoundingClientRect();
+            
+            // Store original positions
+            const dotData = [];
+            dots.forEach((dot, i) => {
+                const rect = dot.getBoundingClientRect();
+                dotData.push({
+                    el: dot,
+                    originalLeft: dot.offsetLeft,
+                    originalTop: dot.offsetTop,
+                    x: rect.left,
+                    y: rect.top,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20
+                });
+                dot.style.position = 'fixed';
+                dot.style.left = rect.left + 'px';
+                dot.style.top = rect.top + 'px';
+                dot.style.zIndex = '9999';
+            });
+            
+            const startTime = Date.now();
+            const duration = 2000;
+            
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const remaining = duration - elapsed;
+                
+                if (remaining <= 0) {
+                    // Return to original positions
+                    dotData.forEach(d => {
+                        d.el.style.position = '';
+                        d.el.style.left = '';
+                        d.el.style.top = '';
+                        d.el.style.zIndex = '';
+                        d.el.style.transition = '';
+                    });
+                    return;
+                }
+                
+                const slowFactor = remaining < 500 ? remaining / 500 : 1;
+                
+                dotData.forEach(d => {
+                    // Brownian motion
+                    d.vx += (Math.random() - 0.5) * 5;
+                    d.vy += (Math.random() - 0.5) * 5;
+                    
+                    // Damping
+                    d.vx *= 0.96;
+                    d.vy *= 0.96;
+                    
+                    // Speed limit
+                    const maxSpeed = 15;
+                    d.vx = Math.max(-maxSpeed, Math.min(maxSpeed, d.vx));
+                    d.vy = Math.max(-maxSpeed, Math.min(maxSpeed, d.vy));
+                    
+                    // Update position
+                    d.x += d.vx * slowFactor;
+                    d.y += d.vy * slowFactor;
+                    
+                    // Bounce off edges
+                    if (d.x < 0) { d.x = 0; d.vx *= -1; }
+                    if (d.x > window.innerWidth - 14) { d.x = window.innerWidth - 14; d.vx *= -1; }
+                    if (d.y < 0) { d.y = 0; d.vy *= -1; }
+                    if (d.y > window.innerHeight - 14) { d.y = window.innerHeight - 14; d.vy *= -1; }
+                    
+                    // Pull back in last 500ms
+                    if (remaining < 500) {
+                        const targetX = qRect.left + d.originalLeft;
+                        const targetY = qRect.top + d.originalTop;
+                        const pullStrength = (500 - remaining) / 500 * 0.15;
+                        d.vx += (targetX - d.x) * pullStrength;
+                        d.vy += (targetY - d.y) * pullStrength;
+                    }
+                    
+                    d.el.style.left = d.x + 'px';
+                    d.el.style.top = d.y + 'px';
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+    </script>
+</body>
+</html>

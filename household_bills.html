@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16.4 Household Bills & 16.5 Ratio and Proportion</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h2 {
+            color: #4a5568;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        h3 {
+            color: #2d3748;
+            margin: 1.5rem 0 1rem;
+        }
+        .worked-example {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-left: 5px solid #0ea5e9;
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+        .worked-example h4 {
+            color: #0369a1;
+            margin-bottom: 1rem;
+        }
+        .solution {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        .solution h4 {
+            color: #059669;
+            margin-bottom: 1rem;
+        }
+        .step {
+            margin: 0.75rem 0;
+            padding-left: 1rem;
+            border-left: 3px solid #10b981;
+        }
+        .answer {
+            display: inline-block;
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #92400e;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid #cbd5e1;
+        }
+        th {
+            background: #0ea5e9;
+            color: white;
+        }
+        tr:nth-child(even) { background: #f1f5f9; }
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin: 1.5rem 0;
+        }
+        .tip {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 5px solid #f59e0b;
+            padding: 1rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1rem 0;
+        }
+        .tip strong { color: #92400e; }
+        .exercise {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .exercise h4 {
+            color: #065f46;
+            margin-bottom: 1rem;
+        }
+        .q-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .q-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #d1fae5;
+        }
+        .q-card strong { color: #047857; }
+        .formula {
+            background: #ede9fe;
+            border: 2px solid #8b5cf6;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .nav-tabs button {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            background: #e2e8f0;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .nav-tabs button.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .highlight { 
+            background: linear-gradient(90deg, #fef08a, #fde047);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Applied Arithmetic I</h1>
+        
+        <div class="section">
+            <div class="nav-tabs">
+                <button class="active" onclick="showTab('bills')">16.4 Household Bills</button>
+                <button onclick="showTab('ratio')">16.5 Ratio & Proportion</button>
+            </div>
+
+            <!-- HOUSEHOLD BILLS TAB -->
+            <div id="bills" class="tab-content active">
+                <h2>16.4 Household Bills</h2>
+                
+                <p>Utility bills (electricity, gas) have two components:</p>
+                <ul style="margin: 1rem 0 1rem 2rem;">
+                    <li><strong>Standing charge</strong> – fixed daily amount (pay regardless of usage)</li>
+                    <li><strong>Unit charge</strong> – cost per kWh of electricity used</li>
+                </ul>
+
+                <div class="formula">
+                    <strong>Total Cost</strong> = Standing Charge + (Units Used × Unit Rate) + VAT
+                </div>
+
+                <h3>Understanding the Standing Charge</h3>
+                <div class="chart-container">
+                    <canvas id="standingChargeChart"></canvas>
+                </div>
+                <p>The graph shows that even with <strong>zero usage</strong>, you still pay the standing charge (the y-intercept). The slope of the line is the unit rate.</p>
+
+                <div class="worked-example">
+                    <h4>Worked Example 16.9 – Electricity Bill</h4>
+                    <table>
+                        <tr><th>Meter No.</th><th>Present (kWh)</th><th>Previous (kWh)</th></tr>
+                        <tr><td>12345678</td><td>39,302</td><td>38,830</td></tr>
+                    </table>
+                    <table>
+                        <tr><th>Description</th><th>Units</th><th>Rate</th><th>Amount €</th></tr>
+                        <tr><td>Standing Charge</td><td>58 days</td><td>25.20c/day</td><td><em>B</em></td></tr>
+                        <tr><td>Electricity Used</td><td><em>A</em></td><td>14.10c/kWh</td><td><em>C</em></td></tr>
+                        <tr><td>Total excl. VAT</td><td colspan="2"></td><td><em>D</em></td></tr>
+                        <tr><td>VAT @ 13.5%</td><td colspan="2"></td><td><em>E</em></td></tr>
+                        <tr><td><strong>Invoice Total</strong></td><td colspan="2"></td><td><em>F</em></td></tr>
+                    </table>
+                </div>
+
+                <div class="solution">
+                    <h4>Solution</h4>
+                    <div class="step"><strong>Step 1:</strong> Units = 39,302 − 38,830 = <span class="answer">A = 472 kWh</span></div>
+                    <div class="step"><strong>Step 2:</strong> Standing = 58 × €0.252 = <span class="answer">B = €14.62</span></div>
+                    <div class="step">Electricity = 472 × €0.141 = <span class="answer">C = €66.55</span></div>
+                    <div class="step"><strong>Step 3:</strong> Total excl. VAT = €14.62 + €66.55 = <span class="answer">D = €81.17</span></div>
+                    <div class="step">VAT = €81.17 × 0.135 = <span class="answer">E = €10.96</span></div>
+                    <div class="step">Invoice = €81.17 + €10.96 = <span class="answer">F = €92.13</span></div>
+                </div>
+
+                <div class="worked-example">
+                    <h4>Worked Example 16.10 – Phone Bill</h4>
+                    <p>Paul's plan: €50/month (300 min, 200 texts included). Extra: 15c/min, 12c/text.</p>
+                    <p>December: 210 texts, 320 minutes. VAT = 21%.</p>
+                </div>
+
+                <div class="solution">
+                    <h4>Solution</h4>
+                    <table>
+                        <tr><td>Standing charge</td><td style="text-align:right;">€50.00</td></tr>
+                        <tr><td>Extra texts: 10 × €0.12</td><td style="text-align:right;">€1.20</td></tr>
+                        <tr><td>Extra calls: 20 × €0.15</td><td style="text-align:right;">€3.00</td></tr>
+                        <tr><td><strong>Total excl. VAT</strong></td><td style="text-align:right;"><strong>€54.20</strong></td></tr>
+                        <tr><td>VAT @ 21%</td><td style="text-align:right;">€11.38</td></tr>
+                        <tr><td><strong>Total incl. VAT</strong></td><td style="text-align:right;"><span class="answer">€65.58</span></td></tr>
+                    </table>
+                </div>
+
+                <div class="exercise">
+                    <h4>Exercise 16.4 – Solutions</h4>
+                    <div class="q-grid">
+                        <div class="q-card">
+                            <strong>Q1.</strong> Present = 65,490, Previous = 64,914<br>
+                            A = 576 kWh, B = €14.62, C = €81.22<br>
+                            D = €95.84, E = €12.94, <span class="answer">F = €108.78</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q2.</strong> 9,556 − 9,487 = 69 kWh<br>
+                            (i) <span class="answer">69 kWh</span> (ii) <span class="answer">€8.28</span><br>
+                            (iii) <span class="answer">€20.28</span> (iv) <span class="answer">€23.02</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q3.</strong> 10,004 − 8,754 = 1,250 kWh<br>
+                            (i) <span class="answer">1,250 kWh</span> (ii) <span class="answer">€150</span><br>
+                            (iii) <span class="answer">€162</span> (iv) <span class="answer">€183.87</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q4.</strong> Overseas 20 min @ 45c<br>
+                            (a) <span class="answer">€9.00</span> (b) <span class="answer">€74.00</span><br>
+                            (c) <span class="answer">€89.54</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q5.</strong> Network A: €28.00, Network B: €27.80<br>
+                            <span class="answer">Network B cheaper – Aaron correct</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q6.</strong> Graph: Mon €3.50, Tue €5.50, Wed €4.50, Thu €5.50, Fri €5.00<br>
+                            (a) <span class="answer">Tue & Thu</span> (b) <span class="answer">€4.50</span><br>
+                            (c) <span class="answer">Monday</span> (d) <span class="answer">€6.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RATIO TAB -->
+            <div id="ratio" class="tab-content">
+                <h2>16.5 Ratio and Proportion</h2>
+                
+                <p><strong>Ratios</strong> are used to divide or share quantities.</p>
+
+                <div class="section" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); margin: 1.5rem 0; border-left: 5px solid #f59e0b;">
+                    <h3 style="color: #92400e;">🔗 Connection to y = mx + c</h3>
+                    
+                    <p>Remember from coordinate geometry: <strong>y = mx + c</strong> describes a straight line where <em>m</em> is the slope and <em>c</em> is the y-intercept.</p>
+                    
+                    <p>Our electricity bill follows this pattern exactly:</p>
+                    <div class="formula" style="background: white;">
+                        Cost = <span class="highlight">0.141</span> × kWh + <span class="highlight">14.62</span><br>
+                        <small>y = m × x + c</small>
+                    </div>
+                    
+                    <p>But here's the <strong>big discovery</strong>: when c ≠ 0 (the line doesn't pass through the origin), we <strong>cannot</strong> use direct proportion with absolute values!</p>
+                </div>
+
+                <div class="worked-example" style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-left-color: #ef4444;">
+                    <h4 style="color: #b91c1c;">⚠️ Why Absolute Values Don't Work</h4>
+                    
+                    <p><strong>Situation:</strong> A streaming service charges a <strong>€10 standing fee</strong> plus <strong>€2 per unit</strong> (downloads/hours/etc.)</p>
+                    
+                    <p>Cost = 2 × units + 10</p>
+                    
+                    <table>
+                        <tr><th>Units</th><th>Cost (€)</th><th>Calculation</th></tr>
+                        <tr><td>4</td><td><strong>€18</strong></td><td>2 × 4 + 10 = 18</td></tr>
+                        <tr><td>12</td><td><strong>€34</strong></td><td>2 × 12 + 10 = 34</td></tr>
+                    </table>
+                    
+                    <p style="margin-top: 1rem;"><strong>Test for proportionality:</strong> Are these ratios equal?</p>
+                    
+                    <div class="formula" style="background: white;">
+                        <sup>34</sup>/<sub>12</sub> = 2.83... &nbsp;&nbsp;&nbsp; vs &nbsp;&nbsp;&nbsp; <sup>18</sup>/<sub>4</sub> = 4.5
+                    </div>
+                    
+                    <p style="color: #b91c1c; font-weight: bold;">2.83 ≠ 4.5 — NOT proportional!</p>
+                </div>
+
+                <div class="tip">
+                    <strong>💡 Cross-Multiplication Test (No Calculator Needed!)</strong><br><br>
+                    To check if <sup>a</sup>/<sub>b</sub> = <sup>c</sup>/<sub>d</sub>, compute the <strong>cross products</strong>:
+                    <div class="formula" style="background: white; margin: 1rem 0;">
+                        If a × d = b × c → Ratios are <strong>equal</strong> ✓<br>
+                        If a × d ≠ b × c → Ratios are <strong>not equal</strong> ✗
+                    </div>
+                    
+                    <p><strong>Our example:</strong> Is <sup>34</sup>/<sub>12</sub> = <sup>18</sup>/<sub>4</sub>?</p>
+                    <p>Cross multiply: 34 × 4 = <strong>136</strong> &nbsp;&nbsp; vs &nbsp;&nbsp; 12 × 18 = <strong>216</strong></p>
+                    <p>136 ≠ 216 → <strong>Not proportional!</strong></p>
+                </div>
+
+                <div class="section" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); margin: 1.5rem 0; border-left: 5px solid #10b981;">
+                    <h3 style="color: #065f46;">✅ The Solution: Use Relative Values</h3>
+                    
+                    <p>When the line doesn't pass through the origin, <strong>all is not lost!</strong> We can still find proportionality using <strong>changes</strong> (relative values) instead of absolute values.</p>
+                    
+                    <p><strong>Key insight:</strong> The <em>change</em> in cost is proportional to the <em>change</em> in units.</p>
+                    
+                    <table>
+                        <tr><th>Units</th><th>Cost (€)</th><th>Change in Units</th><th>Change in Cost</th></tr>
+                        <tr><td>4</td><td>€18</td><td>—</td><td>—</td></tr>
+                        <tr><td>12</td><td>€34</td><td>12 − 4 = <strong>8</strong></td><td>34 − 18 = <strong>€16</strong></td></tr>
+                    </table>
+                    
+                    <p style="margin-top: 1rem;"><strong>Check:</strong> €16 ÷ 8 units = <span class="answer">€2 per unit</span> ✓</p>
+                    
+                    <p>This matches our rate! The <strong>slope</strong> (m = 2) gives us the constant of proportionality for the <em>changes</em>.</p>
+                    
+                    <div class="formula" style="background: white;">
+                        <strong>Δy = m × Δx</strong><br>
+                        <small>Change in cost = rate × change in units</small>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <strong>📐 Summary: When is there Direct Proportion?</strong><br><br>
+                    <table>
+                        <tr><th>Line Type</th><th>Equation</th><th>Direct Proportion?</th></tr>
+                        <tr><td>Through origin</td><td>y = mx</td><td><span style="color: green; font-weight: bold;">Yes</span> — use absolute values</td></tr>
+                        <tr><td>Not through origin</td><td>y = mx + c (c ≠ 0)</td><td><span style="color: red; font-weight: bold;">No</span> — use relative values (changes)</td></tr>
+                    </table>
+                </div>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 2px dashed #cbd5e1;">
+
+                <div class="formula">
+                    Each share = <sup>parts</sup>/<sub>total parts</sub> × amount
+                </div>
+
+                <div class="tip">
+                    <strong>💡 Method:</strong> (1) Add ratio numbers to find total parts. (2) Calculate each share as a fraction of the total.
+                </div>
+
+                <div class="worked-example">
+                    <h4>Worked Example 16.11</h4>
+                    <p>A pizza has 14 slices, shared between Alan, Brian, and Ciara in ratio 2 : 2 : 3.</p>
+                </div>
+
+                <div class="solution">
+                    <h4>Solution</h4>
+                    <div class="step">Total parts = 2 + 2 + 3 = <span class="highlight">7</span></div>
+                    <div class="step">Alan: ²⁄₇ × 14 = <span class="answer">4 slices</span></div>
+                    <div class="step">Brian: ²⁄₇ × 14 = <span class="answer">4 slices</span></div>
+                    <div class="step">Ciara: ³⁄₇ × 14 = <span class="answer">6 slices</span></div>
+                </div>
+
+                <div class="worked-example">
+                    <h4>Worked Example 16.12</h4>
+                    <p>Jack (8) and Danny (10) share money in ratio of ages. Danny gets €60.</p>
+                    <p>(a) How much in the money box? (b) How much did Jack get?</p>
+                </div>
+
+                <div class="solution">
+                    <h4>Solution</h4>
+                    <div class="step">Ratio 8 : 10. Danny's 10 parts = €60 → 1 part = €6</div>
+                    <div class="step">(a) Total = 18 × €6 = <span class="answer">€108</span></div>
+                    <div class="step">(b) Jack = 8 × €6 = <span class="answer">€48</span></div>
+                </div>
+
+                <div class="worked-example">
+                    <h4>Worked Example 16.13 – Direct Proportion</h4>
+                    <p>Allie gets €12 for 2 hours of chores.</p>
+                </div>
+
+                <div class="solution">
+                    <h4>Solution</h4>
+                    <div class="step">Rate = €12 ÷ 2 = <span class="highlight">€6/hour</span></div>
+                    <div class="step">(a) 3 hours = 3 × €6 = <span class="answer">€18</span></div>
+                    <div class="step">(b) €36 ÷ €6 = <span class="answer">6 hours</span></div>
+                </div>
+
+                <h3>Value for Money</h3>
+                <div class="tip">
+                    <strong>💡 Method:</strong> Compare price per 100g (or per litre). Lower = better value.
+                </div>
+
+                <div class="worked-example">
+                    <h4>Worked Example 16.14</h4>
+                    <p>Biscuits: 140g for €1.50 vs 230g for €3.00</p>
+                </div>
+                <div class="solution">
+                    <h4>Solution</h4>
+                    <div class="step">140g pack: €1.50 ÷ 1.4 = <span class="highlight">€1.07/100g</span></div>
+                    <div class="step">230g pack: €3.00 ÷ 2.3 = <span class="highlight">€1.30/100g</span></div>
+                    <div class="step"><span class="answer">140g pack is better value</span></div>
+                </div>
+
+                <div class="worked-example">
+                    <h4>Worked Example 16.15</h4>
+                    <p>Pasta: 1kg fusilli €3.19 vs 750g shells €1.69</p>
+                </div>
+                <div class="solution">
+                    <h4>Solution</h4>
+                    <div class="step">Fusilli: €3.19 ÷ 10 = €0.32/100g</div>
+                    <div class="step">Shells: €1.69 ÷ 7.5 = €0.23/100g</div>
+                    <div class="step"><span class="answer">750g shells are better value</span></div>
+                </div>
+
+                <div class="exercise">
+                    <h4>Exercise 16.5 – Solutions</h4>
+                    <div class="q-grid">
+                        <div class="q-card">
+                            <strong>Q1.</strong> €4,500 in 6:9<br>
+                            <span class="answer">€1,800</span> and <span class="answer">€2,700</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q2.</strong> 156 kg in 8:5<br>
+                            <span class="answer">96 kg</span> and <span class="answer">60 kg</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q3.</strong> 90 m in 1:2:3<br>
+                            <span class="answer">15 m, 30 m, 45 m</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q4.</strong> 840 g in 5:1:1<br>
+                            <span class="answer">600 g, 120 g, 120 g</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q5.</strong> €180 in 4:4:1<br>
+                            <span class="answer">€80, €80, €20</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q6.</strong> €24 in 94:83:63<br>
+                            <span class="answer">€9.40, €8.30, €6.30</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q7.</strong> €45/hr × 3<br>
+                            <span class="answer">€135</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q8.</strong> €60 ÷ €15/hr<br>
+                            <span class="answer">4 hours</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q9.</strong> 5:2:1, shortest = 120cm<br>
+                            <span class="answer">600 cm, 240 cm, 120 cm</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q10.</strong> 3:2, Jane = 6 slices<br>
+                            (a) <span class="answer">10</span> (b) <span class="answer">4</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q11.</strong> 6:9, 180g sugar<br>
+                            Flour = <span class="answer">270 g</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q12.</strong> 9:4, youngest = €340<br>
+                            Total = <span class="answer">€1,105</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q13.</strong> Lemonade<br>
+                            <span class="answer">2L bottle better</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q14.</strong> Rice<br>
+                            <span class="answer">Basmati better</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q15.</strong> Cereal<br>
+                            <span class="answer">1kg box best</span>
+                        </div>
+                        <div class="q-card">
+                            <strong>Q16.</strong> Crisps<br>
+                            <span class="answer">Multipack better</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Standing charge chart
+        const ctx = document.getElementById('standingChargeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 11}, (_, i) => i * 50),
+                datasets: [
+                    {
+                        label: 'Standing Charge (€14.62)',
+                        data: Array(11).fill(14.62),
+                        borderColor: '#3b82f6',
+                        borderDash: [10, 5],
+                        borderWidth: 3,
+                        fill: false,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Total Cost = €14.62 + €0.141 × kWh',
+                        data: Array.from({length: 11}, (_, i) => 14.62 + 0.141 * i * 50),
+                        borderColor: '#ef4444',
+                        borderWidth: 3,
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Electricity Usage (kWh)', font: { size: 14 } }
+                    },
+                    y: {
+                        title: { display: true, text: 'Cost (€)', font: { size: 14 } },
+                        min: 0,
+                        max: 90
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
