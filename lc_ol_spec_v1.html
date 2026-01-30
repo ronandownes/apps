@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC Ordinary Level - Mr Downes Maths</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #1a1a1a; }
+
+        /* Header */
+        .topbar {
+            background: #e8e8e8;
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #22c55e, #3b82f6, #ef4444, #1a1a1a) 1;
+            position: sticky;
+            top: 0;
+            z-index: 300;
+        }
+        .topbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.15em;
+            color: #1a1a1a;
+            opacity: 0;
+            animation: textFadeIn 0.6s ease-out 0.1s forwards;
+        }
+        .tagline {
+            color: #555;
+            font-size: 0.9em;
+            opacity: 0;
+            animation: textFadeIn 0.6s ease-out 0.3s forwards;
+        }
+        @keyframes textFadeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .mark { display: flex; gap: 4px; }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: dotBounce 0.8s ease-out forwards;
+        }
+        .mark-left .dot:nth-child(1) { animation-delay: 0.5s; }
+        .mark-left .dot:nth-child(2) { animation-delay: 0.6s; }
+        .mark-left .dot:nth-child(3) { animation-delay: 0.7s; }
+        .mark-left .dot:nth-child(4) { animation-delay: 0.8s; }
+        .mark-right .dot:nth-child(1) { animation-delay: 0.9s; }
+        .mark-right .dot:nth-child(2) { animation-delay: 1.0s; }
+        .mark-right .dot:nth-child(3) { animation-delay: 1.1s; }
+        .mark-right .dot:nth-child(4) { animation-delay: 1.2s; }
+        @keyframes dotBounce {
+            0% { transform: translateY(-30px) scale(0.3); opacity: 0; }
+            25% { transform: translateY(8px) scale(1.2); opacity: 1; }
+            40% { transform: translateY(-12px) scale(0.9); }
+            55% { transform: translateY(5px) scale(1.05); }
+            70% { transform: translateY(-4px) scale(0.98); }
+            85% { transform: translateY(2px) scale(1.01); }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .dot.green { background: #22c55e; }
+        .dot.blue { background: #3b82f6; }
+        .dot.red { background: #ef4444; }
+        .dot.black { background: #1a1a1a; }
+
+        .lesson-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .lesson-input label { font-size: 0.9em; color: #444; font-weight: 600; }
+        .lesson-input input {
+            padding: 8px 14px;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            font-size: 1em;
+            width: 200px;
+            background: white;
+        }
+        .lesson-input input:focus { outline: none; border-color: #00a6a0; }
+        .level-badge {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: width 0.3s, margin-left 0.3s;
+        }
+        .sidebar.collapsed {
+            width: 0;
+            overflow: hidden;
+            border: none;
+        }
+        .sidebar-toggle {
+            position: fixed;
+            left: 10px;
+            top: 70px;
+            width: 36px;
+            height: 36px;
+            background: #00a6a0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 250;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: left 0.3s;
+        }
+        .sidebar-toggle:hover { background: #00b8b0; }
+        .sidebar:not(.collapsed) ~ .sidebar-toggle { left: 330px; }
+
+        /* Global controls */
+        .global-controls {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 8px;
+        }
+        .global-controls button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .global-controls .select-all-btn { background: #00a6a0; color: white; }
+        .global-controls .select-all-btn:hover { background: #00b8b0; }
+        .global-controls .clear-all-btn { background: #e0e0e0; color: #444; }
+        .global-controls .clear-all-btn:hover { background: #d0d0d0; }
+
+        .today-section {
+            background: #f0fafa;
+            border-bottom: 2px solid #00a6a0;
+            padding: 12px 15px;
+        }
+        .today-section h3 {
+            font-size: 0.85em;
+            color: #00a6a0;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .today-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 28px;
+        }
+        .today-tag {
+            background: #00a6a0;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        .today-empty { color: #999; font-size: 0.8em; font-style: italic; }
+
+        /* Strand sections */
+        .strand-section { border-bottom: 1px solid #eee; }
+        .strand-toggle {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            text-align: left;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .strand-toggle:hover { background: #fafafa; }
+        .strand-toggle .arrow { transition: transform 0.2s; font-size: 0.7em; color: #999; }
+        .strand-section.open .strand-toggle .arrow { transform: rotate(90deg); }
+        .strand-controls {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+            margin-right: 8px;
+        }
+        .strand-controls button {
+            background: #e8e8e8;
+            border: none;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            cursor: pointer;
+            color: #555;
+        }
+        .strand-controls button:hover { background: #ddd; }
+        .strand-items { display: none; padding: 5px 10px 10px; }
+        .strand-section.open .strand-items { display: block; }
+
+        .lo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            line-height: 1.35;
+        }
+        .lo-item:hover { background: #f5f5f5; }
+        .lo-item input { margin-top: 2px; accent-color: #00a6a0; }
+        .lo-item .code {
+            background: #e5e5e5;
+            color: #444;
+            padding: 2px 7px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .lo-item .text { color: #444; }
+
+        /* Main area */
+        .main {
+            flex: 1;
+            padding: 20px;
+            padding-left: 60px;
+            transition: padding-left 0.3s;
+        }
+        .sidebar.collapsed ~ .main { padding-left: 60px; }
+
+        /* Controls bar */
+        .controls-bar {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: sticky;
+            top: 60px;
+            z-index: 100;
+        }
+        .controls-left {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .btn {
+            background: #00a6a0;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: #00b8b0; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn.secondary { background: #e0e0e0; color: #444; }
+        .btn.secondary:hover { background: #d0d0d0; }
+        .btn.active { background: #007a75; }
+
+        .nav-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .controls-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .counter { font-size: 0.85em; color: #666; min-width: 70px; text-align: center; }
+
+        .strand-header-card {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-radius: 10px;
+            padding: 25px 30px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .strand-header-card h2 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+        .strand-header-card .count {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        body.overview-mode .today-section { display: none; }
+        body.overview-mode .strand-section { display: none; }
+
+        .toggle-label {
+            font-size: 0.8em;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .toggle-label input { accent-color: #00a6a0; }
+
+        /* Cards area */
+        .cards-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .lo-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px 18px;
+            flex: 1 1 300px;
+            max-width: 100%;
+            transition: all 0.3s;
+        }
+        .lo-card.hidden-blur {
+            filter: blur(8px);
+            opacity: 0.3;
+            user-select: none;
+        }
+        .lo-card.revealed { filter: none; opacity: 1; }
+        .lo-card .code-pill {
+            display: inline-block;
+            background: #e5e5e5;
+            color: #444;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        .lo-card .lo-text {
+            font-size: 1.15em;
+            line-height: 1.45;
+            color: #1a1a1a;
+        }
+        .lo-card .official {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.85em;
+            color: #888;
+            display: none;
+        }
+        body.show-official .lo-card .official { display: block; }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 60px 20px;
+            width: 100%;
+        }
+        .empty-state .icon { font-size: 3em; margin-bottom: 15px; }
+
+        /* Single slide mode */
+        body.slide-mode .cards-area { justify-content: center; }
+        body.slide-mode .lo-card { display: none; flex: none; width: 100%; max-width: 700px; }
+        body.slide-mode .lo-card.active { display: block; }
+        body.slide-mode .lo-card .lo-text { font-size: 1.6em; text-align: center; }
+        body.slide-mode .lo-card .code-pill { font-size: 1em; }
+
+        @media (max-width: 800px) {
+            .sidebar { position: fixed; left: 0; top: 56px; height: calc(100vh - 56px); z-index: 200; }
+            .sidebar.collapsed { margin-left: -320px; width: 320px; }
+            .main { padding-left: 20px; }
+            .lo-card { flex: 1 1 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="mark mark-left">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="brand-text">Mr Downes Maths</span>
+                <span class="mark mark-right">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="tagline">— Designed for learning on your terms</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span class="level-badge">LC Ordinary Level</span>
+                <div class="lesson-input">
+                    <label>Today's Lesson:</label>
+                    <input type="text" id="lessonTitle" placeholder="e.g. Differentiation">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="global-controls">
+                <button class="select-all-btn" onclick="selectAll()">✓ Select All</button>
+                <button class="clear-all-btn" onclick="clearAll()">✕ Clear All</button>
+            </div>
+
+            <div class="today-section">
+                <h3>📌 Today's Focus</h3>
+                <div class="today-tags" id="todayTags">
+                    <span class="today-empty">Select outcomes from strands below</span>
+                </div>
+            </div>
+
+            <!-- Strand 1: Stats & Probability -->
+            <div class="strand-section open">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    1. Statistics & Probability
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('stats')">All</button>
+                        <button onclick="clearStrand('stats')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="stats-items"></div>
+            </div>
+
+            <!-- Strand 2: Geometry & Trig -->
+            <div class="strand-section">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    2. Geometry & Trigonometry
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('geometry')">All</button>
+                        <button onclick="clearStrand('geometry')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="geometry-items"></div>
+            </div>
+
+            <!-- Strand 3: Number -->
+            <div class="strand-section">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    3. Number
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('number')">All</button>
+                        <button onclick="clearStrand('number')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="number-items"></div>
+            </div>
+
+            <!-- Strand 4: Algebra -->
+            <div class="strand-section">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    4. Algebra
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('algebra')">All</button>
+                        <button onclick="clearStrand('algebra')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="algebra-items"></div>
+            </div>
+
+            <!-- Strand 5: Functions -->
+            <div class="strand-section">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    5. Functions
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('functions')">All</button>
+                        <button onclick="clearStrand('functions')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="functions-items"></div>
+            </div>
+        </aside>
+
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
+
+        <main class="main">
+            <div class="controls-bar">
+                <div class="controls-left">
+                    <button class="btn" id="overviewBtn" onclick="toggleOverview()">📊 Overview</button>
+                    <button class="btn secondary" id="hideAllBtn" onclick="hideAll()">Hide All</button>
+                    <button class="btn secondary" id="showAllBtn" onclick="showAll()">Show All</button>
+                </div>
+                <div class="nav-controls">
+                    <button class="btn secondary" id="prevBtn" onclick="goPrev()">◀ Back</button>
+                    <span class="counter" id="counter">0 / 0</span>
+                    <button class="btn secondary" id="nextBtn" onclick="goNext()">Next ▶</button>
+                </div>
+                <div class="controls-right">
+                    <button class="btn secondary" id="slideModeBtn" onclick="toggleSlideMode()">Slide Mode</button>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="officialToggle" onchange="document.body.classList.toggle('show-official', this.checked)">
+                        Official wording
+                    </label>
+                </div>
+            </div>
+
+            <div class="cards-area" id="cardsArea">
+                <div class="empty-state">
+                    <div class="icon">📋</div>
+                    <p>Select learning outcomes from the sidebar, or use <strong>Overview</strong> to browse all strands</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const allLOs = {
+            stats: [
+                // 1.1 Counting
+                { code: '1.1a', text: 'Count the arrangements of n different objects (n!)', official: 'count the arrangements of n distinct objects (n!)' },
+                // 1.2 Concepts of probability
+                { code: '1.2a', text: 'Use set theory to discuss experiments, outcomes, and sample spaces', official: 'use set theory to discuss experiments, outcomes, sample spaces' },
+                { code: '1.2b', text: 'Discuss basic probability rules (AND/OR, mutually exclusive) using Venn diagrams', official: 'discuss basic rules of probability (AND/OR, mutually exclusive) through the use of Venn diagrams' },
+                { code: '1.2c', text: 'Calculate expected value and understand it doesn\'t have to be a possible outcome', official: 'calculate expected value and understand that this does not need to be one of the outcomes' },
+                { code: '1.2d', text: 'Recognise expected value in decision making and explore fair games', official: 'recognise the role of expected value in decision making and explore the issue of fair games' },
+                // 1.3 Outcomes of random processes
+                { code: '1.3a', text: 'Find the probability that two independent events both occur', official: 'find the probability that two independent events both occur' },
+                { code: '1.3b', text: 'Apply understanding of Bernoulli trials', official: 'apply an understanding of Bernoulli trials' },
+                { code: '1.3c', text: 'Solve problems involving up to 3 Bernoulli trials', official: 'solve problems involving up to 3 Bernoulli trials' },
+                // 1.4 Statistical reasoning
+                { code: '1.4a', text: 'Discuss populations and samples', official: 'discuss populations and samples' },
+                { code: '1.4b', text: 'Decide how far conclusions can be generalised', official: 'decide to what extent conclusions can be generalised' },
+                { code: '1.4c', text: 'Work with bivariate data (two variables)', official: 'work with different types of bivariate data' },
+                // 1.5 Finding, collecting, organising data
+                { code: '1.5a', text: 'Select a Simple Random Sample', official: 'select a sample (Simple Random Sample)' },
+                { code: '1.5b', text: 'Recognise representativeness to avoid biased samples', official: 'recognise the importance of representativeness so as to avoid biased samples' },
+                { code: '1.5c', text: 'Discuss different study types: surveys, observational studies, designed experiments', official: 'discuss different types of studies: sample surveys, observational studies and designed experiments' },
+                { code: '1.5d', text: 'Design a plan and collect data', official: 'design a plan and collect data on the basis of above knowledge' },
+                // 1.6 Representing data - Graphical
+                { code: '1.6a', text: 'Describe samples using appropriate graphical or numerical methods (univariate and bivariate)', official: 'describe the sample (both univariate and bivariate data) by selecting appropriate graphical or numerical methods' },
+                { code: '1.6b', text: 'Explore distribution of data: symmetry and skewness', official: 'explore the distribution of data, including concepts of symmetry and skewness' },
+                { code: '1.6c', text: 'Compare data sets using back-to-back stem and leaf plots', official: 'compare data sets using appropriate displays including back-to-back stem and leaf plots' },
+                { code: '1.6d', text: 'Use scatterplots to determine relationships between variables', official: 'determine the relationship between variables using scatterplots' },
+                { code: '1.6e', text: 'Recognise correlation is a value from −1 to +1 measuring linear relationship', official: 'recognise that correlation is a value from -1 to +1 and that it measures the extent of the linear relationship between two variables' },
+                { code: '1.6f', text: 'Match correlation coefficient values to scatterplots', official: 'match correlation coefficient values to appropriate scatterplots' },
+                { code: '1.6g', text: 'Understand that correlation does not imply causality', official: 'understand that correlation does not imply causality' },
+                // 1.6 Representing data - Numerical
+                { code: '1.6h', text: 'Recognise standard deviation and interquartile range as measures of spread', official: 'recognise standard deviation and interquartile range as measures of variability' },
+                { code: '1.6i', text: 'Use a calculator to find standard deviation', official: 'use a calculator to calculate standard deviation' },
+                { code: '1.6j', text: 'Find quartiles and the interquartile range', official: 'find quartiles and the interquartile range' },
+                { code: '1.6k', text: 'Use the interquartile range appropriately when analysing data', official: 'use the interquartile range appropriately when analysing data' },
+                { code: '1.6l', text: 'Recognise outliers in data', official: 'recognise the existence of outliers' },
+                // 1.7 Analysing, interpreting, drawing inferences
+                { code: '1.7a', text: 'Recognise how sampling variability affects statements about populations', official: 'recognise how sampling variability influences the use of sample information to make statements about the population' },
+                { code: '1.7b', text: 'Use appropriate tools to describe variability and draw inferences', official: 'use appropriate tools to describe variability drawing inferences about the population from the sample' },
+                { code: '1.7c', text: 'Interpret analysis and relate to the original question', official: 'interpret the analysis and relate the interpretation to the original question' },
+                { code: '1.7d', text: 'Interpret a histogram in terms of how data is distributed', official: 'interpret a histogram in terms of distribution of data' },
+                { code: '1.7e', text: 'Make decisions based on the empirical rule (68-95-99.7)', official: 'make decisions based on the empirical rule' },
+                { code: '1.7f', text: 'Recognise the concept of a hypothesis test', official: 'recognise the concept of a hypothesis test' },
+                { code: '1.7g', text: 'Calculate the margin of error for a population proportion', official: 'calculate the margin of error for a population proportion' },
+                { code: '1.7h', text: 'Conduct a hypothesis test on a population proportion using margin of error', official: 'conduct a hypothesis test on a population proportion using the margin of error' }
+            ],
+            geometry: [
+                // 2.1 Synthetic geometry
+                { code: '2.1a', text: 'Perform constructions 16-21', official: 'perform constructions 16-21 (see Geometry for Post-primary School Mathematics)' },
+                { code: '2.1b', text: 'Use terms: theorem, proof, axiom, corollary, converse, implies', official: 'use the following terms related to logic and deductive reasoning: theorem, proof, axiom, corollary, converse, implies' },
+                { code: '2.1c', text: 'Investigate and use theorems 7, 8, 11, 12, 13, 16, 17, 18, 20, 21 and corollary 6', official: 'investigate theorems 7, 8, 11, 12, 13, 16, 17, 18, 20, 21 and corollary 6 and use them to solve problems' },
+                // 2.2 Co-ordinate geometry
+                { code: '2.2a', text: 'Use slopes to show two lines are parallel or perpendicular', official: 'use slopes to show that two lines are parallel or perpendicular' },
+                { code: '2.2b', text: 'Recognise that ax + by + c = 0 represents a line', official: 'recognise the fact that the relationship ax + by + c = 0 is linear' },
+                { code: '2.2c', text: 'Solve problems involving slopes of lines', official: 'solve problems involving slopes of lines' },
+                { code: '2.2d', text: 'Calculate the area of a triangle using coordinates', official: 'calculate the area of a triangle' },
+                { code: '2.2e', text: 'Recognise (x−h)² + (y−k)² = r² as a circle with centre (h,k) and radius r', official: 'recognise that (x-h)² + (y-k)² = r² represents the relationship between the x and y co-ordinates of points on a circle with centre (h, k) and radius r' },
+                { code: '2.2f', text: 'Solve problems with a line and a circle centred at the origin', official: 'solve problems involving a line and a circle with centre (0, 0)' },
+                // 2.3 Trigonometry
+                { code: '2.3a', text: 'Use the theorem of Pythagoras to solve 2D problems', official: 'use of the theorem of Pythagoras to solve problems (2D only)' },
+                { code: '2.3b', text: 'Use trigonometry to calculate the area of a triangle', official: 'use trigonometry to calculate the area of a triangle' },
+                { code: '2.3c', text: 'Solve problems using the sine and cosine rules (2D)', official: 'solve problems using the sine and cosine rules (2D)' },
+                // 2.4 Transformation geometry
+                { code: '2.4a', text: 'Investigate enlargements and their effect on area (scale factor k)', official: 'investigate enlargements and their effect on area, paying attention to centre of enlargement and scale factor k where 0<k<1, k>1, k ∈ Q' },
+                { code: '2.4b', text: 'Solve problems involving enlargements', official: 'solve problems involving enlargements' }
+            ],
+            number: [
+                // 3.1 Number systems
+                { code: '3.1a', text: 'Recognise irrational numbers and understand that R ≠ Q', official: 'recognise irrational numbers and appreciate that R ≠ Q' },
+                { code: '3.1b', text: 'Work with irrational numbers', official: 'work with irrational numbers' },
+                { code: '3.1c', text: 'Revisit operations (+, −, ×, ÷) in ℕ, ℤ, ℚ, ℝ and represent on a number line', official: 'revisit the operations of addition, multiplication, subtraction and division in N, Z, Q, R and represent these numbers on a number line' },
+                { code: '3.1d', text: 'Develop understanding of decimals as equivalent fractions', official: 'develop decimals as special equivalent fractions strengthening the connection between these numbers and fraction and place-value understanding' },
+                { code: '3.1e', text: 'Consolidate understanding of factors, multiples, prime numbers', official: 'consolidate their understanding of factors, multiples, prime numbers in N' },
+                { code: '3.1f', text: 'Express numbers as products of prime factors', official: 'express numbers in terms of their prime factors' },
+                { code: '3.1g', text: 'Apply order of operations including brackets', official: 'appreciate the order of operations, including brackets' },
+                { code: '3.1h', text: 'Express numbers in standard form (a × 10ⁿ)', official: 'express non-zero positive rational numbers in the form a × 10ⁿ, where n ∈ Z and 1 ≤ a < 10 and perform arithmetic operations on numbers in this form' },
+                { code: '3.1i', text: 'Appreciate that processes can generate sequences', official: 'appreciate that processes can generate sequences of numbers or objects' },
+                { code: '3.1j', text: 'Investigate patterns among sequences', official: 'investigate patterns among these sequences' },
+                { code: '3.1k', text: 'Use patterns to continue sequences', official: 'use patterns to continue the sequence' },
+                { code: '3.1l', text: 'Generalise and explain patterns in algebraic form', official: 'generalise and explain patterns and relationships in algebraic form' },
+                { code: '3.1m', text: 'Recognise if a sequence is arithmetic, geometric, or neither', official: 'recognise whether a sequence is arithmetic, geometric or neither' },
+                { code: '3.1n', text: 'Find the sum to n terms of an arithmetic series', official: 'find the sum to n terms of an arithmetic series' },
+                // 3.2 Indices
+                { code: '3.2a', text: 'Use the rules for indices: aᵖ × aᵍ = aᵖ⁺ᵍ', official: 'solve problems using aᵖaᵍ = aᵖ⁺ᵍ' },
+                { code: '3.2b', text: 'Use the rules for indices: aᵖ ÷ aᵍ = aᵖ⁻ᵍ', official: 'solve problems using aᵖ/aᵍ = aᵖ⁻ᵍ' },
+                { code: '3.2c', text: 'Use the rules for indices: a⁰ = 1', official: 'solve problems using a⁰ = 1' },
+                { code: '3.2d', text: 'Use the rules for indices: (aᵖ)ᵍ = aᵖᵍ', official: 'solve problems using (aᵖ)ᵍ = aᵖᵍ' },
+                { code: '3.2e', text: 'Use the rules for indices: a^(1/q) = ᵍ√a', official: 'solve problems using fractional indices' },
+                { code: '3.2f', text: 'Use the rules for indices: a⁻ᵖ = 1/aᵖ', official: 'solve problems using negative indices' },
+                { code: '3.2g', text: 'Use the rules for indices: (ab)ᵖ = aᵖbᵖ', official: 'solve problems using (ab)ᵖ = aᵖbᵖ' },
+                // 3.3 Arithmetic
+                { code: '3.3a', text: 'Check results by estimation and working backwards; round off', official: 'check a result by considering whether it is of the right order of magnitude and by working the problem backwards; round off a result' },
+                { code: '3.3b', text: 'Accumulate error (addition/subtraction only)', official: 'accumulate error (by addition or subtraction only)' },
+                { code: '3.3c', text: 'Make estimates; calculate percentage error and tolerance', official: 'make and justify estimates and approximations of calculations; calculate percentage error and tolerance' },
+                { code: '3.3d', text: 'Calculate average rates of change (with respect to time)', official: 'calculate average rates of change (with respect to time)' },
+                { code: '3.3e', text: 'Solve problems: cost price, selling price, loss, discount, mark up, margin', official: 'solve problems that involve calculating cost price, selling price, loss, discount, mark up (profit as a % of cost price), margin (profit as a % of selling price)' },
+                { code: '3.3f', text: 'Solve problems: compound interest, depreciation, income tax, net pay', official: 'solve problems involving compound interest, depreciation (reducing balance method), income tax and net pay (including other deductions)' },
+                { code: '3.3g', text: 'Solve costing problems: materials, labour, wastage', official: 'solve problems involving costing: materials, labour and wastage' },
+                { code: '3.3h', text: 'Work with metric system, change of units, everyday imperial units', official: 'work with metric system; change of units; everyday imperial units (conversion factors provided for imperial units)' },
+                { code: '3.3i', text: 'Make estimates of measures in the physical world', official: 'make estimates of measures in the physical world around them' },
+                // 3.4 Length, area, volume
+                { code: '3.4a', text: 'Investigate nets of prisms, cylinders and cones', official: 'investigate the nets of prisms, cylinders and cones' },
+                { code: '3.4b', text: 'Solve problems involving perimeter and area of plane figures', official: 'solve problems involving the length of the perimeter and the area of plane figures: disc, triangle, rectangle, square, parallelogram, trapezium, sectors of discs, and figures made from combinations of these' },
+                { code: '3.4c', text: 'Solve problems involving surface area and volume of solids', official: 'solve problems involving surface area and volume of the following solid figures: rectangular block, cylinder, right cone, triangular-based prism (right angle, isosceles and equilateral), sphere, hemisphere, and solids made from combinations of these' },
+                { code: '3.4d', text: 'Use the trapezoidal rule to approximate area', official: 'use the trapezoidal rule to approximate area' }
+            ],
+            algebra: [
+                // 4.1 Expressions
+                { code: '4.1a', text: 'Evaluate expressions given the value of variables', official: 'evaluate expressions given the value of the variables' },
+                { code: '4.1b', text: 'Expand and regroup expressions', official: 'expand and re-group expressions' },
+                { code: '4.1c', text: 'Factorise quadratic expressions', official: 'factorise expressions of order 2' },
+                { code: '4.1d', text: 'Add and subtract linear and quadratic expressions', official: 'add and subtract expressions of the form (ax+by+c)±(dx+ey+f) and (ax²+bx+c)±(dx²+ex+f)' },
+                { code: '4.1e', text: 'Add and subtract algebraic fractions', official: 'add and subtract expressions of the form a/(bx+c) ± p/(qx+r)' },
+                { code: '4.1f', text: 'Use distributive property: a(bx±cy±d)', official: 'use the associative and distributive properties to simplify expressions of the form a(bx±cy±d)±…±e(fx±gy±h)' },
+                { code: '4.1g', text: 'Multiply two brackets: (x±y)(w±z)', official: 'use the distributive property to simplify (x±y)(w±z)' },
+                { code: '4.1h', text: 'Rearrange formulae', official: 'rearrange formulae' },
+                // 4.2 Solving equations
+                { code: '4.2a', text: 'Solve linear equations: ax + b = cx + d', official: 'find solutions to f(x) = g(x), with f(x) = ax+b, g(x) = cx+d' },
+                { code: '4.2b', text: 'Solve equations with algebraic fractions', official: 'find solutions to equations involving algebraic fractions' },
+                { code: '4.2c', text: 'Solve quadratic equations (not necessarily factorisable)', official: 'find solutions to f(x) = k with f(x) = ax² + bx + c (and not necessarily factorisable)' },
+                { code: '4.2d', text: 'Solve simultaneous linear equations (2 unknowns)', official: 'find solutions to simultaneous linear equations with two unknowns and interpret the results' },
+                { code: '4.2e', text: 'Solve one linear and one quadratic equation (2 unknowns)', official: 'find solutions to one linear equation and one equation of order 2 with two unknowns (restricted to the case where either the coefficient of x or the coefficient of y is ± 1 in the linear equation)' },
+                { code: '4.2f', text: 'Form quadratic equations given whole number roots', official: 'form quadratic equations given whole number roots' },
+                // 4.3 Inequalities
+                { code: '4.3a', text: 'Solve linear inequalities: ax + b < k, ≤, >, ≥', official: 'find solutions to inequalities of the form g(x) ≤ k, g(x) ≥ k, g(x) < k, g(x) > k, where g(x) = ax + b' },
+                { code: '4.3b', text: 'Use absolute value notation |x|', official: 'use notation |x|' }
+            ],
+            functions: [
+                // 5.1 Functions
+                { code: '5.1a', text: 'Recognise that a function assigns a unique output to each input', official: 'recognise that a function assigns a unique output to a given input' },
+                { code: '5.1b', text: 'Form composite functions', official: 'form composite functions' },
+                { code: '5.1c', text: 'Graph linear functions: y = ax + b', official: 'graph functions of the form ax+b where a,b ∈ Q, x ∈ R' },
+                { code: '5.1d', text: 'Graph quadratic functions: y = ax² + bx + c', official: 'graph functions of the form ax²+bx+c where a,b,c ∈ Z, x ∈ R' },
+                { code: '5.1e', text: 'Graph cubic functions: y = ax³ + bx² + cx + d', official: 'graph functions of the form ax³+bx²+cx+d where a,b,c,d ∈ Z, x ∈ R' },
+                { code: '5.1f', text: 'Graph exponential functions: y = a·bˣ', official: 'graph functions of the form abˣ where a ∈ N, b, x ∈ R' },
+                { code: '5.1g', text: 'Interpret f(x) = g(x) as comparing functions', official: 'interpret equations of the form f(x) = g(x) as a comparison of the above functions' },
+                { code: '5.1h', text: 'Use graphs to find approximate solutions to f(x) = 0, f(x) = k, f(x) = g(x)', official: 'use graphical methods to find approximate solutions to f(x) = 0, f(x) = k, f(x) = g(x) where f(x) and g(x) are of the above form' },
+                { code: '5.1i', text: 'Investigate the concept of limit of a function', official: 'investigate the concept of the limit of a function' },
+                // 5.2 Calculus
+                { code: '5.2a', text: 'Find first and second derivatives of linear, quadratic, cubic functions by rule', official: 'find first and second derivatives of linear, quadratic and cubic functions by rule' },
+                { code: '5.2b', text: 'Associate derivatives with slopes and tangent lines', official: 'associate derivatives with slopes and tangent lines' },
+                { code: '5.2c', text: 'Apply differentiation to rates of change', official: 'apply differentiation to rates of change' },
+                { code: '5.2d', text: 'Apply differentiation to find maxima and minima', official: 'apply differentiation to maxima and minima' },
+                { code: '5.2e', text: 'Apply differentiation to curve sketching', official: 'apply differentiation to curve sketching' }
+            ]
+        };
+
+        let selected = [];
+        let revealIndex = 0;
+        let slideMode = false;
+        let currentSlideIndex = 0;
+        let overviewMode = false;
+        let overviewStrandIndex = 0;
+        const strandNames = ['stats', 'geometry', 'number', 'algebra', 'functions'];
+        const strandTitles = {
+            stats: 'Strand 1: Statistics & Probability',
+            geometry: 'Strand 2: Geometry & Trigonometry',
+            number: 'Strand 3: Number',
+            algebra: 'Strand 4: Algebra',
+            functions: 'Strand 5: Functions'
+        };
+
+        function buildCheckboxes() {
+            for (const [strand, items] of Object.entries(allLOs)) {
+                const container = document.getElementById(`${strand}-items`);
+                items.forEach((lo, i) => {
+                    const div = document.createElement('label');
+                    div.className = 'lo-item';
+                    div.innerHTML = `
+                        <input type="checkbox" data-strand="${strand}" data-index="${i}">
+                        <span class="code">${lo.code}</span>
+                        <span class="text">${lo.text}</span>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            document.querySelectorAll('.lo-item input').forEach(cb => {
+                cb.addEventListener('change', updateSelection);
+            });
+        }
+
+        function updateSelection() {
+            selected = [];
+            document.querySelectorAll('.lo-item input:checked').forEach(cb => {
+                const strand = cb.dataset.strand;
+                const index = parseInt(cb.dataset.index);
+                selected.push(allLOs[strand][index]);
+            });
+            updateTodayTags();
+            if (!overviewMode) {
+                buildCards();
+            }
+            revealIndex = 0;
+            currentSlideIndex = 0;
+            updateCounter();
+        }
+
+        function updateTodayTags() {
+            const container = document.getElementById('todayTags');
+            if (selected.length === 0) {
+                container.innerHTML = '<span class="today-empty">Select outcomes from strands below</span>';
+            } else if (selected.length <= 8) {
+                container.innerHTML = selected.map(lo => `<span class="today-tag">${lo.code}</span>`).join('');
+            } else {
+                container.innerHTML = `<span class="today-tag">${selected.length} outcomes selected</span>`;
+            }
+        }
+
+        function buildCards() {
+            const area = document.getElementById('cardsArea');
+            if (selected.length === 0) {
+                area.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>Select learning outcomes from the sidebar, or use <strong>Overview</strong> to browse all strands</p></div>`;
+                return;
+            }
+            area.innerHTML = selected.map((lo, i) => `
+                <div class="lo-card revealed ${i === 0 ? 'active' : ''}" data-index="${i}">
+                    <span class="code-pill">${lo.code}</span>
+                    <p class="lo-text">${lo.text}</p>
+                    <p class="official">${lo.official}</p>
+                </div>
+            `).join('');
+            revealIndex = selected.length;
+        }
+
+        function toggleOverview() {
+            overviewMode = !overviewMode;
+            document.body.classList.toggle('overview-mode', overviewMode);
+            document.getElementById('overviewBtn').classList.toggle('active', overviewMode);
+            document.getElementById('overviewBtn').textContent = overviewMode ? '✕ Exit Overview' : '📊 Overview';
+            
+            if (overviewMode) {
+                overviewStrandIndex = 0;
+                showOverviewStrand();
+            } else {
+                buildCards();
+                updateCounter();
+            }
+        }
+
+        function showOverviewStrand() {
+            const strandKey = strandNames[overviewStrandIndex];
+            const items = allLOs[strandKey];
+            const area = document.getElementById('cardsArea');
+            
+            area.innerHTML = `
+                <div class="strand-header-card">
+                    <h2>${strandTitles[strandKey]}</h2>
+                    <div class="count">${items.length} learning outcomes</div>
+                </div>
+                ${items.map((lo, i) => `
+                    <div class="lo-card revealed" data-index="${i}">
+                        <span class="code-pill">${lo.code}</span>
+                        <p class="lo-text">${lo.text}</p>
+                        <p class="official">${lo.official}</p>
+                    </div>
+                `).join('')}
+            `;
+            
+            document.getElementById('counter').textContent = `Strand ${overviewStrandIndex + 1} / ${strandNames.length}`;
+        }
+
+        function hideAll() {
+            document.querySelectorAll('.lo-card').forEach(card => {
+                card.classList.add('hidden-blur');
+                card.classList.remove('revealed', 'active');
+            });
+            revealIndex = 0;
+            currentSlideIndex = 0;
+            updateCounter();
+        }
+
+        function showAll() {
+            document.querySelectorAll('.lo-card').forEach((card, i) => {
+                card.classList.remove('hidden-blur');
+                card.classList.add('revealed');
+                if (i === 0) card.classList.add('active');
+            });
+            revealIndex = selected.length;
+            updateCounter();
+        }
+
+        function goNext() {
+            if (overviewMode) {
+                if (overviewStrandIndex < strandNames.length - 1) {
+                    overviewStrandIndex++;
+                    showOverviewStrand();
+                }
+            } else if (slideMode) {
+                const cards = document.querySelectorAll('.lo-card');
+                if (currentSlideIndex < selected.length - 1) {
+                    cards[currentSlideIndex].classList.remove('active');
+                    currentSlideIndex++;
+                    cards[currentSlideIndex].classList.add('active');
+                    cards[currentSlideIndex].classList.remove('hidden-blur');
+                    cards[currentSlideIndex].classList.add('revealed');
+                }
+                updateCounter();
+            } else {
+                const cards = document.querySelectorAll('.lo-card');
+                if (revealIndex < cards.length) {
+                    cards[revealIndex].classList.remove('hidden-blur');
+                    cards[revealIndex].classList.add('revealed');
+                    revealIndex++;
+                }
+                updateCounter();
+            }
+        }
+
+        function goPrev() {
+            if (overviewMode) {
+                if (overviewStrandIndex > 0) {
+                    overviewStrandIndex--;
+                    showOverviewStrand();
+                }
+            } else if (slideMode) {
+                const cards = document.querySelectorAll('.lo-card');
+                if (currentSlideIndex > 0) {
+                    cards[currentSlideIndex].classList.remove('active');
+                    currentSlideIndex--;
+                    cards[currentSlideIndex].classList.add('active');
+                }
+                updateCounter();
+            }
+        }
+
+        function updateCounter() {
+            const total = selected.length;
+            if (overviewMode) {
+                document.getElementById('counter').textContent = `Strand ${overviewStrandIndex + 1} / ${strandNames.length}`;
+            } else if (slideMode) {
+                document.getElementById('counter').textContent = total > 0 ? `${currentSlideIndex + 1} / ${total}` : '0 / 0';
+            } else {
+                document.getElementById('counter').textContent = `${revealIndex} / ${total}`;
+            }
+        }
+
+        function toggleSlideMode() {
+            slideMode = !slideMode;
+            document.body.classList.toggle('slide-mode', slideMode);
+            document.getElementById('slideModeBtn').classList.toggle('active', slideMode);
+            document.getElementById('slideModeBtn').textContent = slideMode ? 'Cards Mode' : 'Slide Mode';
+            
+            if (slideMode) {
+                currentSlideIndex = 0;
+                document.querySelectorAll('.lo-card').forEach((card, i) => {
+                    card.classList.toggle('active', i === 0);
+                });
+            }
+            updateCounter();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('sidebarToggle').textContent = 
+                document.getElementById('sidebar').classList.contains('collapsed') ? '☰' : '✕';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                goNext();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                goPrev();
+            }
+        });
+
+        function selectAll() {
+            document.querySelectorAll('.lo-item input').forEach(cb => cb.checked = true);
+            updateSelection();
+        }
+
+        function clearAll() {
+            document.querySelectorAll('.lo-item input').forEach(cb => cb.checked = false);
+            updateSelection();
+        }
+
+        function selectStrand(strand) {
+            document.querySelectorAll(`.lo-item input[data-strand="${strand}"]`).forEach(cb => cb.checked = true);
+            updateSelection();
+        }
+
+        function clearStrand(strand) {
+            document.querySelectorAll(`.lo-item input[data-strand="${strand}"]`).forEach(cb => cb.checked = false);
+            updateSelection();
+        }
+
+        buildCheckboxes();
+        updateSelection();
+    </script>
+</body>
+</html>

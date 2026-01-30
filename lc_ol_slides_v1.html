@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC Ordinary Level - Mr Downes Maths</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f5f5f5; 
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: #e8e8e8;
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #22c55e, #3b82f6, #ef4444, #1a1a1a) 1;
+        }
+        .topbar-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand { display: flex; align-items: center; gap: 8px; }
+        .brand-text { font-weight: 700; font-size: 1.15em; color: #1a1a1a; }
+        .tagline { color: #555; font-size: 0.9em; }
+        .mark { display: flex; gap: 4px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot.green { background: #22c55e; }
+        .dot.blue { background: #3b82f6; }
+        .dot.red { background: #ef4444; }
+        .dot.black { background: #1a1a1a; }
+        .level-badge {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .main {
+            flex: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .slide {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+            min-height: 400px;
+        }
+        .slide-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        .slide-header h2 { font-size: 1.3em; color: #333; }
+        .slide-header .subtitle { font-size: 0.9em; color: #666; margin-top: 4px; }
+
+        .lo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            transition: all 0.2s;
+        }
+        .lo-item:hover { background: #f0f0f0; }
+        .lo-item.ticked { background: #e8f5f5; border-color: #00a6a0; }
+        .lo-item input[type="checkbox"] {
+            width: 20px; height: 20px; margin-top: 2px;
+            accent-color: #00a6a0; cursor: pointer; flex-shrink: 0;
+        }
+        .lo-item .code {
+            background: #e0e0e0; color: #444;
+            padding: 3px 10px; border-radius: 10px;
+            font-size: 0.8em; font-weight: 600;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .lo-item.ticked .code { background: #00a6a0; color: white; }
+        .lo-item .text { font-size: 1.05em; line-height: 1.5; color: #333; }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .btn {
+            background: #00a6a0; color: white; border: none;
+            padding: 10px 20px; border-radius: 6px; cursor: pointer;
+            font-weight: 600; font-size: 0.95em; transition: all 0.2s;
+        }
+        .btn:hover { background: #00b8b0; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn.secondary { background: #e0e0e0; color: #444; }
+        .btn.secondary:hover { background: #d0d0d0; }
+        .page-info { font-size: 1em; color: #666; font-weight: 600; }
+
+        .clipboard-bar {
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .clipboard-bar .label { font-weight: 600; color: #00a6a0; font-size: 0.9em; }
+        .clipboard-bar .ticked-codes { flex: 1; font-size: 0.85em; color: #555; }
+        .clipboard-bar .ticked-codes span {
+            display: inline-block; background: #00a6a0; color: white;
+            padding: 2px 8px; border-radius: 10px; margin: 2px 4px 2px 0; font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="mark">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="brand-text">Mr Downes Maths</span>
+                <span class="tagline">— Designed for learning on your terms</span>
+            </div>
+            <span class="level-badge">LC Ordinary Level</span>
+        </div>
+    </header>
+
+    <div class="main">
+        <div class="slide" id="slide"></div>
+        <div class="nav-bar">
+            <button class="btn secondary" id="prevBtn" onclick="prevSlide()">◀ Back</button>
+            <span class="page-info" id="pageInfo">1 / 1</span>
+            <button class="btn secondary" id="nextBtn" onclick="nextSlide()">Next ▶</button>
+        </div>
+        <div class="clipboard-bar">
+            <span class="label">📋 Ticked:</span>
+            <div class="ticked-codes" id="tickedCodes">None</div>
+            <button class="btn" onclick="copyTicked()">Copy</button>
+        </div>
+    </div>
+
+    <script>
+        const slides = [
+            // STRAND 1: STATISTICS & PROBABILITY
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Counting & Probability Basics', items: [
+                { code: '1.1a', text: 'Count the arrangements of n distinct objects (n!)' },
+                { code: '1.2a', text: 'Use set theory to discuss experiments, outcomes, sample spaces' },
+                { code: '1.2b', text: 'Discuss probability rules (AND/OR, mutually exclusive) using Venn diagrams' },
+                { code: '1.2c', text: 'Calculate expected value and understand it doesn\'t have to be an outcome' }
+            ]},
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Expected Value & Bernoulli Trials', items: [
+                { code: '1.2d', text: 'Recognise expected value in decision making; explore fair games' },
+                { code: '1.3a', text: 'Find the probability that two independent events both occur' },
+                { code: '1.3b', text: 'Apply understanding of Bernoulli trials' },
+                { code: '1.3c', text: 'Solve problems involving up to 3 Bernoulli trials' }
+            ]},
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Data Collection', items: [
+                { code: '1.4a', text: 'Discuss populations and samples' },
+                { code: '1.4b', text: 'Decide how far conclusions can be generalised' },
+                { code: '1.4c', text: 'Work with bivariate data (two variables)' },
+                { code: '1.5a', text: 'Select a Simple Random Sample' }
+            ]},
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Study Types', items: [
+                { code: '1.5b', text: 'Recognise representativeness to avoid biased samples' },
+                { code: '1.5c', text: 'Discuss study types: surveys, observational studies, designed experiments' },
+                { code: '1.5d', text: 'Design a plan and collect data' }
+            ]},
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Graphical Representation', items: [
+                { code: '1.6a', text: 'Describe samples using appropriate graphical or numerical methods' },
+                { code: '1.6b', text: 'Explore distribution: symmetry and skewness' },
+                { code: '1.6c', text: 'Compare data sets using back-to-back stem and leaf plots' },
+                { code: '1.6d', text: 'Use scatterplots to determine relationships between variables' }
+            ]},
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Correlation', items: [
+                { code: '1.6e', text: 'Recognise correlation is a value from −1 to +1 measuring linear relationship' },
+                { code: '1.6f', text: 'Match correlation coefficient values to scatterplots' },
+                { code: '1.6g', text: 'Understand that correlation does not imply causality' }
+            ]},
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Numerical Measures', items: [
+                { code: '1.6h', text: 'Recognise standard deviation and IQR as measures of spread' },
+                { code: '1.6i', text: 'Use a calculator to find standard deviation' },
+                { code: '1.6j', text: 'Find quartiles and the interquartile range' },
+                { code: '1.6k', text: 'Use IQR appropriately when analysing data' }
+            ]},
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Inference & Hypothesis Testing', items: [
+                { code: '1.6l', text: 'Recognise outliers in data' },
+                { code: '1.7a', text: 'Recognise how sampling variability affects statements about populations' },
+                { code: '1.7b', text: 'Use tools to describe variability and draw inferences' },
+                { code: '1.7c', text: 'Interpret analysis and relate to the original question' }
+            ]},
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Empirical Rule & Margin of Error', items: [
+                { code: '1.7d', text: 'Interpret a histogram in terms of data distribution' },
+                { code: '1.7e', text: 'Make decisions based on the empirical rule (68-95-99.7)' },
+                { code: '1.7f', text: 'Recognise the concept of a hypothesis test' },
+                { code: '1.7g', text: 'Calculate margin of error for a population proportion' }
+            ]},
+            { title: 'Strand 1: Statistics & Probability', subtitle: 'Hypothesis Testing', items: [
+                { code: '1.7h', text: 'Conduct a hypothesis test on a population proportion using margin of error' }
+            ]},
+
+            // STRAND 2: GEOMETRY & TRIGONOMETRY
+            { title: 'Strand 2: Geometry & Trigonometry', subtitle: 'Synthetic Geometry', items: [
+                { code: '2.1a', text: 'Perform constructions 16-21' },
+                { code: '2.1b', text: 'Use terms: theorem, proof, axiom, corollary, converse, implies' },
+                { code: '2.1c', text: 'Investigate and use theorems 7, 8, 11, 12, 13, 16, 17, 18, 20, 21 and corollary 6' }
+            ]},
+            { title: 'Strand 2: Geometry & Trigonometry', subtitle: 'Coordinate Geometry - Lines', items: [
+                { code: '2.2a', text: 'Use slopes to show two lines are parallel or perpendicular' },
+                { code: '2.2b', text: 'Recognise that ax + by + c = 0 represents a line' },
+                { code: '2.2c', text: 'Solve problems involving slopes of lines' },
+                { code: '2.2d', text: 'Calculate the area of a triangle using coordinates' }
+            ]},
+            { title: 'Strand 2: Geometry & Trigonometry', subtitle: 'Coordinate Geometry - Circles', items: [
+                { code: '2.2e', text: 'Recognise (x−h)² + (y−k)² = r² as a circle with centre (h,k) and radius r' },
+                { code: '2.2f', text: 'Solve problems with a line and a circle centred at the origin' }
+            ]},
+            { title: 'Strand 2: Geometry & Trigonometry', subtitle: 'Trigonometry', items: [
+                { code: '2.3a', text: 'Use the theorem of Pythagoras to solve 2D problems' },
+                { code: '2.3b', text: 'Use trigonometry to calculate the area of a triangle' },
+                { code: '2.3c', text: 'Solve problems using the sine and cosine rules (2D)' }
+            ]},
+            { title: 'Strand 2: Geometry & Trigonometry', subtitle: 'Transformations', items: [
+                { code: '2.4a', text: 'Investigate enlargements and their effect on area (scale factor k)' },
+                { code: '2.4b', text: 'Solve problems involving enlargements' }
+            ]},
+
+            // STRAND 3: NUMBER
+            { title: 'Strand 3: Number', subtitle: 'Number Systems', items: [
+                { code: '3.1a', text: 'Recognise irrational numbers and understand that ℝ ≠ ℚ' },
+                { code: '3.1b', text: 'Work with irrational numbers' },
+                { code: '3.1c', text: 'Revisit operations (+, −, ×, ÷) in ℕ, ℤ, ℚ, ℝ and represent on number line' },
+                { code: '3.1d', text: 'Develop understanding of decimals as equivalent fractions' }
+            ]},
+            { title: 'Strand 3: Number', subtitle: 'Factors & Prime Numbers', items: [
+                { code: '3.1e', text: 'Consolidate understanding of factors, multiples, prime numbers' },
+                { code: '3.1f', text: 'Express numbers as products of prime factors' },
+                { code: '3.1g', text: 'Apply order of operations including brackets' },
+                { code: '3.1h', text: 'Express numbers in standard form (a × 10ⁿ)' }
+            ]},
+            { title: 'Strand 3: Number', subtitle: 'Sequences', items: [
+                { code: '3.1i', text: 'Appreciate that processes can generate sequences' },
+                { code: '3.1j', text: 'Investigate patterns among sequences' },
+                { code: '3.1k', text: 'Use patterns to continue sequences' },
+                { code: '3.1l', text: 'Generalise and explain patterns in algebraic form' }
+            ]},
+            { title: 'Strand 3: Number', subtitle: 'Arithmetic Sequences', items: [
+                { code: '3.1m', text: 'Recognise if a sequence is arithmetic, geometric, or neither' },
+                { code: '3.1n', text: 'Find the sum to n terms of an arithmetic series' }
+            ]},
+            { title: 'Strand 3: Number', subtitle: 'Indices (Part 1)', items: [
+                { code: '3.2a', text: 'Use the rules for indices: aᵖ × aᵍ = aᵖ⁺ᵍ' },
+                { code: '3.2b', text: 'Use the rules for indices: aᵖ ÷ aᵍ = aᵖ⁻ᵍ' },
+                { code: '3.2c', text: 'Use the rules for indices: a⁰ = 1' },
+                { code: '3.2d', text: 'Use the rules for indices: (aᵖ)ᵍ = aᵖᵍ' }
+            ]},
+            { title: 'Strand 3: Number', subtitle: 'Indices (Part 2)', items: [
+                { code: '3.2e', text: 'Use the rules for indices: a^(1/q) = ᵍ√a' },
+                { code: '3.2f', text: 'Use the rules for indices: a⁻ᵖ = 1/aᵖ' },
+                { code: '3.2g', text: 'Use the rules for indices: (ab)ᵖ = aᵖbᵖ' }
+            ]},
+            { title: 'Strand 3: Number', subtitle: 'Arithmetic - Estimation', items: [
+                { code: '3.3a', text: 'Check results by estimation and working backwards; round off' },
+                { code: '3.3b', text: 'Accumulate error (addition/subtraction only)' },
+                { code: '3.3c', text: 'Make estimates; calculate percentage error and tolerance' },
+                { code: '3.3d', text: 'Calculate average rates of change (with respect to time)' }
+            ]},
+            { title: 'Strand 3: Number', subtitle: 'Arithmetic - Financial', items: [
+                { code: '3.3e', text: 'Solve problems: cost price, selling price, loss, discount, mark up, margin' },
+                { code: '3.3f', text: 'Solve problems: compound interest, depreciation, income tax, net pay' },
+                { code: '3.3g', text: 'Solve costing problems: materials, labour, wastage' }
+            ]},
+            { title: 'Strand 3: Number', subtitle: 'Units & Measurement', items: [
+                { code: '3.3h', text: 'Work with metric system, change of units, everyday imperial units' },
+                { code: '3.3i', text: 'Make estimates of measures in the physical world' }
+            ]},
+            { title: 'Strand 3: Number', subtitle: 'Length, Area & Volume', items: [
+                { code: '3.4a', text: 'Investigate nets of prisms, cylinders and cones' },
+                { code: '3.4b', text: 'Solve problems involving perimeter and area of plane figures' },
+                { code: '3.4c', text: 'Solve problems involving surface area and volume of solids' },
+                { code: '3.4d', text: 'Use the trapezoidal rule to approximate area' }
+            ]},
+
+            // STRAND 4: ALGEBRA
+            { title: 'Strand 4: Algebra', subtitle: 'Expressions (Part 1)', items: [
+                { code: '4.1a', text: 'Evaluate expressions given the value of variables' },
+                { code: '4.1b', text: 'Expand and regroup expressions' },
+                { code: '4.1c', text: 'Factorise quadratic expressions' },
+                { code: '4.1d', text: 'Add and subtract linear and quadratic expressions' }
+            ]},
+            { title: 'Strand 4: Algebra', subtitle: 'Expressions (Part 2)', items: [
+                { code: '4.1e', text: 'Add and subtract algebraic fractions' },
+                { code: '4.1f', text: 'Use distributive property: a(bx±cy±d)' },
+                { code: '4.1g', text: 'Multiply two brackets: (x±y)(w±z)' },
+                { code: '4.1h', text: 'Rearrange formulae' }
+            ]},
+            { title: 'Strand 4: Algebra', subtitle: 'Equations (Part 1)', items: [
+                { code: '4.2a', text: 'Solve linear equations: ax + b = cx + d' },
+                { code: '4.2b', text: 'Solve equations with algebraic fractions' },
+                { code: '4.2c', text: 'Solve quadratic equations (not necessarily factorisable)' }
+            ]},
+            { title: 'Strand 4: Algebra', subtitle: 'Equations (Part 2)', items: [
+                { code: '4.2d', text: 'Solve simultaneous linear equations (2 unknowns)' },
+                { code: '4.2e', text: 'Solve one linear and one quadratic equation (2 unknowns)' },
+                { code: '4.2f', text: 'Form quadratic equations given whole number roots' }
+            ]},
+            { title: 'Strand 4: Algebra', subtitle: 'Inequalities', items: [
+                { code: '4.3a', text: 'Solve linear inequalities: ax + b < k, ≤, >, ≥' },
+                { code: '4.3b', text: 'Use absolute value notation |x|' }
+            ]},
+
+            // STRAND 5: FUNCTIONS
+            { title: 'Strand 5: Functions', subtitle: 'Understanding Functions', items: [
+                { code: '5.1a', text: 'Recognise that a function assigns a unique output to each input' },
+                { code: '5.1b', text: 'Form composite functions' },
+                { code: '5.1c', text: 'Graph linear functions: y = ax + b' },
+                { code: '5.1d', text: 'Graph quadratic functions: y = ax² + bx + c' }
+            ]},
+            { title: 'Strand 5: Functions', subtitle: 'Graphing Functions', items: [
+                { code: '5.1e', text: 'Graph cubic functions: y = ax³ + bx² + cx + d' },
+                { code: '5.1f', text: 'Graph exponential functions: y = a·bˣ' },
+                { code: '5.1g', text: 'Interpret f(x) = g(x) as comparing functions' },
+                { code: '5.1h', text: 'Use graphs to find solutions to f(x) = 0, f(x) = k, f(x) = g(x)' }
+            ]},
+            { title: 'Strand 5: Functions', subtitle: 'Limits & Calculus Basics', items: [
+                { code: '5.1i', text: 'Investigate the concept of limit of a function' },
+                { code: '5.2a', text: 'Find first and second derivatives of linear, quadratic, cubic functions by rule' },
+                { code: '5.2b', text: 'Associate derivatives with slopes and tangent lines' }
+            ]},
+            { title: 'Strand 5: Functions', subtitle: 'Applications of Differentiation', items: [
+                { code: '5.2c', text: 'Apply differentiation to rates of change' },
+                { code: '5.2d', text: 'Apply differentiation to find maxima and minima' },
+                { code: '5.2e', text: 'Apply differentiation to curve sketching' }
+            ]}
+        ];
+
+        let currentSlide = 0;
+        let ticked = {};
+
+        function renderSlide() {
+            const slide = slides[currentSlide];
+            const container = document.getElementById('slide');
+            
+            container.innerHTML = `
+                <div class="slide-header">
+                    <h2>${slide.title}</h2>
+                    <div class="subtitle">${slide.subtitle}</div>
+                </div>
+                ${slide.items.map(item => `
+                    <label class="lo-item ${ticked[item.code] ? 'ticked' : ''}">
+                        <input type="checkbox" ${ticked[item.code] ? 'checked' : ''} onchange="toggleTick('${item.code}')">
+                        <span class="code">${item.code}</span>
+                        <span class="text">${item.text}</span>
+                    </label>
+                `).join('')}
+            `;
+            
+            document.getElementById('pageInfo').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === slides.length - 1;
+            updateTickedDisplay();
+        }
+
+        function toggleTick(code) {
+            if (ticked[code]) {
+                delete ticked[code];
+            } else {
+                for (const slide of slides) {
+                    const item = slide.items.find(i => i.code === code);
+                    if (item) { ticked[code] = item.text; break; }
+                }
+            }
+            renderSlide();
+        }
+
+        function updateTickedDisplay() {
+            const codes = Object.keys(ticked);
+            const container = document.getElementById('tickedCodes');
+            container.innerHTML = codes.length === 0 ? 'None' : codes.map(c => `<span>${c}</span>`).join('');
+        }
+
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; renderSlide(); } }
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; renderSlide(); } }
+
+        function copyTicked() {
+            const codes = Object.keys(ticked);
+            if (codes.length === 0) { alert('Tick some items first!'); return; }
+            const text = codes.map(code => `${code}: ${ticked[code]}`).join('\n');
+            navigator.clipboard.writeText(text).then(() => alert(`Copied ${codes.length} item(s)!`));
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+        });
+
+        renderSlide();
+    </script>
+</body>
+</html>

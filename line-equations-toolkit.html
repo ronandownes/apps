@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Equations Toolkit</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px 15px;
+        }
+        .container { max-width: 650px; margin: 0 auto; }
+        h1 {
+            color: #2d2d2d;
+            text-align: center;
+            margin-bottom: 4px;
+            font-weight: 400;
+            font-size: 1.6rem;
+        }
+        .subtitle {
+            color: #009B77;
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .mode-btn {
+            background: white;
+            border: 2px solid #ddd;
+            color: #666;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .mode-btn:hover { border-color: #009B77; color: #009B77; }
+        .mode-btn.active { background: #009B77; border-color: #009B77; color: white; }
+
+        /* Level Navigation */
+        .level-nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .level-btn {
+            background: white;
+            border: 2px solid #ddd;
+            color: #666;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .level-btn:hover { border-color: #009B77; color: #009B77; }
+        .level-btn.active { background: #009B77; border-color: #009B77; color: white; }
+
+        .level-title {
+            color: #009B77;
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 6px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #009B77;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px 30px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            min-height: 340px;
+        }
+
+        /* Quiz Styles */
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+        .question-num { color: #888; }
+        .score-badge { color: #009B77; font-weight: 600; }
+        .equation {
+            font-size: 1.4rem;
+            text-align: center;
+            margin: 20px 0 25px;
+            color: #333;
+        }
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .choice-btn {
+            background: #fafafa;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 12px 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+        }
+        .choice-btn:hover:not(:disabled) {
+            border-color: #009B77;
+            background: #f0faf8;
+        }
+        .choice-btn.correct {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+        .choice-btn.incorrect {
+            background: #ffebee;
+            border-color: #ef5350;
+            color: #c62828;
+        }
+        .choice-btn:disabled { cursor: default; }
+        .feedback {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .feedback-correct { color: #2e7d32; text-align: center; font-weight: 500; }
+        .feedback-incorrect {
+            color: #333;
+            background: #fff8e1;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #ffc107;
+        }
+        .solution {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .solution-title {
+            font-weight: 600;
+            color: #009B77;
+            margin-bottom: 8px;
+        }
+        .halfway, .results {
+            text-align: center;
+            padding: 20px 10px;
+        }
+        .halfway h2 { font-size: 1.4rem; color: #333; margin-bottom: 10px; font-weight: 500; }
+        .halfway p { color: #666; margin-bottom: 15px; }
+        .halfway .score-display { font-size: 1.5rem; color: #009B77; font-weight: 600; margin: 10px 0; }
+        .results h2 { font-size: 1.6rem; color: #333; margin-bottom: 10px; }
+        .results .final-score { font-size: 3rem; color: #009B77; font-weight: 700; margin: 15px 0; }
+        .results .message { color: #666; margin-bottom: 20px; }
+        .certificate {
+            background: linear-gradient(135deg, #fffef5 0%, #fff8dc 100%);
+            border: 4px double #c9a227;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .certificate h3 { font-size: 0.9rem; color: #888; font-weight: 400; }
+        .certificate .cert-title { font-size: 1.2rem; color: #333; font-weight: 600; margin: 8px 0; }
+        .certificate .student-name { font-size: 1.5rem; color: #c9a227; font-family: Georgia, serif; font-style: italic; margin: 10px 0; }
+        .certificate .stars { font-size: 1.5rem; margin: 10px 0; }
+        .name-input {
+            padding: 8px 15px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            width: 150px;
+            text-align: center;
+            margin-right: 8px;
+        }
+        .name-input:focus { outline: none; border-color: #009B77; }
+        .claim-btn {
+            background: #c9a227;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .restart-btn {
+            background: white;
+            color: #009B77;
+            border: 2px solid #009B77;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.2s;
+        }
+        .restart-btn:hover { background: #009B77; color: white; }
+        .countdown { color: #999; font-size: 0.8rem; margin-top: 10px; }
+        .trophy-bounce {
+            display: inline-block;
+            animation: trophyBounce 0.5s ease infinite alternate;
+        }
+        @keyframes trophyBounce {
+            from { transform: translateY(0) rotate(-5deg); }
+            to { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        /* Calculator Styles */
+        .calc-section {
+            margin-bottom: 20px;
+        }
+        .calc-section label {
+            display: block;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .input-group span {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .calc-input {
+            width: 70px;
+            padding: 10px;
+            font-size: 1.1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .calc-input:focus {
+            outline: none;
+            border-color: #009B77;
+        }
+        .calc-input.wide {
+            width: 200px;
+        }
+        .calc-btn {
+            background: #009B77;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+        .calc-btn:hover { background: #00876a; }
+        .calc-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .result-box h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        .result-box .answer {
+            font-size: 1.5rem;
+            color: #333;
+            margin: 15px 0;
+        }
+
+        .steps-toggle {
+            background: none;
+            border: none;
+            color: #009B77;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            text-decoration: underline;
+        }
+        .steps-toggle:hover { color: #00876a; }
+
+        .steps-container {
+            display: none;
+            margin-top: 15px;
+            text-align: left;
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .steps-container.show { display: block; }
+        .step {
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .step:last-child { border-bottom: none; }
+        .step-num {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #009B77;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+        .step-math {
+            margin-top: 8px;
+            padding-left: 34px;
+            font-size: 1.1rem;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Confetti */
+        .confetti-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        .confetti {
+            position: absolute;
+            top: -20px;
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            to { transform: translateY(105vh) rotate(720deg); }
+        }
+        .ticker {
+            width: 8px;
+            height: 20px;
+            border-radius: 2px;
+        }
+
+        /* Equation input helper */
+        .equation-help {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Line Equations</h1>
+        <div class="subtitle">Point-Slope & Slope-Intercept Forms</div>
+
+        <div class="mode-toggle">
+            <button class="mode-btn active" onclick="setMode('quiz')">Quiz</button>
+            <button class="mode-btn" onclick="setMode('calc')">Calculator</button>
+        </div>
+
+        <div class="level-nav" id="level-nav"></div>
+        <div class="level-title" id="level-title"></div>
+
+        <div id="quiz-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="card" id="quiz-card"></div>
+        </div>
+
+        <div id="calc-section" class="hidden">
+            <div class="card" id="calc-card"></div>
+        </div>
+    </div>
+
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <script>
+        // ==================== AUDIO ====================
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        function playNote(freq, duration, delay = 0, type = 'triangle', vol = 0.2) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime + delay);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + delay + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime + delay);
+            osc.stop(audioCtx.currentTime + delay + duration);
+        }
+        function playCorrect() { initAudio(); playNote(523, 0.1, 0); playNote(659, 0.15, 0.08); }
+        function playIncorrect() { initAudio(); playNote(200, 0.2, 0, 'sawtooth', 0.15); }
+        function playMildChime() { initAudio(); playNote(523, 0.2, 0, 'sine', 0.15); playNote(659, 0.2, 0.15, 'sine', 0.15); playNote(784, 0.3, 0.3, 'sine', 0.15); }
+        function playApplause() {
+            initAudio();
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => { playNote(100 + Math.random() * 300, 0.05, 0, 'sawtooth', 0.03); }, i * 50 + Math.random() * 30);
+            }
+        }
+        function playFanfare() {
+            initAudio();
+            const notes = [[392, 0.15], [392, 0.15], [392, 0.15], [523, 0.4], [466, 0.15], [523, 0.15], [587, 0.15], [659, 0.5], [784, 0.2], [784, 0.2], [784, 0.6]];
+            let time = 0;
+            notes.forEach(([freq, dur]) => {
+                playNote(freq, dur, time, 'triangle', 0.25);
+                playNote(freq * 0.5, dur, time, 'triangle', 0.1);
+                time += dur + 0.03;
+            });
+        }
+
+        // ==================== UTILITIES ====================
+        function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function randNonZero(min, max) { let n; do { n = randInt(min, max); } while (n === 0); return n; }
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+        function fmtFrac(num, den) {
+            if (den === 1) return `${num}`;
+            if (num < 0) return `-\\frac{${Math.abs(num)}}{${den}}`;
+            return `\\frac{${num}}{${den}}`;
+        }
+
+        const encouragements = [
+            "Nice work! Keep going!",
+            "You're doing well!",
+            "Great progress so far!",
+            "Solid effort! Almost there!",
+            "Good job! Stay focused!",
+            "Well done! Keep it up!"
+        ];
+
+        // ==================== STATE ====================
+        let currentMode = 'quiz';
+        let currentLevel = 0;
+        let currentQ = 0, score = 0, answered = false, countdownInterval;
+        let questions = [];
+
+        const levels = [
+            { id: 1, title: "Reading Point-Slope Form", short: "Read" },
+            { id: 2, title: "Writing Point-Slope Form", short: "Write" },
+            { id: 3, title: "Slope-Intercept Form (y = mx + c)", short: "y=mx+c" }
+        ];
+
+        // ==================== MODE & LEVEL ====================
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', (i === 0 && mode === 'quiz') || (i === 1 && mode === 'calc'));
+            });
+            document.getElementById('quiz-section').classList.toggle('hidden', mode !== 'quiz');
+            document.getElementById('calc-section').classList.toggle('hidden', mode !== 'calc');
+            
+            if (mode === 'quiz') {
+                initQuiz();
+            } else {
+                renderCalculator();
+            }
+        }
+
+        function buildLevelNav() {
+            const nav = document.getElementById('level-nav');
+            nav.innerHTML = '';
+            levels.forEach((lvl, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'level-btn' + (i === currentLevel ? ' active' : '');
+                btn.textContent = lvl.short;
+                btn.onclick = () => setLevel(i);
+                nav.appendChild(btn);
+            });
+        }
+
+        function setLevel(idx) {
+            currentLevel = idx;
+            document.querySelectorAll('.level-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === idx);
+            });
+            document.getElementById('level-title').textContent = levels[idx].title;
+            
+            if (currentMode === 'quiz') {
+                initQuiz();
+            } else {
+                renderCalculator();
+            }
+        }
+
+        // ==================== QUIZ GENERATORS ====================
+        function generateLevel1() {
+            // Reading point-slope form
+            const useInt = Math.random() < 0.3;
+            let m_num, m_den, m_latex;
+            if (useInt) {
+                m_num = randNonZero(-5, 5);
+                m_den = 1;
+                m_latex = `${m_num}`;
+            } else {
+                m_num = randNonZero(-5, 5);
+                m_den = randInt(2, 6);
+                const g = gcd(Math.abs(m_num), m_den);
+                m_num = m_num / g;
+                m_den = m_den / g;
+                m_latex = fmtFrac(m_num, m_den);
+            }
+
+            const x1 = randNonZero(-10, 10);
+            const y1 = randNonZero(-10, 10);
+
+            const yPart = y1 > 0 ? `y - ${y1}` : `y + ${Math.abs(y1)}`;
+            const xPart = x1 > 0 ? `x - ${x1}` : `x + ${Math.abs(x1)}`;
+            const eq = `${yPart} = ${m_latex}(${xPart})`;
+
+            const correctAns = `m = ${m_latex}, \\; (${x1}, ${y1})`;
+
+            const wrongs = [
+                { val: `m = ${fmtFrac(-m_num, m_den)}, \\; (${x1}, ${y1})`, error: "Check the slope sign." },
+                { val: `m = ${m_latex}, \\; (${-x1}, ${y1})`, error: `For (x − x₁), x₁ has opposite sign to bracket. Here x₁ = ${x1}.` },
+                { val: `m = ${m_latex}, \\; (${x1}, ${-y1})`, error: `For (y − y₁), y₁ has opposite sign to bracket. Here y₁ = ${y1}.` }
+            ];
+
+            const solution = [
+                "Start with the formula:",
+                "$y - y_1 = m(x - x_1)",
+                "Compare with the given equation:",
+                `$${eq}`,
+                "Reading off the values:",
+                `$m = ${m_latex}`,
+                `$${yPart} \\Rightarrow y_1 = ${y1}`,
+                `$${xPart} \\Rightarrow x_1 = ${x1}`,
+                `Answer: m = ${m_latex}, point (${x1}, ${y1})`
+            ];
+
+            return {
+                eq: eq,
+                question: "\\text{State } m \\text{ and } (x_1, y_1)",
+                solution: solution,
+                choices: shuffle([{ val: correctAns, correct: true }, ...wrongs])
+            };
+        }
+
+        function generateLevel2() {
+            // Writing point-slope form
+            const useInt = Math.random() < 0.3;
+            let m_num, m_den, m_latex;
+            if (useInt) {
+                m_num = randNonZero(-5, 5);
+                m_den = 1;
+                m_latex = `${m_num}`;
+            } else {
+                m_num = randNonZero(-5, 5);
+                m_den = randInt(2, 6);
+                const g = gcd(Math.abs(m_num), m_den);
+                m_num = m_num / g;
+                m_den = m_den / g;
+                m_latex = fmtFrac(m_num, m_den);
+            }
+
+            const x1 = randNonZero(-10, 10);
+            const y1 = randNonZero(-10, 10);
+
+            function buildEq(m, x, y) {
+                const yP = y > 0 ? `y - ${y}` : (y < 0 ? `y + ${Math.abs(y)}` : 'y');
+                const xP = x > 0 ? `x - ${x}` : (x < 0 ? `x + ${Math.abs(x)}` : 'x');
+                return `${yP} = ${m}(${xP})`;
+            }
+
+            const correctEq = buildEq(m_latex, x1, y1);
+            const yPartExplain = y1 > 0 ? `y - ${y1}` : `y - (${y1}) = y + ${Math.abs(y1)}`;
+            const xPartExplain = x1 > 0 ? `x - ${x1}` : `x - (${x1}) = x + ${Math.abs(x1)}`;
+
+            const wrongs = [
+                { val: buildEq(m_latex, -x1, y1), error: `For x₁ = ${x1}, write (x − ${x1 > 0 ? x1 : '(' + x1 + ')'}).` },
+                { val: buildEq(m_latex, x1, -y1), error: `For y₁ = ${y1}, write (y − ${y1 > 0 ? y1 : '(' + y1 + ')'}).` },
+                { val: buildEq(fmtFrac(-m_num, m_den), x1, y1), error: "Use the given slope directly." }
+            ];
+
+            const solution = [
+                "Start with the formula:",
+                "$y - y_1 = m(x - x_1)",
+                "Substitute the values:",
+                `$m = ${m_latex}, \\quad x_1 = ${x1}, \\quad y_1 = ${y1}`,
+                "For y₁:",
+                `$${yPartExplain}`,
+                "For x₁:",
+                `$${xPartExplain}`,
+                "Final answer:",
+                `$${correctEq}`
+            ];
+
+            return {
+                eq: `m = ${m_latex}, \\quad (${x1}, ${y1})`,
+                question: "\\text{Write in point-slope form}",
+                solution: solution,
+                choices: shuffle([{ val: correctEq, correct: true }, ...wrongs])
+            };
+        }
+
+        function generateLevel3() {
+            // y = mx + c
+            const useInt = Math.random() < 0.5;
+            let m_num, m_den;
+            if (useInt) {
+                m_num = randNonZero(-5, 5);
+                m_den = 1;
+            } else {
+                m_num = randNonZero(-4, 4);
+                m_den = randInt(2, 5);
+                const g = gcd(Math.abs(m_num), m_den);
+                m_num = m_num / g;
+                m_den = m_den / g;
+            }
+
+            let x1, y1, c_num;
+            if (m_den === 1) {
+                x1 = randNonZero(-8, 8);
+                y1 = randNonZero(-10, 10);
+                c_num = y1 - m_num * x1;
+            } else {
+                x1 = m_den * randNonZero(-3, 3);
+                y1 = randNonZero(-10, 10);
+                c_num = y1 - m_num * (x1 / m_den);
+            }
+
+            const m_latex = fmtFrac(m_num, m_den);
+
+            function fmtYmxc(mN, mD, c) {
+                let mPart;
+                if (mD === 1) {
+                    if (mN === 1) mPart = 'x';
+                    else if (mN === -1) mPart = '-x';
+                    else mPart = `${mN}x`;
+                } else {
+                    if (mN < 0) mPart = `-\\frac{${Math.abs(mN)}}{${mD}}x`;
+                    else mPart = `\\frac{${mN}}{${mD}}x`;
+                }
+                let cPart = '';
+                if (c !== 0) {
+                    cPart = c > 0 ? ` + ${c}` : ` - ${Math.abs(c)}`;
+                }
+                return `y = ${mPart}${cPart}`;
+            }
+
+            const correctEq = fmtYmxc(m_num, m_den, c_num);
+            const mTimesX1Val = m_num * x1 / m_den;
+
+            const wrongs = [
+                { val: fmtYmxc(m_num, m_den, y1 + mTimesX1Val), error: "Remember: c = y₁ − mx₁ (subtract, not add)" },
+                { val: fmtYmxc(-m_num, m_den, c_num), error: "Check the slope sign." },
+                { val: fmtYmxc(m_num, m_den, c_num + randNonZero(-3, 3)), error: "Check your arithmetic for c = y₁ − mx₁" }
+            ];
+
+            const solution = [
+                "Use the formula:",
+                "$c = y_1 - mx_1",
+                "Substitute the values:",
+                `$c = ${y1} - (${m_latex})(${x1})`,
+                `$c = ${y1} - ${mTimesX1Val}`,
+                `$c = ${c_num}`,
+                "Write the equation:",
+                `$${correctEq}`
+            ];
+
+            return {
+                eq: `\\text{Point } (${x1}, ${y1}), \\quad m = ${m_latex}`,
+                question: "\\text{Find } y = mx + c",
+                solution: solution,
+                choices: shuffle([{ val: correctEq, correct: true }, ...wrongs])
+            };
+        }
+
+        // ==================== QUIZ LOGIC ====================
+        function initQuiz() {
+            questions = [];
+            const generators = [generateLevel1, generateLevel2, generateLevel3];
+            for (let i = 0; i < 6; i++) {
+                questions.push(generators[currentLevel]());
+            }
+            currentQ = 0;
+            score = 0;
+            renderQuestion();
+        }
+
+        function updateProgress() {
+            document.getElementById('progress-fill').style.width = ((currentQ) / 6 * 100) + '%';
+        }
+
+        function renderQuestion() {
+            answered = false;
+            updateProgress();
+            const q = questions[currentQ];
+            const card = document.getElementById('quiz-card');
+            card.innerHTML = `
+                <div class="question-header">
+                    <span class="question-num">Question ${currentQ + 1}/6</span>
+                    <span class="score-badge">Score: ${score}</span>
+                </div>
+                <div class="equation" id="equation"></div>
+                <div class="equation" id="question-text" style="font-size: 1.1rem; margin-top: -10px;"></div>
+                <div class="choices" id="choices"></div>
+                <div class="feedback" id="feedback"></div>
+            `;
+
+            katex.render(q.eq, document.getElementById('equation'), { displayMode: true });
+            katex.render(q.question, document.getElementById('question-text'), { displayMode: false });
+
+            const choicesDiv = document.getElementById('choices');
+            q.choices.forEach((choice, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerHTML = `<span></span>`;
+                choicesDiv.appendChild(btn);
+                katex.render(choice.val, btn.querySelector('span'), { displayMode: false });
+                btn.onclick = () => checkAnswer(choice, btn, q, idx);
+            });
+        }
+
+        function checkAnswer(choice, btn, q, idx) {
+            if (answered) return;
+            answered = true;
+
+            const feedback = document.getElementById('feedback');
+            const allBtns = document.querySelectorAll('.choice-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (choice.correct) {
+                score++;
+                playCorrect();
+                btn.classList.add('correct');
+                feedback.innerHTML = `<div class="feedback-correct">✓ Correct!</div>
+                    <div class="solution"><div class="solution-title">Solution</div><div id="sol"></div></div>`;
+            } else {
+                playIncorrect();
+                btn.classList.add('incorrect');
+                allBtns.forEach((b, i) => {
+                    if (q.choices[i].correct) b.classList.add('correct');
+                });
+                feedback.innerHTML = `<div class="feedback-incorrect">${choice.error}</div>
+                    <div class="solution"><div class="solution-title">Solution</div><div id="sol"></div></div>`;
+            }
+
+            const solEl = document.getElementById('sol');
+            q.solution.forEach(line => {
+                const p = document.createElement('div');
+                p.style.marginBottom = '6px';
+                if (line.startsWith('$')) {
+                    try { katex.render(line.slice(1), p, { displayMode: false }); }
+                    catch { p.textContent = line.slice(1); }
+                } else {
+                    p.textContent = line;
+                }
+                solEl.appendChild(p);
+            });
+
+            setTimeout(() => {
+                currentQ++;
+                if (currentQ === 3) showHalfway();
+                else if (currentQ >= 6) showResults();
+                else renderQuestion();
+            }, 2000);
+        }
+
+        function showHalfway() {
+            updateProgress();
+            playMildChime();
+            launchSparkles();
+            const enc = encouragements[randInt(0, encouragements.length - 1)];
+            document.getElementById('quiz-card').innerHTML = `
+                <div class="halfway">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">✨</div>
+                    <h2>Halfway!</h2>
+                    <p>${enc}</p>
+                    <div class="score-display">${score}/3</div>
+                </div>
+            `;
+            setTimeout(() => renderQuestion(), 2500);
+        }
+
+        function showResults() {
+            updateProgress();
+            playFanfare();
+            setTimeout(playApplause, 500);
+            launchTickerTape();
+
+            const stars = '⭐'.repeat(Math.max(1, Math.ceil(score / 1.2)));
+            let message = score === 6 ? "Perfect! Outstanding!" : score >= 5 ? "Excellent work!" : score >= 4 ? "Great job!" : score >= 3 ? "Good effort!" : "Keep practising!";
+
+            const card = document.getElementById('quiz-card');
+            if (score === 6) {
+                card.innerHTML = `
+                    <div class="results">
+                        <div class="trophy-bounce" style="font-size: 2.5rem;">🏆</div>
+                        <h2>Complete!</h2>
+                        <div class="final-score">${score}/6</div>
+                        <p class="message">${message}</p>
+                        <div id="name-section">
+                            <input type="text" class="name-input" id="name-input" placeholder="Your name" maxlength="15">
+                            <button class="claim-btn" onclick="claimCertificate()">Get Certificate</button>
+                            <div class="countdown">Expires in <span id="timer">20</span>s</div>
+                        </div>
+                        <div id="certificate-area"></div>
+                        <div style="margin-top: 15px;">
+                            <button class="restart-btn" onclick="initQuiz()">Try Again</button>
+                            ${currentLevel < 2 ? `<button class="restart-btn" onclick="setLevel(${currentLevel + 1})">Next Level</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                let timeLeft = 20;
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    const t = document.getElementById('timer');
+                    if (t) t.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        const ns = document.getElementById('name-section');
+                        if (ns) ns.innerHTML = '<p style="color:#999;font-size:0.85rem;">Expired</p>';
+                    }
+                }, 1000);
+            } else {
+                card.innerHTML = `
+                    <div class="results">
+                        <div class="trophy-bounce" style="font-size: 2.5rem;">🏆</div>
+                        <h2>Complete!</h2>
+                        <div class="final-score">${score}/6</div>
+                        <p class="message">${message}</p>
+                        <div class="stars">${stars}</div>
+                        <p style="color:#888;font-size:0.9rem;">Get 6/6 to earn your certificate!</p>
+                        <div style="margin-top: 15px;">
+                            <button class="restart-btn" onclick="initQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function claimCertificate() {
+            clearInterval(countdownInterval);
+            const name = document.getElementById('name-input').value.trim() || 'Star';
+            document.getElementById('name-section').classList.add('hidden');
+            document.getElementById('certificate-area').innerHTML = `
+                <div class="certificate">
+                    <h3>Certificate of Achievement</h3>
+                    <div class="cert-title">${levels[currentLevel].title}</div>
+                    <div class="student-name">${name}</div>
+                    <div style="margin:8px 0;"><strong>6/6</strong></div>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <div style="font-size:0.75rem;color:#aaa;">${new Date().toLocaleDateString()}</div>
+                </div>
+                <p style="color:#888;font-size:0.8rem;">📸 Screenshot now!</p>
+            `;
+            playMildChime();
+            launchTickerTape();
+        }
+
+        // ==================== CALCULATORS ====================
+        function renderCalculator() {
+            const card = document.getElementById('calc-card');
+            if (currentLevel === 0) {
+                renderCalc1(card);
+            } else if (currentLevel === 1) {
+                renderCalc2(card);
+            } else {
+                renderCalc3(card);
+            }
+        }
+
+        function renderCalc1(card) {
+            card.innerHTML = `
+                <h3 style="color:#009B77; margin-bottom: 15px;">Reading Point-Slope Form</h3>
+                <p style="color:#666; margin-bottom: 20px;">Enter values from an equation like: y − 3 = 2(x + 5)</p>
+                
+                <div class="calc-section">
+                    <label>Enter the values from your equation:</label>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <span>y</span>
+                            <select id="y-sign" style="padding: 8px; border-radius: 5px; border: 2px solid #ddd;">
+                                <option value="-">−</option>
+                                <option value="+">+</option>
+                            </select>
+                            <input type="number" id="y-val" class="calc-input" placeholder="y₁">
+                        </div>
+                        <span>=</span>
+                        <div class="input-group">
+                            <input type="text" id="m-val" class="calc-input" placeholder="m" style="width: 80px;">
+                        </div>
+                        <span>(x</span>
+                        <div class="input-group">
+                            <select id="x-sign" style="padding: 8px; border-radius: 5px; border: 2px solid #ddd;">
+                                <option value="-">−</option>
+                                <option value="+">+</option>
+                            </select>
+                            <input type="number" id="x-val" class="calc-input" placeholder="x₁">
+                        </div>
+                        <span>)</span>
+                    </div>
+                    <p class="equation-help">For m, enter fractions as "2/3" or "-1/4"</p>
+                </div>
+                
+                <button class="calc-btn" onclick="calculate1()">Calculate</button>
+                <div id="result"></div>
+            `;
+        }
+
+        function calculate1() {
+            const ySign = document.getElementById('y-sign').value;
+            const yVal = parseFloat(document.getElementById('y-val').value);
+            const mStr = document.getElementById('m-val').value.trim();
+            const xSign = document.getElementById('x-sign').value;
+            const xVal = parseFloat(document.getElementById('x-val').value);
+
+            if (isNaN(yVal) || isNaN(xVal) || !mStr) {
+                alert('Please fill in all values');
+                return;
+            }
+
+            // Parse m (could be fraction)
+            let m_num, m_den;
+            if (mStr.includes('/')) {
+                const parts = mStr.split('/');
+                m_num = parseFloat(parts[0]);
+                m_den = parseFloat(parts[1]);
+            } else {
+                m_num = parseFloat(mStr);
+                m_den = 1;
+            }
+
+            // Calculate actual x1 and y1
+            const y1 = ySign === '-' ? yVal : -yVal;
+            const x1 = xSign === '-' ? xVal : -xVal;
+            const m_latex = m_den === 1 ? `${m_num}` : `\\frac{${m_num}}{${m_den}}`;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="result-box">
+                    <h3>Answer</h3>
+                    <div class="answer" id="answer"></div>
+                    <button class="steps-toggle" onclick="toggleSteps()">Show Working</button>
+                    <div class="steps-container" id="steps">
+                        <div class="step">
+                            <span class="step-num">1</span>Formula: y − y₁ = m(x − x₁)
+                        </div>
+                        <div class="step">
+                            <span class="step-num">2</span>The coefficient of (x − x₁) is the slope
+                            <div class="step-math" id="step2"></div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">3</span>For y₁: y ${ySign} ${yVal} means y − (${y1}) = y ${ySign} ${yVal}
+                            <div class="step-math">So y₁ = ${y1}</div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">4</span>For x₁: x ${xSign} ${xVal} means x − (${x1}) = x ${xSign} ${xVal}
+                            <div class="step-math">So x₁ = ${x1}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            katex.render(`m = ${m_latex}, \\quad (x_1, y_1) = (${x1}, ${y1})`, document.getElementById('answer'), { displayMode: true });
+            katex.render(`m = ${m_latex}`, document.getElementById('step2'), { displayMode: false });
+            playMildChime();
+        }
+
+        function renderCalc2(card) {
+            card.innerHTML = `
+                <h3 style="color:#009B77; margin-bottom: 15px;">Writing Point-Slope Form</h3>
+                <p style="color:#666; margin-bottom: 20px;">Enter slope m and a point (x₁, y₁)</p>
+                
+                <div class="calc-section">
+                    <label>Slope (m):</label>
+                    <div class="input-row">
+                        <input type="text" id="m-input" class="calc-input" placeholder="e.g. 2/3" style="width: 100px;">
+                        <span class="equation-help" style="margin-left: 10px;">Enter as "2/3" or "-4"</span>
+                    </div>
+                </div>
+                
+                <div class="calc-section">
+                    <label>Point (x₁, y₁):</label>
+                    <div class="input-row">
+                        <span>(</span>
+                        <input type="number" id="x1-input" class="calc-input" placeholder="x₁">
+                        <span>,</span>
+                        <input type="number" id="y1-input" class="calc-input" placeholder="y₁">
+                        <span>)</span>
+                    </div>
+                </div>
+                
+                <button class="calc-btn" onclick="calculate2()">Calculate</button>
+                <div id="result"></div>
+            `;
+        }
+
+        function calculate2() {
+            const mStr = document.getElementById('m-input').value.trim();
+            const x1 = parseFloat(document.getElementById('x1-input').value);
+            const y1 = parseFloat(document.getElementById('y1-input').value);
+
+            if (!mStr || isNaN(x1) || isNaN(y1)) {
+                alert('Please fill in all values');
+                return;
+            }
+
+            let m_num, m_den;
+            if (mStr.includes('/')) {
+                const parts = mStr.split('/');
+                m_num = parseFloat(parts[0]);
+                m_den = parseFloat(parts[1]);
+            } else {
+                m_num = parseFloat(mStr);
+                m_den = 1;
+            }
+            const m_latex = m_den === 1 ? `${m_num}` : `\\frac{${m_num}}{${m_den}}`;
+
+            const yPart = y1 >= 0 ? `y - ${y1}` : `y + ${Math.abs(y1)}`;
+            const xPart = x1 >= 0 ? `x - ${x1}` : `x + ${Math.abs(x1)}`;
+            const equation = `${yPart} = ${m_latex}(${xPart})`;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="result-box">
+                    <h3>Point-Slope Form</h3>
+                    <div class="answer" id="answer"></div>
+                    <button class="steps-toggle" onclick="toggleSteps()">Show Working</button>
+                    <div class="steps-container" id="steps">
+                        <div class="step">
+                            <span class="step-num">1</span>Start with formula:
+                            <div class="step-math" id="step1"></div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">2</span>Substitute m = ${m_latex}:
+                            <div class="step-math" id="step2"></div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">3</span>For y₁ = ${y1}:
+                            <div class="step-math">y − (${y1}) = ${yPart}</div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">4</span>For x₁ = ${x1}:
+                            <div class="step-math">x − (${x1}) = ${xPart}</div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">5</span>Final equation:
+                            <div class="step-math" id="step5"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            katex.render(equation, document.getElementById('answer'), { displayMode: true });
+            katex.render('y - y_1 = m(x - x_1)', document.getElementById('step1'), { displayMode: false });
+            katex.render(`y - y_1 = ${m_latex}(x - x_1)`, document.getElementById('step2'), { displayMode: false });
+            katex.render(equation, document.getElementById('step5'), { displayMode: false });
+            playMildChime();
+        }
+
+        function renderCalc3(card) {
+            card.innerHTML = `
+                <h3 style="color:#009B77; margin-bottom: 15px;">Slope-Intercept Form (y = mx + c)</h3>
+                <p style="color:#666; margin-bottom: 20px;">Enter slope m and a point (x₁, y₁)</p>
+                
+                <div class="calc-section">
+                    <label>Slope (m):</label>
+                    <div class="input-row">
+                        <input type="text" id="m-input" class="calc-input" placeholder="e.g. 2/3" style="width: 100px;">
+                        <span class="equation-help" style="margin-left: 10px;">Enter as "2/3" or "-4"</span>
+                    </div>
+                </div>
+                
+                <div class="calc-section">
+                    <label>Point (x₁, y₁):</label>
+                    <div class="input-row">
+                        <span>(</span>
+                        <input type="number" id="x1-input" class="calc-input" placeholder="x₁">
+                        <span>,</span>
+                        <input type="number" id="y1-input" class="calc-input" placeholder="y₁">
+                        <span>)</span>
+                    </div>
+                </div>
+                
+                <button class="calc-btn" onclick="calculate3()">Calculate</button>
+                <div id="result"></div>
+            `;
+        }
+
+        function calculate3() {
+            const mStr = document.getElementById('m-input').value.trim();
+            const x1 = parseFloat(document.getElementById('x1-input').value);
+            const y1 = parseFloat(document.getElementById('y1-input').value);
+
+            if (!mStr || isNaN(x1) || isNaN(y1)) {
+                alert('Please fill in all values');
+                return;
+            }
+
+            let m_num, m_den;
+            if (mStr.includes('/')) {
+                const parts = mStr.split('/');
+                m_num = parseFloat(parts[0]);
+                m_den = parseFloat(parts[1]);
+            } else {
+                m_num = parseFloat(mStr);
+                m_den = 1;
+            }
+
+            const m_val = m_num / m_den;
+            const m_latex = m_den === 1 ? `${m_num}` : `\\frac{${m_num}}{${m_den}}`;
+            const mx1 = m_val * x1;
+            const c = y1 - mx1;
+
+            // Format y = mx + c
+            let mPart;
+            if (m_den === 1) {
+                if (m_num === 1) mPart = 'x';
+                else if (m_num === -1) mPart = '-x';
+                else mPart = `${m_num}x`;
+            } else {
+                mPart = `${m_latex}x`;
+            }
+            let cPart = '';
+            if (c !== 0) {
+                cPart = c > 0 ? ` + ${c}` : ` - ${Math.abs(c)}`;
+            }
+            const equation = `y = ${mPart}${cPart}`;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="result-box">
+                    <h3>Slope-Intercept Form</h3>
+                    <div class="answer" id="answer"></div>
+                    <button class="steps-toggle" onclick="toggleSteps()">Show Working</button>
+                    <div class="steps-container" id="steps">
+                        <div class="step">
+                            <span class="step-num">1</span>Use the formula to find c:
+                            <div class="step-math" id="step1"></div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">2</span>Substitute the values:
+                            <div class="step-math" id="step2"></div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">3</span>Calculate mx₁:
+                            <div class="step-math" id="step3"></div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">4</span>Find c:
+                            <div class="step-math" id="step4"></div>
+                        </div>
+                        <div class="step">
+                            <span class="step-num">5</span>Write the equation:
+                            <div class="step-math" id="step5"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            katex.render(equation, document.getElementById('answer'), { displayMode: true });
+            katex.render('c = y_1 - mx_1', document.getElementById('step1'), { displayMode: false });
+            katex.render(`c = ${y1} - (${m_latex})(${x1})`, document.getElementById('step2'), { displayMode: false });
+            katex.render(`(${m_latex})(${x1}) = ${mx1}`, document.getElementById('step3'), { displayMode: false });
+            katex.render(`c = ${y1} - ${mx1} = ${c}`, document.getElementById('step4'), { displayMode: false });
+            katex.render(equation, document.getElementById('step5'), { displayMode: false });
+            playMildChime();
+        }
+
+        function toggleSteps() {
+            const steps = document.getElementById('steps');
+            const btn = document.querySelector('.steps-toggle');
+            if (steps.classList.contains('show')) {
+                steps.classList.remove('show');
+                btn.textContent = 'Show Working';
+            } else {
+                steps.classList.add('show');
+                btn.textContent = 'Hide Working';
+            }
+        }
+
+        // ==================== CONFETTI ====================
+        function launchSparkles() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            const colors = ['#FFD700', '#FFA500', '#00CED1', '#9370DB', '#3CB371'];
+            for (let i = 0; i < 25; i++) {
+                const spark = document.createElement('div');
+                spark.textContent = '✦';
+                spark.className = 'confetti';
+                spark.style.left = Math.random() * 100 + '%';
+                spark.style.color = colors[Math.floor(Math.random() * colors.length)];
+                spark.style.fontSize = (12 + Math.random() * 10) + 'px';
+                spark.style.animationDuration = (2 + Math.random() * 2) + 's';
+                spark.style.animationDelay = Math.random() * 0.5 + 's';
+                container.appendChild(spark);
+            }
+            setTimeout(() => container.innerHTML = '', 4000);
+        }
+
+        function launchTickerTape() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            const colors = ['#009B77', '#FFD700', '#FF6B6B', '#4ECDC4', '#9B59B6', '#3498DB', '#E74C3C', '#2ECC71', '#F39C12', '#1ABC9C'];
+            for (let i = 0; i < 80; i++) {
+                const ticker = document.createElement('div');
+                ticker.className = 'confetti ticker';
+                ticker.style.left = Math.random() * 100 + '%';
+                ticker.style.background = colors[Math.floor(Math.random() * colors.length)];
+                ticker.style.width = (5 + Math.random() * 8) + 'px';
+                ticker.style.height = (15 + Math.random() * 15) + 'px';
+                ticker.style.animationDuration = (2.5 + Math.random() * 2.5) + 's';
+                ticker.style.animationDelay = Math.random() * 1 + 's';
+                ticker.style.borderRadius = Math.random() > 0.5 ? '2px' : '0';
+                container.appendChild(ticker);
+            }
+            setTimeout(() => container.innerHTML = '', 6000);
+        }
+
+        // ==================== INIT ====================
+        buildLevelNav();
+        setLevel(0);
+    </script>
+</body>
+</html>

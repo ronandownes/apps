@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC Foundation Level - Mr Downes Maths</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #1a1a1a; }
+
+        /* Header */
+        .topbar {
+            background: #e8e8e8;
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #22c55e, #3b82f6, #ef4444, #1a1a1a) 1;
+            position: sticky;
+            top: 0;
+            z-index: 300;
+        }
+        .topbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.15em;
+            color: #1a1a1a;
+            opacity: 0;
+            animation: textFadeIn 0.6s ease-out 0.1s forwards;
+        }
+        .tagline {
+            color: #555;
+            font-size: 0.9em;
+            opacity: 0;
+            animation: textFadeIn 0.6s ease-out 0.3s forwards;
+        }
+        @keyframes textFadeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .mark { display: flex; gap: 4px; }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: dotBounce 0.8s ease-out forwards;
+        }
+        .mark-left .dot:nth-child(1) { animation-delay: 0.5s; }
+        .mark-left .dot:nth-child(2) { animation-delay: 0.6s; }
+        .mark-left .dot:nth-child(3) { animation-delay: 0.7s; }
+        .mark-left .dot:nth-child(4) { animation-delay: 0.8s; }
+        .mark-right .dot:nth-child(1) { animation-delay: 0.9s; }
+        .mark-right .dot:nth-child(2) { animation-delay: 1.0s; }
+        .mark-right .dot:nth-child(3) { animation-delay: 1.1s; }
+        .mark-right .dot:nth-child(4) { animation-delay: 1.2s; }
+        @keyframes dotBounce {
+            0% { transform: translateY(-30px) scale(0.3); opacity: 0; }
+            25% { transform: translateY(8px) scale(1.2); opacity: 1; }
+            40% { transform: translateY(-12px) scale(0.9); }
+            55% { transform: translateY(5px) scale(1.05); }
+            70% { transform: translateY(-4px) scale(0.98); }
+            85% { transform: translateY(2px) scale(1.01); }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .dot.green { background: #22c55e; }
+        .dot.blue { background: #3b82f6; }
+        .dot.red { background: #ef4444; }
+        .dot.black { background: #1a1a1a; }
+
+        .lesson-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .lesson-input label { font-size: 0.9em; color: #444; font-weight: 600; }
+        .lesson-input input {
+            padding: 8px 14px;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            font-size: 1em;
+            width: 200px;
+            background: white;
+        }
+        .lesson-input input:focus { outline: none; border-color: #00a6a0; }
+        .level-badge {
+            background: #22c55e;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: width 0.3s, margin-left 0.3s;
+        }
+        .sidebar.collapsed {
+            width: 0;
+            overflow: hidden;
+            border: none;
+        }
+        .sidebar-toggle {
+            position: fixed;
+            left: 10px;
+            top: 70px;
+            width: 36px;
+            height: 36px;
+            background: #00a6a0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 250;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: left 0.3s;
+        }
+        .sidebar-toggle:hover { background: #00b8b0; }
+        .sidebar:not(.collapsed) ~ .sidebar-toggle { left: 330px; }
+
+        /* Global controls */
+        .global-controls {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 8px;
+        }
+        .global-controls button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .global-controls .select-all-btn { background: #00a6a0; color: white; }
+        .global-controls .select-all-btn:hover { background: #00b8b0; }
+        .global-controls .clear-all-btn { background: #e0e0e0; color: #444; }
+        .global-controls .clear-all-btn:hover { background: #d0d0d0; }
+
+        .today-section {
+            background: #f0fafa;
+            border-bottom: 2px solid #00a6a0;
+            padding: 12px 15px;
+        }
+        .today-section h3 {
+            font-size: 0.85em;
+            color: #00a6a0;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .today-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 28px;
+        }
+        .today-tag {
+            background: #00a6a0;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        .today-empty { color: #999; font-size: 0.8em; font-style: italic; }
+
+        /* Strand sections */
+        .strand-section { border-bottom: 1px solid #eee; }
+        .strand-toggle {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            text-align: left;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .strand-toggle:hover { background: #fafafa; }
+        .strand-toggle .arrow { transition: transform 0.2s; font-size: 0.7em; color: #999; }
+        .strand-section.open .strand-toggle .arrow { transform: rotate(90deg); }
+        .strand-controls {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+            margin-right: 8px;
+        }
+        .strand-controls button {
+            background: #e8e8e8;
+            border: none;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            cursor: pointer;
+            color: #555;
+        }
+        .strand-controls button:hover { background: #ddd; }
+        .strand-items { display: none; padding: 5px 10px 10px; }
+        .strand-section.open .strand-items { display: block; }
+
+        .lo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            line-height: 1.35;
+        }
+        .lo-item:hover { background: #f5f5f5; }
+        .lo-item input { margin-top: 2px; accent-color: #00a6a0; }
+        .lo-item .code {
+            background: #e5e5e5;
+            color: #444;
+            padding: 2px 7px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .lo-item .text { color: #444; }
+
+        /* Main area */
+        .main {
+            flex: 1;
+            padding: 20px;
+            padding-left: 60px;
+            transition: padding-left 0.3s;
+        }
+        .sidebar.collapsed ~ .main { padding-left: 60px; }
+
+        /* Controls bar */
+        .controls-bar {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: sticky;
+            top: 60px;
+            z-index: 100;
+        }
+        .controls-left {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .btn {
+            background: #00a6a0;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: #00b8b0; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn.secondary { background: #e0e0e0; color: #444; }
+        .btn.secondary:hover { background: #d0d0d0; }
+        .btn.active { background: #007a75; }
+
+        .nav-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .controls-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .counter { font-size: 0.85em; color: #666; min-width: 70px; text-align: center; }
+
+        .strand-header-card {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border-radius: 10px;
+            padding: 25px 30px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .strand-header-card h2 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+        .strand-header-card .count {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        body.overview-mode .today-section { display: none; }
+        body.overview-mode .strand-section { display: none; }
+
+        .toggle-label {
+            font-size: 0.8em;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .toggle-label input { accent-color: #00a6a0; }
+
+        /* Cards area */
+        .cards-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .lo-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px 18px;
+            flex: 1 1 300px;
+            max-width: 100%;
+            transition: all 0.3s;
+        }
+        .lo-card.hidden-blur {
+            filter: blur(8px);
+            opacity: 0.3;
+            user-select: none;
+        }
+        .lo-card.revealed { filter: none; opacity: 1; }
+        .lo-card .code-pill {
+            display: inline-block;
+            background: #e5e5e5;
+            color: #444;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        .lo-card .lo-text {
+            font-size: 1.15em;
+            line-height: 1.45;
+            color: #1a1a1a;
+        }
+        .lo-card .official {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.85em;
+            color: #888;
+            display: none;
+        }
+        body.show-official .lo-card .official { display: block; }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 60px 20px;
+            width: 100%;
+        }
+        .empty-state .icon { font-size: 3em; margin-bottom: 15px; }
+
+        /* Single slide mode */
+        body.slide-mode .cards-area { justify-content: center; }
+        body.slide-mode .lo-card { display: none; flex: none; width: 100%; max-width: 700px; }
+        body.slide-mode .lo-card.active { display: block; }
+        body.slide-mode .lo-card .lo-text { font-size: 1.6em; text-align: center; }
+        body.slide-mode .lo-card .code-pill { font-size: 1em; }
+
+        @media (max-width: 800px) {
+            .sidebar { position: fixed; left: 0; top: 56px; height: calc(100vh - 56px); z-index: 200; }
+            .sidebar.collapsed { margin-left: -320px; width: 320px; }
+            .main { padding-left: 20px; }
+            .lo-card { flex: 1 1 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="mark mark-left">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="brand-text">Mr Downes Maths</span>
+                <span class="mark mark-right">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="tagline">— Designed for learning on your terms</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span class="level-badge">LC Foundation Level</span>
+                <div class="lesson-input">
+                    <label>Today's Lesson:</label>
+                    <input type="text" id="lessonTitle" placeholder="e.g. Percentages">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="global-controls">
+                <button class="select-all-btn" onclick="selectAll()">✓ Select All</button>
+                <button class="clear-all-btn" onclick="clearAll()">✕ Clear All</button>
+            </div>
+
+            <div class="today-section">
+                <h3>📌 Today's Focus</h3>
+                <div class="today-tags" id="todayTags">
+                    <span class="today-empty">Select outcomes from strands below</span>
+                </div>
+            </div>
+
+            <!-- Strand 1: Stats & Probability -->
+            <div class="strand-section open">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    1. Statistics & Probability
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('stats')">All</button>
+                        <button onclick="clearStrand('stats')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="stats-items"></div>
+            </div>
+
+            <!-- Strand 2: Geometry & Trig -->
+            <div class="strand-section">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    2. Geometry & Trigonometry
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('geometry')">All</button>
+                        <button onclick="clearStrand('geometry')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="geometry-items"></div>
+            </div>
+
+            <!-- Strand 3: Number -->
+            <div class="strand-section">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    3. Number
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('number')">All</button>
+                        <button onclick="clearStrand('number')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="number-items"></div>
+            </div>
+
+            <!-- Strand 4: Algebra -->
+            <div class="strand-section">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    4. Algebra
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('algebra')">All</button>
+                        <button onclick="clearStrand('algebra')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="algebra-items"></div>
+            </div>
+
+            <!-- Strand 5: Functions -->
+            <div class="strand-section">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    5. Functions
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        <button onclick="selectStrand('functions')">All</button>
+                        <button onclick="clearStrand('functions')">None</button>
+                    </span>
+                    <span class="arrow">▶</span>
+                </button>
+                <div class="strand-items" id="functions-items"></div>
+            </div>
+        </aside>
+
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
+
+        <main class="main">
+            <div class="controls-bar">
+                <div class="controls-left">
+                    <button class="btn" id="overviewBtn" onclick="toggleOverview()">📊 Overview</button>
+                    <button class="btn secondary" id="hideAllBtn" onclick="hideAll()">Hide All</button>
+                    <button class="btn secondary" id="showAllBtn" onclick="showAll()">Show All</button>
+                </div>
+                <div class="nav-controls">
+                    <button class="btn secondary" id="prevBtn" onclick="goPrev()">◀ Back</button>
+                    <span class="counter" id="counter">0 / 0</span>
+                    <button class="btn secondary" id="nextBtn" onclick="goNext()">Next ▶</button>
+                </div>
+                <div class="controls-right">
+                    <button class="btn secondary" id="slideModeBtn" onclick="toggleSlideMode()">Slide Mode</button>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="officialToggle" onchange="document.body.classList.toggle('show-official', this.checked)">
+                        Official wording
+                    </label>
+                </div>
+            </div>
+
+            <div class="cards-area" id="cardsArea">
+                <div class="empty-state">
+                    <div class="icon">📋</div>
+                    <p>Select learning outcomes from the sidebar, or use <strong>Overview</strong> to browse all strands</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const allLOs = {
+            stats: [
+                // 1.1 Counting
+                { code: '1.1a', text: 'List all possible outcomes of an experiment', official: 'list all possible outcomes of an experiment' },
+                { code: '1.1b', text: 'Apply the fundamental principle of counting', official: 'apply the fundamental principle of counting' },
+                // 1.2 Concepts of probability
+                { code: '1.2a', text: 'Decide whether an everyday event is likely or unlikely to occur', official: 'decide whether an everyday event is likely or unlikely to occur' },
+                { code: '1.2b', text: 'Recognise that probability is a measure from 0 to 1 of how likely an event is', official: 'recognise that probability is a measure on a scale of 0-1 of how likely an event is to occur' },
+                { code: '1.2c', text: 'Use the language of probability to discuss events', official: 'use the language of probability to discuss events, including those with equally likely outcomes' },
+                { code: '1.2d', text: 'Estimate probabilities from experimental data', official: 'estimate probabilities from experimental data' },
+                { code: '1.2e', text: 'Recognise that repeating an experiment gives different outcomes, and more repeats give better estimates', official: 'recognise that, if an experiment is repeated, there will be different outcomes and that increasing the number of times an experiment is repeated generally leads to better estimates of probability' },
+                { code: '1.2f', text: 'Link probability to long-run relative frequency', official: 'associate the probability of an event with its long-run, relative frequency' },
+                // 1.3 Outcomes of simple random processes
+                { code: '1.3a', text: 'Construct sample spaces for two independent events', official: 'construct sample spaces for two independent events' },
+                { code: '1.3b', text: 'Calculate probability as favourable outcomes ÷ total outcomes', official: 'apply the principle that, in the case of equally likely outcomes, the probability is given by the number of outcomes of interest divided by the total number of outcomes' },
+                // 1.4 Statistical reasoning
+                { code: '1.4a', text: 'Discuss the purpose of statistics and recognise misconceptions and misuses', official: 'engage in discussions about the purpose of statistics and recognise misconceptions and misuses of statistics' },
+                { code: '1.4b', text: 'Discuss populations and samples', official: 'discuss populations and samples' },
+                { code: '1.4c', text: 'Decide how far conclusions can be generalised', official: 'decide to what extent conclusions can be generalised' },
+                { code: '1.4d', text: 'Work with different types of data: categorical (nominal, ordinal) and numerical (discrete, continuous)', official: 'work with different types of data: categorical (nominal or ordinal) and numerical (discrete or continuous)' },
+                // 1.5 Finding, collecting, organising data
+                { code: '1.5a', text: 'Clarify the problem at hand', official: 'clarify the problem at hand' },
+                { code: '1.5b', text: 'Formulate questions that can be answered with data', official: 'formulate one (or more) questions that can be answered with data' },
+                { code: '1.5c', text: 'Explore different ways of collecting data', official: 'explore different ways of collecting data' },
+                { code: '1.5d', text: 'Generate data or find data from other sources including the internet', official: 'generate data, or source data from other sources including the internet' },
+                { code: '1.5e', text: 'Select a Simple Random Sample from a population', official: 'select a sample from a population (Simple Random Sample)' },
+                { code: '1.5f', text: 'Recognise the importance of representativeness to avoid biased samples', official: 'recognise the importance of representativeness so as to avoid biased samples' },
+                { code: '1.5g', text: 'Design a plan and collect data', official: 'design a plan and collect data on the basis of above knowledge' },
+                { code: '1.5h', text: 'Summarise data in diagrams, including spreadsheets', official: 'summarise data in diagrammatic form, including data presented in spreadsheets' },
+                // 1.6 Representing data
+                { code: '1.6a', text: 'Select appropriate methods to represent and describe the sample (univariate data)', official: 'select appropriate methods to represent and describe the sample (univariate data only)' },
+                { code: '1.6b', text: 'Evaluate how well different displays represent findings', official: 'evaluate the effectiveness of different displays in representing the findings of a statistical investigation conducted by others' },
+                { code: '1.6c', text: 'Use pie charts, bar charts, line plots, histograms, stem and leaf plots', official: 'use pie charts, bar charts, line plots, histograms (equal intervals), stem and leaf plots to display data' },
+                { code: '1.6d', text: 'Use appropriate graphs to compare data sets', official: 'use appropriate graphical displays to compare data sets' },
+                { code: '1.6e', text: 'Use mean, median, mode to describe central tendency', official: 'use a variety of summary statistics to describe the data: central tendency (mean, median, mode)' },
+                { code: '1.6f', text: 'Use range to describe variability', official: 'use a variety of summary statistics to describe the data: variability (range)' },
+                // 1.7 Analysing, interpreting, drawing conclusions
+                { code: '1.7a', text: 'Interpret graphical summaries of data', official: 'interpret graphical summaries of data' },
+                { code: '1.7b', text: 'Relate the interpretation to the original question', official: 'relate the interpretation to the original question' },
+                { code: '1.7c', text: 'Recognise how sampling variability affects statements about populations', official: 'recognise how sampling variability influences the use of sample information to make statements about the population' },
+                { code: '1.7d', text: 'Use appropriate tools to describe variability and draw inferences', official: 'use appropriate tools to describe variability, drawing inferences about the population from the sample' },
+                { code: '1.7e', text: 'Interpret the analysis and relate it to the original question', official: 'interpret the analysis and relate the interpretation to the original question' }
+            ],
+            geometry: [
+                // 2.1 Synthetic geometry
+                { code: '2.1a', text: 'Revisit constructions 4, 5, 10, 13 and 15 in real-life contexts', official: 'revisit constructions 4, 5, 10, 13 and 15 in real-life contexts' },
+                { code: '2.1b', text: 'Draw a circle of given radius', official: 'draw a circle of given radius' },
+                { code: '2.1c', text: 'Use instruments (straight edge, compass, ruler, protractor, set square) appropriately', official: 'use the instruments: straight edge, compass, ruler, protractor and set square appropriately when drawing geometric diagrams' },
+                // 2.2 Co-ordinate geometry
+                { code: '2.2a', text: 'Find solutions to real-life problems involving up to two linear relationships (using graphs, numbers, or mental methods)', official: 'select and use suitable strategies (graphic, numeric, mental) for finding solutions to real-life problems involving up to two linear relationships' },
+                // 2.3 Trigonometry
+                { code: '2.3a', text: 'Apply Pythagoras\' theorem to solve simple right-angled triangle problems', official: 'apply the result of the theorem of Pythagoras to solve right-angled triangle problems of a simple nature involving heights and distances' },
+                { code: '2.3b', text: 'Use trigonometric ratios (sin, cos, tan) to solve real-world angle problems', official: 'use trigonometric ratios to solve real world problems involving angles' },
+                // 2.4 Transformation geometry
+                { code: '2.4a', text: 'Locate axes of symmetry in simple shapes', official: 'locate axes of symmetry in simple shapes' },
+                { code: '2.4b', text: 'Recognise images under translation, central symmetry, axial symmetry, and rotation', official: 'recognise images of points and objects under translation, central symmetry, axial symmetry and rotation' },
+                { code: '2.4c', text: 'Investigate enlargements and their effect on area (scale factor k)', official: 'investigate enlargements and their effect on area, paying attention to centre of enlargement and scale factor k where 0<k<1, k>1, k ∈ Q' },
+                { code: '2.4d', text: 'Solve problems involving enlargements', official: 'solve problems involving enlargements' }
+            ],
+            number: [
+                // 3.1 Number systems
+                { code: '3.1a', text: 'Revisit +, −, ×, ÷ in ℕ, ℤ, ℚ and use the number line to order numbers', official: 'revisit the operations of addition, multiplication, subtraction and division in N, Z, Q and use the number line to represent the order of these numbers' },
+                { code: '3.1b', text: 'Use models (decomposition, arrays, groups) to understand +, −, ×, ÷', official: 'investigate models such as decomposition, skip counting, arranging items in arrays and accumulating groups of equal size to make sense of the operations' },
+                { code: '3.1c', text: 'Investigate properties: commutative, associative, distributive laws', official: 'investigate the properties of arithmetic: commutative, associative and distributive laws and the relationships between them' },
+                { code: '3.1d', text: 'Appreciate the order of operations including brackets', official: 'appreciate the order of operations, including the use of brackets' },
+                { code: '3.1e', text: 'Use the number line to illustrate operations with integers', official: 'investigate models, such as the number line, to illustrate the operations of addition, subtraction, multiplication and division in Z' },
+                { code: '3.1f', text: 'Generalise and articulate observations of arithmetic operations', official: 'generalise and articulate observations of arithmetic operations' },
+                { code: '3.1g', text: 'Investigate models for +, −, ×, ÷ with fractions', official: 'investigate models to help think about the operations of addition, subtraction, multiplication and division of rational numbers' },
+                { code: '3.1h', text: 'Understand that equality means two expressions have the same value', official: 'consolidate the idea that equality is a relationship in which two mathematical expressions hold the same value' },
+                { code: '3.1i', text: 'Analyse solution strategies to problems', official: 'analyse solution strategies to problems' },
+                { code: '3.1j', text: 'Calculate percentages', official: 'calculate percentages' },
+                { code: '3.1k', text: 'Use equivalence of fractions, decimals and percentages to compare proportions', official: 'use the equivalence of fractions, decimals and percentages to compare proportions' },
+                { code: '3.1l', text: 'Consolidate understanding of factors, multiples, prime numbers, ratio and proportion', official: 'consolidate their understanding of factors, multiples and prime numbers and the relationship between ratio and proportion' },
+                { code: '3.1m', text: 'Check a result by estimation and working backwards; round off', official: 'check a result by considering whether it is of the right order of magnitude and by working the problem backwards; round off a result' },
+                { code: '3.1n', text: 'Make and justify estimates and approximations', official: 'make and justify estimates and approximations of calculations' },
+                { code: '3.1o', text: 'Present answers to the required degree of accuracy', official: 'present numerical answers to the degree of accuracy specified' },
+                { code: '3.1p', text: 'Express numbers in standard form (a × 10ⁿ)', official: 'express non-zero positive rational numbers in the form a × 10ⁿ, where n ∈ Z and 1 ≤ a < 10' },
+                // 3.2 Indices
+                { code: '3.2a', text: 'Solve problems with √a, a^(1/2), a², a³, 1/a', official: 'solve contextual problems involving numbers represented as: √a, a^(1/2), a², a³, 1/a' },
+                // 3.3 Arithmetic
+                { code: '3.3a', text: 'Solve problems: profit/loss, % profit/loss, discount, selling price', official: 'solve problems that involve finding profit or loss, % profit or loss (on the cost price), discount, % discount, selling price' },
+                { code: '3.3b', text: 'Solve problems: compound interest (up to 3 years)', official: 'solve problems involving compound interest for not more than 3 years' },
+                { code: '3.3c', text: 'Solve problems: income tax (standard rate), net pay', official: 'solve problems involving income tax (standard rate only), net pay (including other deductions of specified amounts)' },
+                { code: '3.3d', text: 'Calculate, interpret and apply units of measure and time', official: 'calculate, interpret and apply units of measure and time' },
+                { code: '3.3e', text: 'Solve problems involving average speed, distance and time', official: 'solve problems that involve calculating average speed, distance and time' },
+                // 3.4 Length, area, volume
+                { code: '3.4a', text: 'Investigate nets of rectangular solids and cylinders', official: 'investigate the nets of rectangular solids and cylinders' },
+                { code: '3.4b', text: 'Find perimeter and area of discs, triangles, rectangles, squares and combinations', official: 'select and use suitable strategies to find length of the perimeter and the area of plane figures: disc, triangle, rectangle, square, and figures made from combinations of these' },
+                { code: '3.4c', text: 'Estimate area of regular and irregular shapes', official: 'select and use suitable strategies to estimate the area of a combination of regular and irregular shapes' },
+                { code: '3.4d', text: 'Find volume and surface area of rectangular solids, cylinders and spheres', official: 'select and use suitable strategies to find the volume and surface area of rectangular solids, cylinders and spheres' },
+                { code: '3.4e', text: 'Draw and interpret scaled diagrams', official: 'draw and interpret scaled diagrams' }
+            ],
+            algebra: [
+                // 4.1a Generating expressions from patterns
+                { code: '4.1a', text: 'Use tables to represent a repeating-pattern situation', official: 'use tables to represent a repeating-pattern situation' },
+                { code: '4.1b', text: 'Generalise and explain patterns in words and numbers', official: 'generalise and explain patterns and relationships in words and numbers' },
+                { code: '4.1c', text: 'Write arithmetic expressions for terms in a sequence', official: 'write arithmetic expressions for particular terms in a sequence' },
+                // 4.1b Representing with tables, diagrams, graphs
+                { code: '4.1d', text: 'Use tables, diagrams and graphs to represent and analyse linear patterns', official: 'use tables, diagrams and graphs as tools for representing and analysing linear patterns and relationships' },
+                { code: '4.1e', text: 'Develop generalising strategies and consider those of others', official: 'develop and use their own generalising strategies and ideas and consider those of others' },
+                { code: '4.1f', text: 'Present and interpret solutions, explaining methods and reasoning', official: 'present and interpret solutions, explaining and justifying methods, inferences and reasoning' },
+                // 4.1c Finding formulae
+                { code: '4.1g', text: 'Find the underlying formula (in words) from which data is derived', official: 'find the underlying formula written in words from which the data is derived (linear relationships)' },
+                // 4.1d Examining algebraic relationships
+                { code: '4.1h', text: 'Show that relations can be represented in different ways', official: 'show that relations have features that can be represented in a variety of ways' },
+                { code: '4.1i', text: 'Identify useful features in tables, graphs, models, and formulae', official: 'distinguish those features that are especially useful to identify and point out how those features appear in different representations' },
+                { code: '4.1j', text: 'Use representations to reason about situations and communicate thinking', official: 'use the representations to reason about the situation from which the relationship is derived and communicate their thinking to others' },
+                { code: '4.1k', text: 'Discuss rate of change and y-intercept and how they appear in tables, graphs and formulae', official: 'discuss rate of change and the y-intercept; consider how these relate to the context and identify how they can appear in a table, in a graph and in a formula' },
+                { code: '4.1l', text: 'Decide if two linear relationships have a common value', official: 'decide if two linear relationships have a common value' },
+                { code: '4.1m', text: 'Recognise direct proportion problems and identify necessary information', official: 'recognise problems involving direct proportion and identify the necessary information to solve them' },
+                // 4.1e Relations without formulae
+                { code: '4.1n', text: 'Explore graphs of motion', official: 'explore graphs of motion' },
+                { code: '4.1o', text: 'Make sense of graphs and draw conclusions from them', official: 'make sense of quantitative graphs and draw conclusions from them' },
+                { code: '4.1p', text: 'Connect the shape of a graph to the story of a phenomenon', official: 'make connections between the shape of a graph and the story of a phenomenon' },
+                { code: '4.1q', text: 'Describe quantity and change of quantity on a graph', official: 'describe both quantity and change of quantity on a graph' },
+                // 4.1f Expressions
+                { code: '4.1r', text: 'Evaluate expressions given the value of variables', official: 'evaluate expressions given the value of the variables' },
+                // 4.2 Solving equations
+                { code: '4.2a', text: 'Solve linear equations: ax + b = cx + d', official: 'select and use suitable strategies (graphic, numeric, mental) for finding solutions to equations of the form f(x) = g(x), with f(x) = ax+b, g(x) = cx+d' },
+                // 4.3 Inequalities
+                { code: '4.3a', text: 'Solve linear inequalities: ax + b ≤ k, ≥, <, >', official: 'select and use suitable strategies (graphic, numeric, mental) for finding solutions to inequalities of the form g(x) ≤ k, g(x) ≥ k, g(x) < k, g(x) > k, where g(x) = ax + b' }
+            ],
+            functions: [
+                // 5.1 Functions
+                { code: '5.1a', text: 'Recognise that a function assigns a unique output to each input', official: 'recognise that a function assigns a unique output to a given input' },
+                { code: '5.1b', text: 'Graph linear functions: y = ax + b', official: 'graph functions of the form ax+b where a,b ∈ Q, x ∈ R' }
+            ]
+        };
+
+        let selected = [];
+        let revealIndex = 0;
+        let slideMode = false;
+        let currentSlideIndex = 0;
+        let overviewMode = false;
+        let overviewStrandIndex = 0;
+        const strandNames = ['stats', 'geometry', 'number', 'algebra', 'functions'];
+        const strandTitles = {
+            stats: 'Strand 1: Statistics & Probability',
+            geometry: 'Strand 2: Geometry & Trigonometry',
+            number: 'Strand 3: Number',
+            algebra: 'Strand 4: Algebra',
+            functions: 'Strand 5: Functions'
+        };
+
+        function buildCheckboxes() {
+            for (const [strand, items] of Object.entries(allLOs)) {
+                const container = document.getElementById(`${strand}-items`);
+                items.forEach((lo, i) => {
+                    const div = document.createElement('label');
+                    div.className = 'lo-item';
+                    div.innerHTML = `
+                        <input type="checkbox" data-strand="${strand}" data-index="${i}">
+                        <span class="code">${lo.code}</span>
+                        <span class="text">${lo.text}</span>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            document.querySelectorAll('.lo-item input').forEach(cb => {
+                cb.addEventListener('change', updateSelection);
+            });
+        }
+
+        function updateSelection() {
+            selected = [];
+            document.querySelectorAll('.lo-item input:checked').forEach(cb => {
+                const strand = cb.dataset.strand;
+                const index = parseInt(cb.dataset.index);
+                selected.push(allLOs[strand][index]);
+            });
+            updateTodayTags();
+            if (!overviewMode) {
+                buildCards();
+            }
+            revealIndex = 0;
+            currentSlideIndex = 0;
+            updateCounter();
+        }
+
+        function updateTodayTags() {
+            const container = document.getElementById('todayTags');
+            if (selected.length === 0) {
+                container.innerHTML = '<span class="today-empty">Select outcomes from strands below</span>';
+            } else if (selected.length <= 8) {
+                container.innerHTML = selected.map(lo => `<span class="today-tag">${lo.code}</span>`).join('');
+            } else {
+                container.innerHTML = `<span class="today-tag">${selected.length} outcomes selected</span>`;
+            }
+        }
+
+        function buildCards() {
+            const area = document.getElementById('cardsArea');
+            if (selected.length === 0) {
+                area.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>Select learning outcomes from the sidebar, or use <strong>Overview</strong> to browse all strands</p></div>`;
+                return;
+            }
+            area.innerHTML = selected.map((lo, i) => `
+                <div class="lo-card revealed ${i === 0 ? 'active' : ''}" data-index="${i}">
+                    <span class="code-pill">${lo.code}</span>
+                    <p class="lo-text">${lo.text}</p>
+                    <p class="official">${lo.official}</p>
+                </div>
+            `).join('');
+            revealIndex = selected.length;
+        }
+
+        function toggleOverview() {
+            overviewMode = !overviewMode;
+            document.body.classList.toggle('overview-mode', overviewMode);
+            document.getElementById('overviewBtn').classList.toggle('active', overviewMode);
+            document.getElementById('overviewBtn').textContent = overviewMode ? '✕ Exit Overview' : '📊 Overview';
+            
+            if (overviewMode) {
+                overviewStrandIndex = 0;
+                showOverviewStrand();
+            } else {
+                buildCards();
+                updateCounter();
+            }
+        }
+
+        function showOverviewStrand() {
+            const strandKey = strandNames[overviewStrandIndex];
+            const items = allLOs[strandKey];
+            const area = document.getElementById('cardsArea');
+            
+            area.innerHTML = `
+                <div class="strand-header-card">
+                    <h2>${strandTitles[strandKey]}</h2>
+                    <div class="count">${items.length} learning outcomes</div>
+                </div>
+                ${items.map((lo, i) => `
+                    <div class="lo-card revealed" data-index="${i}">
+                        <span class="code-pill">${lo.code}</span>
+                        <p class="lo-text">${lo.text}</p>
+                        <p class="official">${lo.official}</p>
+                    </div>
+                `).join('')}
+            `;
+            
+            document.getElementById('counter').textContent = `Strand ${overviewStrandIndex + 1} / ${strandNames.length}`;
+        }
+
+        function hideAll() {
+            document.querySelectorAll('.lo-card').forEach(card => {
+                card.classList.add('hidden-blur');
+                card.classList.remove('revealed', 'active');
+            });
+            revealIndex = 0;
+            currentSlideIndex = 0;
+            updateCounter();
+        }
+
+        function showAll() {
+            document.querySelectorAll('.lo-card').forEach((card, i) => {
+                card.classList.remove('hidden-blur');
+                card.classList.add('revealed');
+                if (i === 0) card.classList.add('active');
+            });
+            revealIndex = selected.length;
+            updateCounter();
+        }
+
+        function goNext() {
+            if (overviewMode) {
+                if (overviewStrandIndex < strandNames.length - 1) {
+                    overviewStrandIndex++;
+                    showOverviewStrand();
+                }
+            } else if (slideMode) {
+                const cards = document.querySelectorAll('.lo-card');
+                if (currentSlideIndex < selected.length - 1) {
+                    cards[currentSlideIndex].classList.remove('active');
+                    currentSlideIndex++;
+                    cards[currentSlideIndex].classList.add('active');
+                    cards[currentSlideIndex].classList.remove('hidden-blur');
+                    cards[currentSlideIndex].classList.add('revealed');
+                }
+                updateCounter();
+            } else {
+                const cards = document.querySelectorAll('.lo-card');
+                if (revealIndex < cards.length) {
+                    cards[revealIndex].classList.remove('hidden-blur');
+                    cards[revealIndex].classList.add('revealed');
+                    revealIndex++;
+                }
+                updateCounter();
+            }
+        }
+
+        function goPrev() {
+            if (overviewMode) {
+                if (overviewStrandIndex > 0) {
+                    overviewStrandIndex--;
+                    showOverviewStrand();
+                }
+            } else if (slideMode) {
+                const cards = document.querySelectorAll('.lo-card');
+                if (currentSlideIndex > 0) {
+                    cards[currentSlideIndex].classList.remove('active');
+                    currentSlideIndex--;
+                    cards[currentSlideIndex].classList.add('active');
+                }
+                updateCounter();
+            }
+        }
+
+        function updateCounter() {
+            const total = selected.length;
+            if (overviewMode) {
+                document.getElementById('counter').textContent = `Strand ${overviewStrandIndex + 1} / ${strandNames.length}`;
+            } else if (slideMode) {
+                document.getElementById('counter').textContent = total > 0 ? `${currentSlideIndex + 1} / ${total}` : '0 / 0';
+            } else {
+                document.getElementById('counter').textContent = `${revealIndex} / ${total}`;
+            }
+        }
+
+        function toggleSlideMode() {
+            slideMode = !slideMode;
+            document.body.classList.toggle('slide-mode', slideMode);
+            document.getElementById('slideModeBtn').classList.toggle('active', slideMode);
+            document.getElementById('slideModeBtn').textContent = slideMode ? 'Cards Mode' : 'Slide Mode';
+            
+            if (slideMode) {
+                currentSlideIndex = 0;
+                document.querySelectorAll('.lo-card').forEach((card, i) => {
+                    card.classList.toggle('active', i === 0);
+                });
+            }
+            updateCounter();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('sidebarToggle').textContent = 
+                document.getElementById('sidebar').classList.contains('collapsed') ? '☰' : '✕';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                goNext();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                goPrev();
+            }
+        });
+
+        function selectAll() {
+            document.querySelectorAll('.lo-item input').forEach(cb => cb.checked = true);
+            updateSelection();
+        }
+
+        function clearAll() {
+            document.querySelectorAll('.lo-item input').forEach(cb => cb.checked = false);
+            updateSelection();
+        }
+
+        function selectStrand(strand) {
+            document.querySelectorAll(`.lo-item input[data-strand="${strand}"]`).forEach(cb => cb.checked = true);
+            updateSelection();
+        }
+
+        function clearStrand(strand) {
+            document.querySelectorAll(`.lo-item input[data-strand="${strand}"]`).forEach(cb => cb.checked = false);
+            updateSelection();
+        }
+
+        buildCheckboxes();
+        updateSelection();
+    </script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LCA Maths - Mr Downes Maths</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f5f5f5; 
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .topbar {
+            background: #e8e8e8;
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #22c55e, #3b82f6, #ef4444, #1a1a1a) 1;
+        }
+        .topbar-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-text { font-weight: 700; font-size: 1.15em; color: #1a1a1a; }
+        .tagline { color: #555; font-size: 0.9em; }
+        .mark { display: flex; gap: 4px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot.green { background: #22c55e; }
+        .dot.blue { background: #3b82f6; }
+        .dot.red { background: #ef4444; }
+        .dot.black { background: #1a1a1a; }
+        .level-badge {
+            background: #f59e0b;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+
+        /* Slide */
+        .slide {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+            min-height: 400px;
+        }
+        .slide-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        .slide-header h2 {
+            font-size: 1.3em;
+            color: #333;
+        }
+        .slide-header .subtitle {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .lo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            transition: all 0.2s;
+        }
+        .lo-item:hover { background: #f0f0f0; }
+        .lo-item.ticked {
+            background: #e8f5f5;
+            border-color: #00a6a0;
+        }
+        .lo-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: #00a6a0;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .lo-item .code {
+            background: #e0e0e0;
+            color: #444;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .lo-item.ticked .code {
+            background: #00a6a0;
+            color: white;
+        }
+        .lo-item .text {
+            font-size: 1.05em;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .btn {
+            background: #00a6a0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: #00b8b0; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn.secondary { background: #e0e0e0; color: #444; }
+        .btn.secondary:hover { background: #d0d0d0; }
+        .page-info {
+            font-size: 1em;
+            color: #666;
+            font-weight: 600;
+        }
+
+        /* Clipboard section */
+        .clipboard-bar {
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .clipboard-bar .label {
+            font-weight: 600;
+            color: #00a6a0;
+            font-size: 0.9em;
+        }
+        .clipboard-bar .ticked-codes {
+            flex: 1;
+            font-size: 0.85em;
+            color: #555;
+        }
+        .clipboard-bar .ticked-codes span {
+            display: inline-block;
+            background: #00a6a0;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin: 2px 4px 2px 0;
+            font-size: 0.85em;
+        }
+
+        @media (max-width: 600px) {
+            .slide { padding: 20px; }
+            .lo-item .text { font-size: 0.95em; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="mark">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="brand-text">Mr Downes Maths</span>
+                <span class="tagline">— Designed for learning on your terms</span>
+            </div>
+            <span class="level-badge">LCA Mathematical Applications</span>
+        </div>
+    </header>
+
+    <div class="main">
+        <div class="slide" id="slide"></div>
+
+        <div class="nav-bar">
+            <button class="btn secondary" id="prevBtn" onclick="prevSlide()">◀ Back</button>
+            <span class="page-info" id="pageInfo">1 / 6</span>
+            <button class="btn secondary" id="nextBtn" onclick="nextSlide()">Next ▶</button>
+        </div>
+
+        <div class="clipboard-bar">
+            <span class="label">📋 Ticked:</span>
+            <div class="ticked-codes" id="tickedCodes">None</div>
+            <button class="btn" onclick="copyTicked()">Copy</button>
+        </div>
+    </div>
+
+    <script>
+        const slides = [
+            {
+                title: 'MCS.1 — Problem Solving',
+                subtitle: 'Reason mathematically about problems',
+                items: [
+                    { code: '1a', text: 'Make sense of a given problem and represent it using mathematics' },
+                    { code: '1b', text: 'Apply knowledge and skills to solve a problem, including decomposing it into manageable parts and/or simplifying it using appropriate assumptions' },
+                    { code: '1c', text: 'Interpret and justify their solution in terms of the original problem and communicate their findings mathematically' }
+                ]
+            },
+            {
+                title: 'MCS.2 — Calculations (Part 1)',
+                subtitle: 'Reason mathematically about problems',
+                items: [
+                    { code: '2a', text: 'Perform calculations on positive and negative numbers involving +, −, ×, ÷, square roots (positive only), and positive whole number powers' },
+                    { code: '2b', text: 'Use the order of arithmetic operations, including the use of brackets' },
+                    { code: '2c', text: 'Present answers to the degree of accuracy required (e.g. nearest whole number, nearest thousand, two decimal places)' }
+                ]
+            },
+            {
+                title: 'MCS.2 — Calculations (Part 2)',
+                subtitle: 'Reason mathematically about problems',
+                items: [
+                    { code: '2d', text: 'Use appropriate units and convert between them (mm, cm, m, km, seconds, minutes, hours, days, €k, €million, degrees, etc.)' },
+                    { code: '2e', text: 'Flexibly convert between fractions, decimals, and percentages' },
+                    { code: '2f', text: 'Use and understand ratio and proportion' }
+                ]
+            },
+            {
+                title: 'MCS.3 — 2D and 3D Shapes (Part 1)',
+                subtitle: 'Investigate 2D and 3D shapes',
+                items: [
+                    { code: '3a', text: 'Draw and interpret scaled diagrams, using appropriate geometric tools (ruler, straight edge, set square, protractor, compass)' },
+                    { code: '3b', text: 'Draw and interpret nets, including those of rectangular solids and cylinders' },
+                    { code: '3c', text: 'Find the perimeter and area of 2D shapes made from combinations of discs, triangles, and rectangles' }
+                ]
+            },
+            {
+                title: 'MCS.3 — 2D and 3D Shapes (Part 2)',
+                subtitle: 'Investigate 2D and 3D shapes',
+                items: [
+                    { code: '3d', text: 'Find the volume and surface area of 3D shapes, including those made from combinations of rectangular solids and cylinders' },
+                    { code: '3e', text: 'Recognise and use the important facts regarding angles at a point, on a straight line, and in squares, rectangles, parallelograms, and triangles' },
+                    { code: '3f', text: 'Apply the theorem of Pythagoras to solve simple problems' }
+                ]
+            },
+            {
+                title: 'MCS.4 — Relationships & Expressions',
+                subtitle: 'Explore certain types of relationships and expressions',
+                items: [
+                    { code: '4a', text: 'Evaluate expressions given the value of variables' },
+                    { code: '4b', text: 'Represent linear relationships in tables, graphs, and generalised expressions (expressed in words)' },
+                    { code: '4c', text: 'Select and use suitable strategies (graphic, numeric, trial and improvement, working backwards) for finding solutions to problems involving linear relationships' }
+                ]
+            },
+            {
+                title: 'MCS.5 — Statistical Investigation (Part 1)',
+                subtitle: 'Carry out a statistical investigation',
+                items: [
+                    { code: '5a', text: 'Generate a statistical question' },
+                    { code: '5b', text: 'Plan and implement a method to generate and/or source unbiased, representative data' },
+                    { code: '5c', text: 'Select, draw, and interpret appropriate graphical displays of data, including bar charts, pie charts, trend graphs, and histograms (equal intervals)' }
+                ]
+            },
+            {
+                title: 'MCS.5 — Statistical Investigation (Part 2)',
+                subtitle: 'Carry out a statistical investigation',
+                items: [
+                    { code: '5d', text: 'Select, calculate, and interpret appropriate summary statistics to describe aspects of univariate data, including measures of central tendency (mean, median, mode) and of spread (range)' },
+                    { code: '5e', text: 'Evaluate the effectiveness of different graphical displays in representing data' },
+                    { code: '5f', text: 'Discuss misconceptions and misuses of statistics' }
+                ]
+            }
+        ];
+
+        let currentSlide = 0;
+        let ticked = {};
+
+        function renderSlide() {
+            const slide = slides[currentSlide];
+            const container = document.getElementById('slide');
+            
+            container.innerHTML = `
+                <div class="slide-header">
+                    <h2>${slide.title}</h2>
+                    <div class="subtitle">${slide.subtitle}</div>
+                </div>
+                ${slide.items.map(item => `
+                    <label class="lo-item ${ticked[item.code] ? 'ticked' : ''}">
+                        <input type="checkbox" ${ticked[item.code] ? 'checked' : ''} onchange="toggleTick('${item.code}')">
+                        <span class="code">${item.code}</span>
+                        <span class="text">${item.text}</span>
+                    </label>
+                `).join('')}
+            `;
+            
+            document.getElementById('pageInfo').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === slides.length - 1;
+            
+            updateTickedDisplay();
+        }
+
+        function toggleTick(code) {
+            if (ticked[code]) {
+                delete ticked[code];
+            } else {
+                // Find the text for this code
+                for (const slide of slides) {
+                    const item = slide.items.find(i => i.code === code);
+                    if (item) {
+                        ticked[code] = item.text;
+                        break;
+                    }
+                }
+            }
+            renderSlide();
+        }
+
+        function updateTickedDisplay() {
+            const codes = Object.keys(ticked);
+            const container = document.getElementById('tickedCodes');
+            if (codes.length === 0) {
+                container.innerHTML = 'None';
+            } else {
+                container.innerHTML = codes.map(c => `<span>${c}</span>`).join('');
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                renderSlide();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                renderSlide();
+            }
+        }
+
+        function copyTicked() {
+            const codes = Object.keys(ticked);
+            if (codes.length === 0) {
+                alert('Tick some items first!');
+                return;
+            }
+            
+            const text = codes.map(code => `${code}: ${ticked[code]}`).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`Copied ${codes.length} item(s)!`);
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert(`Copied ${codes.length} item(s)!`);
+            });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        renderSlide();
+    </script>
+</body>
+</html>

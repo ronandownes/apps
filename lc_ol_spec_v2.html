@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC Ordinary Level - Mr Downes Maths</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #1a1a1a; }
+
+        /* Header */
+        .topbar {
+            background: #e8e8e8;
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #22c55e, #3b82f6, #ef4444, #1a1a1a) 1;
+            position: sticky;
+            top: 0;
+            z-index: 300;
+        }
+        .topbar-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.15em;
+            color: #1a1a1a;
+            opacity: 0;
+            animation: textFadeIn 0.6s ease-out 0.1s forwards;
+        }
+        .tagline {
+            color: #555;
+            font-size: 0.9em;
+            opacity: 0;
+            animation: textFadeIn 0.6s ease-out 0.3s forwards;
+        }
+        @keyframes textFadeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .mark { display: flex; gap: 4px; }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: dotBounce 0.8s ease-out forwards;
+        }
+        .mark-left .dot:nth-child(1) { animation-delay: 0.5s; }
+        .mark-left .dot:nth-child(2) { animation-delay: 0.6s; }
+        .mark-left .dot:nth-child(3) { animation-delay: 0.7s; }
+        .mark-left .dot:nth-child(4) { animation-delay: 0.8s; }
+        .mark-right .dot:nth-child(1) { animation-delay: 0.9s; }
+        .mark-right .dot:nth-child(2) { animation-delay: 1.0s; }
+        .mark-right .dot:nth-child(3) { animation-delay: 1.1s; }
+        .mark-right .dot:nth-child(4) { animation-delay: 1.2s; }
+        @keyframes dotBounce {
+            0% { transform: translateY(-30px) scale(0.3); opacity: 0; }
+            25% { transform: translateY(8px) scale(1.2); opacity: 1; }
+            40% { transform: translateY(-12px) scale(0.9); }
+            55% { transform: translateY(5px) scale(1.05); }
+            70% { transform: translateY(-4px) scale(0.98); }
+            85% { transform: translateY(2px) scale(1.01); }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .dot.green { background: #22c55e; }
+        .dot.blue { background: #3b82f6; }
+        .dot.red { background: #ef4444; }
+        .dot.black { background: #1a1a1a; }
+
+        .level-badge {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        /* Main layout */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Left panel - All LOs */
+        .all-los {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            overflow: hidden;
+        }
+        .panel-header {
+            background: #f8f8f8;
+            padding: 12px 16px;
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            font-size: 0.95em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .panel-header .count {
+            font-weight: normal;
+            color: #666;
+            font-size: 0.85em;
+        }
+        .lo-list {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        .strand-header {
+            background: #f0f0f0;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 0.85em;
+            color: #555;
+            position: sticky;
+            top: 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .lo-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 16px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .lo-row:hover { background: #f8f8f8; }
+        .lo-row.selected { background: #e8f5f5; }
+        .lo-row .code {
+            background: #e5e5e5;
+            color: #444;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .lo-row.selected .code {
+            background: #00a6a0;
+            color: white;
+        }
+        .lo-row .text {
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        /* Right panel - Clipboard */
+        .clipboard {
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #00a6a0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .clipboard .panel-header {
+            background: #00a6a0;
+            color: white;
+            border-bottom: none;
+        }
+        .clipboard .panel-header .count { color: rgba(255,255,255,0.8); }
+        
+        .clipboard-controls {
+            padding: 10px 16px;
+            background: #f0fafa;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: #00a6a0;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8em;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: #00b8b0; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn.secondary { background: #e0e0e0; color: #444; }
+        .btn.secondary:hover { background: #d0d0d0; }
+
+        .page-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .page-info {
+            font-size: 0.85em;
+            color: #666;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .clipboard-items {
+            flex: 1;
+            padding: 16px;
+            min-height: 300px;
+        }
+        .clipboard-item {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .clipboard-item input[type="checkbox"] {
+            margin-top: 3px;
+            accent-color: #00a6a0;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .clipboard-item .content { flex: 1; }
+        .clipboard-item .code {
+            display: inline-block;
+            background: #00a6a0;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .clipboard-item .text {
+            font-size: 1em;
+            line-height: 1.45;
+            color: #1a1a1a;
+        }
+        .clipboard-item .remove {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0 4px;
+        }
+        .clipboard-item .remove:hover { color: #e53935; }
+
+        .empty-clipboard {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+        .empty-clipboard .icon { font-size: 2.5em; margin-bottom: 10px; }
+
+        .copy-section {
+            padding: 12px 16px;
+            background: #f8f8f8;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .copy-section .hint {
+            font-size: 0.8em;
+            color: #666;
+            margin-left: auto;
+        }
+
+        @media (max-width: 800px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .lo-list, .clipboard-items {
+                max-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="mark mark-left">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="brand-text">Mr Downes Maths</span>
+                <span class="mark mark-right">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="tagline">— Designed for learning on your terms</span>
+            </div>
+            <span class="level-badge">LC Ordinary Level</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Left: All Learning Outcomes -->
+        <div class="all-los">
+            <div class="panel-header">
+                All Learning Outcomes
+                <span class="count" id="totalCount">0 total</span>
+            </div>
+            <div class="lo-list" id="loList"></div>
+        </div>
+
+        <!-- Right: Clipboard -->
+        <div class="clipboard">
+            <div class="panel-header">
+                📋 Today's Selection
+                <span class="count" id="clipCount">0 selected</span>
+            </div>
+            <div class="clipboard-controls">
+                <button class="btn secondary" onclick="clearClipboard()">Clear All</button>
+                <div class="page-nav">
+                    <button class="btn secondary" id="prevPage" onclick="prevPage()">◀</button>
+                    <span class="page-info" id="pageInfo">0 / 0</span>
+                    <button class="btn secondary" id="nextPage" onclick="nextPage()">▶</button>
+                </div>
+            </div>
+            <div class="clipboard-items" id="clipboardItems">
+                <div class="empty-clipboard">
+                    <div class="icon">👆</div>
+                    <p>Click outcomes on the left to add them here</p>
+                </div>
+            </div>
+            <div class="copy-section">
+                <button class="btn" onclick="copyTicked()">📋 Copy Ticked</button>
+                <button class="btn secondary" onclick="tickAll()">Tick All</button>
+                <button class="btn secondary" onclick="untickAll()">Untick All</button>
+                <span class="hint">Tick items to copy</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const allLOs = [
+            // Strand 1: Statistics & Probability
+            { strand: 1, code: '1.1a', text: 'Count the arrangements of n different objects (n!)' },
+            { strand: 1, code: '1.2a', text: 'Use set theory to discuss experiments, outcomes, and sample spaces' },
+            { strand: 1, code: '1.2b', text: 'Discuss basic probability rules (AND/OR, mutually exclusive) using Venn diagrams' },
+            { strand: 1, code: '1.2c', text: 'Calculate expected value and understand it doesn\'t have to be a possible outcome' },
+            { strand: 1, code: '1.2d', text: 'Recognise expected value in decision making and explore fair games' },
+            { strand: 1, code: '1.3a', text: 'Find the probability that two independent events both occur' },
+            { strand: 1, code: '1.3b', text: 'Apply understanding of Bernoulli trials' },
+            { strand: 1, code: '1.3c', text: 'Solve problems involving up to 3 Bernoulli trials' },
+            { strand: 1, code: '1.4a', text: 'Discuss populations and samples' },
+            { strand: 1, code: '1.4b', text: 'Decide how far conclusions can be generalised' },
+            { strand: 1, code: '1.4c', text: 'Work with bivariate data (two variables)' },
+            { strand: 1, code: '1.5a', text: 'Select a Simple Random Sample' },
+            { strand: 1, code: '1.5b', text: 'Recognise representativeness to avoid biased samples' },
+            { strand: 1, code: '1.5c', text: 'Discuss different study types: surveys, observational studies, designed experiments' },
+            { strand: 1, code: '1.5d', text: 'Design a plan and collect data' },
+            { strand: 1, code: '1.6a', text: 'Describe samples using appropriate graphical or numerical methods' },
+            { strand: 1, code: '1.6b', text: 'Explore distribution of data: symmetry and skewness' },
+            { strand: 1, code: '1.6c', text: 'Compare data sets using back-to-back stem and leaf plots' },
+            { strand: 1, code: '1.6d', text: 'Use scatterplots to determine relationships between variables' },
+            { strand: 1, code: '1.6e', text: 'Recognise correlation is a value from −1 to +1 measuring linear relationship' },
+            { strand: 1, code: '1.6f', text: 'Match correlation coefficient values to scatterplots' },
+            { strand: 1, code: '1.6g', text: 'Understand that correlation does not imply causality' },
+            { strand: 1, code: '1.6h', text: 'Recognise standard deviation and interquartile range as measures of spread' },
+            { strand: 1, code: '1.6i', text: 'Use a calculator to find standard deviation' },
+            { strand: 1, code: '1.6j', text: 'Find quartiles and the interquartile range' },
+            { strand: 1, code: '1.6k', text: 'Use the interquartile range appropriately when analysing data' },
+            { strand: 1, code: '1.6l', text: 'Recognise outliers in data' },
+            { strand: 1, code: '1.7a', text: 'Recognise how sampling variability affects statements about populations' },
+            { strand: 1, code: '1.7b', text: 'Use appropriate tools to describe variability and draw inferences' },
+            { strand: 1, code: '1.7c', text: 'Interpret analysis and relate to the original question' },
+            { strand: 1, code: '1.7d', text: 'Interpret a histogram in terms of how data is distributed' },
+            { strand: 1, code: '1.7e', text: 'Make decisions based on the empirical rule (68-95-99.7)' },
+            { strand: 1, code: '1.7f', text: 'Recognise the concept of a hypothesis test' },
+            { strand: 1, code: '1.7g', text: 'Calculate the margin of error for a population proportion' },
+            { strand: 1, code: '1.7h', text: 'Conduct a hypothesis test on a population proportion using margin of error' },
+
+            // Strand 2: Geometry & Trigonometry
+            { strand: 2, code: '2.1a', text: 'Perform constructions 16-21' },
+            { strand: 2, code: '2.1b', text: 'Use terms: theorem, proof, axiom, corollary, converse, implies' },
+            { strand: 2, code: '2.1c', text: 'Investigate and use theorems 7, 8, 11, 12, 13, 16, 17, 18, 20, 21 and corollary 6' },
+            { strand: 2, code: '2.2a', text: 'Use slopes to show two lines are parallel or perpendicular' },
+            { strand: 2, code: '2.2b', text: 'Recognise that ax + by + c = 0 represents a line' },
+            { strand: 2, code: '2.2c', text: 'Solve problems involving slopes of lines' },
+            { strand: 2, code: '2.2d', text: 'Calculate the area of a triangle using coordinates' },
+            { strand: 2, code: '2.2e', text: 'Recognise (x−h)² + (y−k)² = r² as a circle with centre (h,k) and radius r' },
+            { strand: 2, code: '2.2f', text: 'Solve problems with a line and a circle centred at the origin' },
+            { strand: 2, code: '2.3a', text: 'Use the theorem of Pythagoras to solve 2D problems' },
+            { strand: 2, code: '2.3b', text: 'Use trigonometry to calculate the area of a triangle' },
+            { strand: 2, code: '2.3c', text: 'Solve problems using the sine and cosine rules (2D)' },
+            { strand: 2, code: '2.4a', text: 'Investigate enlargements and their effect on area (scale factor k)' },
+            { strand: 2, code: '2.4b', text: 'Solve problems involving enlargements' },
+
+            // Strand 3: Number
+            { strand: 3, code: '3.1a', text: 'Recognise irrational numbers and understand that ℝ ≠ ℚ' },
+            { strand: 3, code: '3.1b', text: 'Work with irrational numbers' },
+            { strand: 3, code: '3.1c', text: 'Revisit operations (+, −, ×, ÷) in ℕ, ℤ, ℚ, ℝ and represent on a number line' },
+            { strand: 3, code: '3.1d', text: 'Develop understanding of decimals as equivalent fractions' },
+            { strand: 3, code: '3.1e', text: 'Consolidate understanding of factors, multiples, prime numbers' },
+            { strand: 3, code: '3.1f', text: 'Express numbers as products of prime factors' },
+            { strand: 3, code: '3.1g', text: 'Apply order of operations including brackets' },
+            { strand: 3, code: '3.1h', text: 'Express numbers in standard form (a × 10ⁿ)' },
+            { strand: 3, code: '3.1i', text: 'Appreciate that processes can generate sequences' },
+            { strand: 3, code: '3.1j', text: 'Investigate patterns among sequences' },
+            { strand: 3, code: '3.1k', text: 'Use patterns to continue sequences' },
+            { strand: 3, code: '3.1l', text: 'Generalise and explain patterns in algebraic form' },
+            { strand: 3, code: '3.1m', text: 'Recognise if a sequence is arithmetic, geometric, or neither' },
+            { strand: 3, code: '3.1n', text: 'Find the sum to n terms of an arithmetic series' },
+            { strand: 3, code: '3.2a', text: 'Use the rules for indices: aᵖ × aᵍ = aᵖ⁺ᵍ' },
+            { strand: 3, code: '3.2b', text: 'Use the rules for indices: aᵖ ÷ aᵍ = aᵖ⁻ᵍ' },
+            { strand: 3, code: '3.2c', text: 'Use the rules for indices: a⁰ = 1' },
+            { strand: 3, code: '3.2d', text: 'Use the rules for indices: (aᵖ)ᵍ = aᵖᵍ' },
+            { strand: 3, code: '3.2e', text: 'Use the rules for indices: a^(1/q) = ᵍ√a' },
+            { strand: 3, code: '3.2f', text: 'Use the rules for indices: a⁻ᵖ = 1/aᵖ' },
+            { strand: 3, code: '3.2g', text: 'Use the rules for indices: (ab)ᵖ = aᵖbᵖ' },
+            { strand: 3, code: '3.3a', text: 'Check results by estimation and working backwards; round off' },
+            { strand: 3, code: '3.3b', text: 'Accumulate error (addition/subtraction only)' },
+            { strand: 3, code: '3.3c', text: 'Make estimates; calculate percentage error and tolerance' },
+            { strand: 3, code: '3.3d', text: 'Calculate average rates of change (with respect to time)' },
+            { strand: 3, code: '3.3e', text: 'Solve problems: cost price, selling price, loss, discount, mark up, margin' },
+            { strand: 3, code: '3.3f', text: 'Solve problems: compound interest, depreciation, income tax, net pay' },
+            { strand: 3, code: '3.3g', text: 'Solve costing problems: materials, labour, wastage' },
+            { strand: 3, code: '3.3h', text: 'Work with metric system, change of units, everyday imperial units' },
+            { strand: 3, code: '3.3i', text: 'Make estimates of measures in the physical world' },
+            { strand: 3, code: '3.4a', text: 'Investigate nets of prisms, cylinders and cones' },
+            { strand: 3, code: '3.4b', text: 'Solve problems involving perimeter and area of plane figures' },
+            { strand: 3, code: '3.4c', text: 'Solve problems involving surface area and volume of solids' },
+            { strand: 3, code: '3.4d', text: 'Use the trapezoidal rule to approximate area' },
+
+            // Strand 4: Algebra
+            { strand: 4, code: '4.1a', text: 'Evaluate expressions given the value of variables' },
+            { strand: 4, code: '4.1b', text: 'Expand and regroup expressions' },
+            { strand: 4, code: '4.1c', text: 'Factorise quadratic expressions' },
+            { strand: 4, code: '4.1d', text: 'Add and subtract linear and quadratic expressions' },
+            { strand: 4, code: '4.1e', text: 'Add and subtract algebraic fractions' },
+            { strand: 4, code: '4.1f', text: 'Use distributive property: a(bx±cy±d)' },
+            { strand: 4, code: '4.1g', text: 'Multiply two brackets: (x±y)(w±z)' },
+            { strand: 4, code: '4.1h', text: 'Rearrange formulae' },
+            { strand: 4, code: '4.2a', text: 'Solve linear equations: ax + b = cx + d' },
+            { strand: 4, code: '4.2b', text: 'Solve equations with algebraic fractions' },
+            { strand: 4, code: '4.2c', text: 'Solve quadratic equations (not necessarily factorisable)' },
+            { strand: 4, code: '4.2d', text: 'Solve simultaneous linear equations (2 unknowns)' },
+            { strand: 4, code: '4.2e', text: 'Solve one linear and one quadratic equation (2 unknowns)' },
+            { strand: 4, code: '4.2f', text: 'Form quadratic equations given whole number roots' },
+            { strand: 4, code: '4.3a', text: 'Solve linear inequalities: ax + b < k, ≤, >, ≥' },
+            { strand: 4, code: '4.3b', text: 'Use absolute value notation |x|' },
+
+            // Strand 5: Functions
+            { strand: 5, code: '5.1a', text: 'Recognise that a function assigns a unique output to each input' },
+            { strand: 5, code: '5.1b', text: 'Form composite functions' },
+            { strand: 5, code: '5.1c', text: 'Graph linear functions: y = ax + b' },
+            { strand: 5, code: '5.1d', text: 'Graph quadratic functions: y = ax² + bx + c' },
+            { strand: 5, code: '5.1e', text: 'Graph cubic functions: y = ax³ + bx² + cx + d' },
+            { strand: 5, code: '5.1f', text: 'Graph exponential functions: y = a·bˣ' },
+            { strand: 5, code: '5.1g', text: 'Interpret f(x) = g(x) as comparing functions' },
+            { strand: 5, code: '5.1h', text: 'Use graphs to find approximate solutions to f(x) = 0, f(x) = k, f(x) = g(x)' },
+            { strand: 5, code: '5.1i', text: 'Investigate the concept of limit of a function' },
+            { strand: 5, code: '5.2a', text: 'Find first and second derivatives of linear, quadratic, cubic functions by rule' },
+            { strand: 5, code: '5.2b', text: 'Associate derivatives with slopes and tangent lines' },
+            { strand: 5, code: '5.2c', text: 'Apply differentiation to rates of change' },
+            { strand: 5, code: '5.2d', text: 'Apply differentiation to find maxima and minima' },
+            { strand: 5, code: '5.2e', text: 'Apply differentiation to curve sketching' }
+        ];
+
+        const strandNames = {
+            1: 'Strand 1: Statistics & Probability',
+            2: 'Strand 2: Geometry & Trigonometry',
+            3: 'Strand 3: Number',
+            4: 'Strand 4: Algebra',
+            5: 'Strand 5: Functions'
+        };
+
+        let clipboard = [];
+        let currentPage = 0;
+        const itemsPerPage = 4;
+
+        function buildList() {
+            const container = document.getElementById('loList');
+            let currentStrand = 0;
+            
+            allLOs.forEach((lo, index) => {
+                if (lo.strand !== currentStrand) {
+                    currentStrand = lo.strand;
+                    const header = document.createElement('div');
+                    header.className = 'strand-header';
+                    header.textContent = strandNames[currentStrand];
+                    container.appendChild(header);
+                }
+                
+                const row = document.createElement('div');
+                row.className = 'lo-row';
+                row.dataset.index = index;
+                row.innerHTML = `
+                    <span class="code">${lo.code}</span>
+                    <span class="text">${lo.text}</span>
+                `;
+                row.onclick = () => toggleSelection(index);
+                container.appendChild(row);
+            });
+            
+            document.getElementById('totalCount').textContent = `${allLOs.length} total`;
+        }
+
+        function toggleSelection(index) {
+            const row = document.querySelector(`.lo-row[data-index="${index}"]`);
+            const lo = allLOs[index];
+            
+            const clipIndex = clipboard.findIndex(item => item.code === lo.code);
+            if (clipIndex >= 0) {
+                clipboard.splice(clipIndex, 1);
+                row.classList.remove('selected');
+            } else {
+                clipboard.push({ ...lo, ticked: false });
+                row.classList.add('selected');
+            }
+            
+            updateClipboard();
+        }
+
+        function updateClipboard() {
+            const container = document.getElementById('clipboardItems');
+            document.getElementById('clipCount').textContent = `${clipboard.length} selected`;
+            
+            if (clipboard.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-clipboard">
+                        <div class="icon">👆</div>
+                        <p>Click outcomes on the left to add them here</p>
+                    </div>
+                `;
+                document.getElementById('pageInfo').textContent = '0 / 0';
+                return;
+            }
+            
+            const totalPages = Math.ceil(clipboard.length / itemsPerPage);
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+            if (currentPage < 0) currentPage = 0;
+            
+            const start = currentPage * itemsPerPage;
+            const end = Math.min(start + itemsPerPage, clipboard.length);
+            const pageItems = clipboard.slice(start, end);
+            
+            container.innerHTML = pageItems.map((item, i) => `
+                <div class="clipboard-item">
+                    <input type="checkbox" ${item.ticked ? 'checked' : ''} onchange="toggleTick(${start + i})">
+                    <div class="content">
+                        <span class="code">${item.code}</span>
+                        <div class="text">${item.text}</div>
+                    </div>
+                    <button class="remove" onclick="removeItem(${start + i})" title="Remove">×</button>
+                </div>
+            `).join('');
+            
+            document.getElementById('pageInfo').textContent = `${currentPage + 1} / ${totalPages}`;
+        }
+
+        function toggleTick(index) {
+            clipboard[index].ticked = !clipboard[index].ticked;
+        }
+
+        function removeItem(index) {
+            const lo = clipboard[index];
+            const row = document.querySelector(`.lo-row[data-index="${allLOs.findIndex(l => l.code === lo.code)}"]`);
+            if (row) row.classList.remove('selected');
+            clipboard.splice(index, 1);
+            updateClipboard();
+        }
+
+        function clearClipboard() {
+            clipboard = [];
+            document.querySelectorAll('.lo-row.selected').forEach(row => row.classList.remove('selected'));
+            currentPage = 0;
+            updateClipboard();
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                updateClipboard();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(clipboard.length / itemsPerPage);
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                updateClipboard();
+            }
+        }
+
+        function tickAll() {
+            clipboard.forEach(item => item.ticked = true);
+            updateClipboard();
+        }
+
+        function untickAll() {
+            clipboard.forEach(item => item.ticked = false);
+            updateClipboard();
+        }
+
+        function copyTicked() {
+            const ticked = clipboard.filter(item => item.ticked);
+            if (ticked.length === 0) {
+                alert('Tick some items first!');
+                return;
+            }
+            
+            const text = ticked.map(item => `${item.code}: ${item.text}`).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`Copied ${ticked.length} item(s) to clipboard!`);
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert(`Copied ${ticked.length} item(s) to clipboard!`);
+            });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+                e.preventDefault();
+                nextPage();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                prevPage();
+            }
+        });
+
+        buildList();
+    </script>
+</body>
+</html>

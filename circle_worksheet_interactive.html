@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circle Core Skills — Interactive Worksheet</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #f3f4f6; }
+    .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+    h1 { text-align: center; color: #1e40af; margin-bottom: 5px; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
+    .nav { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 20px; position: sticky; top: 0; background: #f3f4f6; padding: 10px 0; z-index: 100; }
+    .nav button { padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; background: #e5e7eb; color: #333; font-size: 13px; }
+    .nav button.active { background: #1e40af; color: #fff; font-weight: bold; }
+    .nav button:hover { opacity: 0.85; }
+    
+    .card { margin-bottom: 30px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
+    .card-header { background: #1e40af; color: #fff; padding: 12px 16px; }
+    .card-header h3 { margin: 0; font-size: 16px; }
+    .worksheet-content { background: #f8fafc; padding: 16px; border-bottom: 1px solid #e5e7eb; font-size: 14px; line-height: 1.6; }
+    .worksheet-content .formula { background: #fff; padding: 10px 14px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #3b82f6; font-family: Georgia, serif; }
+    .worksheet-content .note { font-size: 12px; color: #666; font-style: italic; }
+    .worksheet-content .task-list { margin-top: 12px; }
+    .worksheet-content .task-item { display: inline-block; background: #e0e7ff; padding: 4px 10px; border-radius: 4px; margin: 3px; font-size: 13px; }
+    .worksheet-content .task-item.active { background: #3b82f6; color: #fff; font-weight: bold; }
+    
+    .card-body { padding: 16px; }
+    .card-content { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+    .controls { display: flex; flex-direction: column; gap: 10px; min-width: 240px; flex: 1; }
+    .controls label { font-size: 13px; display: block; }
+    .controls input[type="range"] { width: 100%; margin-top: 4px; }
+    
+    .coord-display { background: #1e293b; color: #fff; padding: 12px; border-radius: 8px; font-family: 'Courier New', monospace; margin-bottom: 12px; }
+    .coord-display .coord-title { font-size: 11px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+    .coord-display .coord-row { display: flex; justify-content: space-between; margin: 4px 0; }
+    .coord-display .coord-label { color: #94a3b8; }
+    .coord-display .coord-value { font-weight: bold; font-size: 15px; }
+    .coord-display .coord-value.center { color: #f87171; }
+    .coord-display .coord-value.point { color: #4ade80; }
+    .coord-display .coord-value.radius { color: #60a5fa; }
+    .coord-display .coord-value.tangent { color: #fbbf24; }
+    
+    .info-box { padding: 12px; border-radius: 6px; font-size: 13px; }
+    .info-box.blue { background: #eff6ff; border: 1px solid #bfdbfe; }
+    .info-box.yellow { background: #fef3c7; border: 1px solid #fde68a; }
+    .info-box.purple { background: #ede9fe; border: 1px solid #ddd6fe; }
+    .info-box.green { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .info-box.red { background: #fef2f2; border: 1px solid #fecaca; }
+    .equation { font-family: Georgia, serif; font-size: 16px; margin-top: 8px; font-weight: bold; }
+    .calc { font-family: 'Courier New', monospace; font-size: 12px; margin-top: 4px; background: #f1f5f9; padding: 8px; border-radius: 4px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    const SCALE = 22;
+
+    // KaTeX rendering helper
+    const Tex = ({ children }) => {
+      const ref = useRef(null);
+      useEffect(() => {
+        if (ref.current) {
+          katex.render(children, ref.current, { throwOnError: false, displayMode: false });
+        }
+      }, [children]);
+      return <span ref={ref}></span>;
+    };
+
+    const GridCanvas = ({ children, width = 400, height = 400, centerX = 0, centerY = 0, scale = SCALE }) => {
+      const toScreen = (x, y) => ({
+        x: width/2 + (x - centerX) * scale,
+        y: height/2 - (y - centerY) * scale
+      });
+      
+      const gridLines = [];
+      const xMin = Math.floor(centerX - width / (2 * scale));
+      const xMax = Math.ceil(centerX + width / (2 * scale));
+      const yMin = Math.floor(centerY - height / (2 * scale));
+      const yMax = Math.ceil(centerY + height / (2 * scale));
+      
+      for (let x = xMin; x <= xMax; x++) {
+        const { x: sx } = toScreen(x, 0);
+        gridLines.push(
+          <line key={`vg${x}`} x1={sx} y1={0} x2={sx} y2={height} 
+            stroke={x === 0 ? "#444" : "#e5e5e5"} strokeWidth={x === 0 ? 2 : 1} />
+        );
+        if (x !== 0 && x % 2 === 0) {
+          const { y: labelY } = toScreen(0, 0);
+          gridLines.push(
+            <text key={`xl${x}`} x={sx} y={Math.min(Math.max(labelY + 14, 14), height - 4)} 
+              textAnchor="middle" fontSize="11" fill="#666" fontWeight="bold">{x}</text>
+          );
+        }
+      }
+      for (let y = yMin; y <= yMax; y++) {
+        const { y: sy } = toScreen(0, y);
+        gridLines.push(
+          <line key={`hg${y}`} x1={0} y1={sy} x2={width} y2={sy} 
+            stroke={y === 0 ? "#444" : "#e5e5e5"} strokeWidth={y === 0 ? 2 : 1} />
+        );
+        if (y !== 0 && y % 2 === 0) {
+          const { x: labelX } = toScreen(0, 0);
+          gridLines.push(
+            <text key={`yl${y}`} x={Math.min(Math.max(labelX + 4, 14), width - 14)} y={sy + 4} 
+              fontSize="11" fill="#666" fontWeight="bold">{y}</text>
+          );
+        }
+      }
+      
+      return (
+        <svg width={width} height={height} style={{ border: '2px solid #cbd5e1', background: '#fafafa', borderRadius: '8px' }}>
+          {gridLines}
+          {children}
+        </svg>
+      );
+    };
+
+    // ========== Q1: C=(0,0) and point on circle ==========
+    const Q1Visual = () => {
+      const tasks = [
+        {p: [3,4]}, {p: [-6,2]}, {p: [5,-12]}, {p: [-8,-1]}, {p: [7,-7]}, {p: [-2,9]}, {p: [9,-4]}, {p: [-10,3]}, {p: [8,6]}
+      ];
+      const [taskIdx, setTaskIdx] = useState(0);
+      const [radiusScale, setRadiusScale] = useState(1);
+      
+      const {p} = tasks[taskIdx];
+      const baseR = Math.sqrt(p[0]*p[0] + p[1]*p[1]);
+      const r = baseR * radiusScale;
+      const px = p[0] * radiusScale;
+      const py = p[1] * radiusScale;
+      const r2 = Math.round(r * r);
+      
+      const sc = Math.min(SCALE, 180 / Math.max(Math.abs(px), Math.abs(py), 6));
+      const toScreen = (x, y) => ({ x: 200 + x * sc, y: 200 - y * sc });
+      const cScreen = toScreen(0, 0);
+      const pScreen = toScreen(px, py);
+      
+      return (
+        <div className="card">
+          <div className="card-header"><h3>Q1: Centre at Origin — Point on Circle → Equation</h3></div>
+          <div className="worksheet-content">
+            <p>For a circle centred at <strong>C(0,0)</strong> with point <strong>P(x₁, y₁)</strong> on the circle:</p>
+            <div className="formula">r² = |x₁|² + |y₁|² → <strong>x² + y² = r²</strong></div>
+            <p className="note">Use magnitudes so signs never matter.</p>
+            <div className="task-list">
+              {tasks.map((t, i) => (
+                <span key={i} className={`task-item ${i === taskIdx ? 'active' : ''}`} 
+                  onClick={() => {setTaskIdx(i); setRadiusScale(1)}} style={{cursor:'pointer'}}>
+                  {String.fromCharCode(97+i)}) P({t.p[0]},{t.p[1]})
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-content">
+              <GridCanvas scale={sc} centerX={0} centerY={0}>
+                <circle cx={cScreen.x} cy={cScreen.y} r={r * sc} fill="rgba(59,130,246,0.12)" stroke="#3b82f6" strokeWidth={2} />
+                <line x1={cScreen.x} y1={cScreen.y} x2={cScreen.x + px * sc} y2={cScreen.y} stroke="#3b82f6" strokeWidth={2} />
+                <line x1={cScreen.x + px * sc} y1={cScreen.y} x2={pScreen.x} y2={pScreen.y} stroke="#dc2626" strokeWidth={2} />
+                <line x1={cScreen.x} y1={cScreen.y} x2={pScreen.x} y2={pScreen.y} stroke="#666" strokeWidth={1.5} strokeDasharray="4" />
+                <circle cx={cScreen.x} cy={cScreen.y} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} />
+                <circle cx={pScreen.x} cy={pScreen.y} r={8} fill="#16a34a" stroke="#fff" strokeWidth={2} />
+                <text x={cScreen.x} y={cScreen.y - 14} fontSize="13" fontWeight="bold" fill="#dc2626" textAnchor="middle">C(0,0)</text>
+                <text x={pScreen.x} y={pScreen.y - 14} fontSize="13" fontWeight="bold" fill="#16a34a" textAnchor="middle">P</text>
+              </GridCanvas>
+              <div className="controls">
+                <div className="coord-display">
+                  <div className="coord-title">Coordinates</div>
+                  <div className="coord-row"><span className="coord-label">Centre C:</span><span className="coord-value center">(0, 0)</span></div>
+                  <div className="coord-row"><span className="coord-label">Point P:</span><span className="coord-value point">({px.toFixed(1)}, {py.toFixed(1)})</span></div>
+                  <div className="coord-row"><span className="coord-label">|x₁| , |y₁|:</span><span className="coord-value">{Math.abs(px).toFixed(1)} , {Math.abs(py).toFixed(1)}</span></div>
+                  <div className="coord-row"><span className="coord-label">Radius r:</span><span className="coord-value radius">{r.toFixed(2)}</span></div>
+                  <div className="coord-row"><span className="coord-label">r² = |x₁|² + |y₁|²:</span><span className="coord-value radius">{r2}</span></div>
+                </div>
+                <label>Radius Scale: <strong>{radiusScale.toFixed(1)}×</strong>
+                  <input type="range" min={0.6} max={1.4} step={0.1} value={radiusScale} onChange={e => setRadiusScale(+e.target.value)} />
+                </label>
+                <div className="info-box blue">
+                  <div className="calc">{Math.abs(p[0])}² + {Math.abs(p[1])}² = {p[0]*p[0]} + {p[1]*p[1]} = {p[0]*p[0] + p[1]*p[1]}</div>
+                  <div className="equation">x² + y² = {r2}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========== Q2: C=(h,k) and point on circle ==========
+    const Q2Visual = () => {
+      const tasks = [
+        {c:[2,-1], p:[6,2]}, {c:[-4,3], p:[-1,-5]}, {c:[5,6], p:[1,9]}, {c:[-7,-2], p:[-10,4]},
+        {c:[3,-5], p:[8,-5]}, {c:[-1,8], p:[2,1]}, {c:[6,-3], p:[2,-7]}, {c:[-8,5], p:[-12,2]}, {c:[1,-9], p:[6,-13]}
+      ];
+      const [taskIdx, setTaskIdx] = useState(0);
+      const [h, setH] = useState(tasks[0].c[0]);
+      const [k, setK] = useState(tasks[0].c[1]);
+      
+      const {c, p} = tasks[taskIdx];
+      const px = p[0], py = p[1];
+      const dx = px - h, dy = py - k;
+      const r2 = dx * dx + dy * dy;
+      const r = Math.sqrt(r2);
+      
+      const centerX = (h + px) / 2;
+      const centerY = (k + py) / 2;
+      const sc = Math.min(SCALE, 160 / Math.max(Math.abs(px - centerX), Math.abs(py - centerY), Math.abs(h - centerX), Math.abs(k - centerY), 5));
+      
+      const toScreen = (x, y) => ({ x: 200 + (x - centerX) * sc, y: 200 - (y - centerY) * sc });
+      const cScreen = toScreen(h, k);
+      const pScreen = toScreen(px, py);
+      
+      const switchTask = (i) => { setTaskIdx(i); setH(tasks[i].c[0]); setK(tasks[i].c[1]); };
+      
+      return (
+        <div className="card">
+          <div className="card-header"><h3>Q2: General Centre — Point on Circle → Equation</h3></div>
+          <div className="worksheet-content">
+            <p>For a circle with centre <strong>C(h, k)</strong> and point <strong>P(x₁, y₁)</strong> on the circle:</p>
+            <div className="formula">Δx = x₁ − h, Δy = y₁ − k → r² = (Δx)² + (Δy)² → <strong>(x−h)² + (y−k)² = r²</strong></div>
+            <div className="task-list">
+              {tasks.map((t, i) => (
+                <span key={i} className={`task-item ${i === taskIdx ? 'active' : ''}`} 
+                  onClick={() => switchTask(i)} style={{cursor:'pointer'}}>
+                  {String.fromCharCode(97+i)}) C({t.c[0]},{t.c[1]}), P({t.p[0]},{t.p[1]})
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-content">
+              <GridCanvas scale={sc} centerX={centerX} centerY={centerY}>
+                <circle cx={cScreen.x} cy={cScreen.y} r={r * sc} fill="rgba(59,130,246,0.12)" stroke="#3b82f6" strokeWidth={2} />
+                <line x1={cScreen.x} y1={cScreen.y} x2={pScreen.x} y2={cScreen.y} stroke="#3b82f6" strokeWidth={2} />
+                <line x1={pScreen.x} y1={cScreen.y} x2={pScreen.x} y2={pScreen.y} stroke="#dc2626" strokeWidth={2} />
+                <line x1={cScreen.x} y1={cScreen.y} x2={pScreen.x} y2={pScreen.y} stroke="#666" strokeWidth={1.5} strokeDasharray="4" />
+                <text x={(cScreen.x + pScreen.x)/2} y={cScreen.y + (dy >= 0 ? 16 : -6)} fontSize="12" fill="#3b82f6" fontWeight="bold" textAnchor="middle">Δx={dx}</text>
+                <text x={pScreen.x + (dx >= 0 ? 8 : -8)} y={(cScreen.y + pScreen.y)/2} fontSize="12" fill="#dc2626" fontWeight="bold" textAnchor={dx >= 0 ? "start" : "end"}>Δy={dy}</text>
+                <circle cx={cScreen.x} cy={cScreen.y} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} />
+                <circle cx={pScreen.x} cy={pScreen.y} r={8} fill="#16a34a" stroke="#fff" strokeWidth={2} />
+                <text x={cScreen.x} y={cScreen.y - 14} fontSize="13" fontWeight="bold" fill="#dc2626" textAnchor="middle">C</text>
+                <text x={pScreen.x} y={pScreen.y - 14} fontSize="13" fontWeight="bold" fill="#16a34a" textAnchor="middle">P</text>
+              </GridCanvas>
+              <div className="controls">
+                <div className="coord-display">
+                  <div className="coord-title">Coordinates</div>
+                  <div className="coord-row"><span className="coord-label">Centre C:</span><span className="coord-value center">({h}, {k})</span></div>
+                  <div className="coord-row"><span className="coord-label">Point P:</span><span className="coord-value point">({px}, {py})</span></div>
+                  <div className="coord-row"><span className="coord-label">Δx, Δy:</span><span className="coord-value">{dx}, {dy}</span></div>
+                  <div className="coord-row"><span className="coord-label">r² = Δx² + Δy²:</span><span className="coord-value radius">{r2}</span></div>
+                </div>
+                <label>Centre h: <strong>{h}</strong>
+                  <input type="range" min={c[0]-5} max={c[0]+5} step={1} value={h} onChange={e => setH(+e.target.value)} />
+                </label>
+                <label>Centre k: <strong>{k}</strong>
+                  <input type="range" min={c[1]-5} max={c[1]+5} step={1} value={k} onChange={e => setK(+e.target.value)} />
+                </label>
+                <div className="info-box blue">
+                  <div className="calc">{dx}² + {dy}² = {dx*dx} + {dy*dy} = {r2}</div>
+                  <div className="equation">(x−{h})² + (y−{k < 0 ? `(${k})` : k})² = {r2}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========== Q3: x-axis is tangent ==========
+    const Q3Visual = () => {
+      const tasks = [
+        {c:[6,4]}, {c:[-3,-7]}, {c:[1,9]}, {c:[-8,2]}, {c:[5,-1]}, {c:[-2,6]}, {c:[7,-5]}, {c:[-9,3]}, {c:[4,-8]}
+      ];
+      const [taskIdx, setTaskIdx] = useState(0);
+      const [h, setH] = useState(tasks[0].c[0]);
+      const [k, setK] = useState(tasks[0].c[1]);
+      
+      const r = Math.abs(k);
+      const centerY = k / 2;
+      const sc = Math.min(SCALE, 180 / Math.max(Math.abs(k), 8));
+      
+      const toScreen = (x, y) => ({ x: 200 + (x - h) * sc, y: 200 - (y - centerY) * sc });
+      const cScreen = toScreen(h, k);
+      const tScreen = toScreen(h, 0);
+      const axisY = toScreen(0, 0).y;
+      
+      const switchTask = (i) => { setTaskIdx(i); setH(tasks[i].c[0]); setK(tasks[i].c[1]); };
+      
+      return (
+        <div className="card">
+          <div className="card-header"><h3>Q3: x-axis is Tangent</h3></div>
+          <div className="worksheet-content">
+            <p>If the <strong>x-axis (y = 0)</strong> is tangent to the circle, then the radius equals the vertical distance from C to the x-axis:</p>
+            <div className="formula"><strong>r = |k|</strong></div>
+            <div className="task-list">
+              {tasks.map((t, i) => (
+                <span key={i} className={`task-item ${i === taskIdx ? 'active' : ''}`} 
+                  onClick={() => switchTask(i)} style={{cursor:'pointer'}}>
+                  {String.fromCharCode(97+i)}) C({t.c[0]},{t.c[1]})
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-content">
+              <GridCanvas scale={sc} centerX={h} centerY={centerY}>
+                <line x1={0} y1={axisY} x2={400} y2={axisY} stroke="#f59e0b" strokeWidth={4} />
+                <text x={380} y={axisY - 8} fontSize="12" fill="#f59e0b" fontWeight="bold">y = 0</text>
+                <circle cx={cScreen.x} cy={cScreen.y} r={r * sc} fill="rgba(59,130,246,0.12)" stroke="#3b82f6" strokeWidth={2} />
+                <line x1={cScreen.x} y1={cScreen.y} x2={tScreen.x} y2={tScreen.y} stroke="#dc2626" strokeWidth={2} strokeDasharray="5" />
+                <circle cx={cScreen.x} cy={cScreen.y} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} />
+                <circle cx={tScreen.x} cy={tScreen.y} r={10} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
+                <text x={cScreen.x} y={cScreen.y - 14} fontSize="13" fontWeight="bold" fill="#dc2626" textAnchor="middle">C</text>
+                <text x={tScreen.x + 16} y={tScreen.y + 5} fontSize="12" fontWeight="bold" fill="#92400e">Tangent</text>
+              </GridCanvas>
+              <div className="controls">
+                <div className="coord-display">
+                  <div className="coord-title">Coordinates</div>
+                  <div className="coord-row"><span className="coord-label">Centre C:</span><span className="coord-value center">({h}, {k})</span></div>
+                  <div className="coord-row"><span className="coord-label">Tangent Point:</span><span className="coord-value tangent">({h}, 0)</span></div>
+                  <div className="coord-row"><span className="coord-label">r = |k|:</span><span className="coord-value radius">{r}</span></div>
+                  <div className="coord-row"><span className="coord-label">r²:</span><span className="coord-value radius">{r*r}</span></div>
+                </div>
+                <label>Roll along x-axis (h): <strong>{h}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={h} onChange={e => setH(+e.target.value)} />
+                </label>
+                <label>Height (k): <strong>{k}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={k} onChange={e => setK(+e.target.value)} />
+                </label>
+                <div className="info-box yellow">
+                  <div><strong>Key:</strong> r = |k| = |{k}| = {r}</div>
+                  <div className="equation">(x−{h})² + (y−{k < 0 ? `(${k})` : k})² = {r*r}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========== Q4: y-axis is tangent ==========
+    const Q4Visual = () => {
+      const tasks = [
+        {c:[7,-3]}, {c:[-5,8]}, {c:[2,1]}, {c:[-9,-4]}, {c:[4,6]}, {c:[-1,-7]}, {c:[8,2]}, {c:[-6,-3]}, {c:[3,9]}
+      ];
+      const [taskIdx, setTaskIdx] = useState(0);
+      const [h, setH] = useState(tasks[0].c[0]);
+      const [k, setK] = useState(tasks[0].c[1]);
+      
+      const r = Math.abs(h);
+      const centerX = h / 2;
+      const sc = Math.min(SCALE, 180 / Math.max(Math.abs(h), 8));
+      
+      const toScreen = (x, y) => ({ x: 200 + (x - centerX) * sc, y: 200 - (y - k) * sc });
+      const cScreen = toScreen(h, k);
+      const tScreen = toScreen(0, k);
+      const axisX = toScreen(0, 0).x;
+      
+      const switchTask = (i) => { setTaskIdx(i); setH(tasks[i].c[0]); setK(tasks[i].c[1]); };
+      
+      return (
+        <div className="card">
+          <div className="card-header"><h3>Q4: y-axis is Tangent</h3></div>
+          <div className="worksheet-content">
+            <p>If the <strong>y-axis (x = 0)</strong> is tangent to the circle, then the radius equals the horizontal distance from C to the y-axis:</p>
+            <div className="formula"><strong>r = |h|</strong></div>
+            <div className="task-list">
+              {tasks.map((t, i) => (
+                <span key={i} className={`task-item ${i === taskIdx ? 'active' : ''}`} 
+                  onClick={() => switchTask(i)} style={{cursor:'pointer'}}>
+                  {String.fromCharCode(97+i)}) C({t.c[0]},{t.c[1]})
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-content">
+              <GridCanvas scale={sc} centerX={centerX} centerY={k}>
+                <line x1={axisX} y1={0} x2={axisX} y2={400} stroke="#8b5cf6" strokeWidth={4} />
+                <text x={axisX + 8} y={20} fontSize="12" fill="#8b5cf6" fontWeight="bold">x = 0</text>
+                <circle cx={cScreen.x} cy={cScreen.y} r={r * sc} fill="rgba(59,130,246,0.12)" stroke="#3b82f6" strokeWidth={2} />
+                <line x1={cScreen.x} y1={cScreen.y} x2={tScreen.x} y2={tScreen.y} stroke="#3b82f6" strokeWidth={2} strokeDasharray="5" />
+                <circle cx={cScreen.x} cy={cScreen.y} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} />
+                <circle cx={tScreen.x} cy={tScreen.y} r={10} fill="#8b5cf6" stroke="#fff" strokeWidth={2} />
+                <text x={cScreen.x} y={cScreen.y - 14} fontSize="13" fontWeight="bold" fill="#dc2626" textAnchor="middle">C</text>
+                <text x={tScreen.x + 16} y={tScreen.y + 5} fontSize="12" fontWeight="bold" fill="#6d28d9">Tangent</text>
+              </GridCanvas>
+              <div className="controls">
+                <div className="coord-display">
+                  <div className="coord-title">Coordinates</div>
+                  <div className="coord-row"><span className="coord-label">Centre C:</span><span className="coord-value center">({h}, {k})</span></div>
+                  <div className="coord-row"><span className="coord-label">Tangent Point:</span><span className="coord-value tangent">(0, {k})</span></div>
+                  <div className="coord-row"><span className="coord-label">r = |h|:</span><span className="coord-value radius">{r}</span></div>
+                  <div className="coord-row"><span className="coord-label">r²:</span><span className="coord-value radius">{r*r}</span></div>
+                </div>
+                <label>Distance (h): <strong>{h}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={h} onChange={e => setH(+e.target.value)} />
+                </label>
+                <label>Roll along y-axis (k): <strong>{k}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={k} onChange={e => setK(+e.target.value)} />
+                </label>
+                <div className="info-box purple">
+                  <div><strong>Key:</strong> r = |h| = |{h}| = {r}</div>
+                  <div className="equation">(x−{h < 0 ? `(${h})` : h})² + (y−{k < 0 ? `(${k})` : k})² = {r*r}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========== Q5: Axis intersections analysis ==========
+    const Q5Visual = () => {
+      const tasks = [
+        {c:[4,3],r:5}, {c:[-2,5],r:5}, {c:[1,6],r:5}, {c:[3,-1],r:5}, {c:[6,2],r:6}, {c:[8,-3],r:5}, {c:[-7,4],r:6}, {c:[5,-8],r:7}, {c:[-9,0],r:4}
+      ];
+      const [taskIdx, setTaskIdx] = useState(0);
+      const [h, setH] = useState(tasks[0].c[0]);
+      const [k, setK] = useState(tasks[0].c[1]);
+      const [r, setR] = useState(tasks[0].r);
+      
+      const r2 = r * r, h2 = h * h, k2 = k * k;
+      const xCount = r2 > k2 ? 2 : r2 === k2 ? 1 : 0;
+      const yCount = r2 > h2 ? 2 : r2 === h2 ? 1 : 0;
+      
+      const sc = Math.min(SCALE, 160 / Math.max(Math.abs(h) + r, Math.abs(k) + r, 8));
+      const toScreen = (x, y) => ({ x: 200 + x * sc, y: 200 - y * sc });
+      const cScreen = toScreen(h, k);
+      
+      const xInts = [], yInts = [];
+      if (r2 >= k2) {
+        const dx = Math.sqrt(r2 - k2);
+        xInts.push([h - dx, 0]);
+        if (r2 > k2) xInts.push([h + dx, 0]);
+      }
+      if (r2 >= h2) {
+        const dy = Math.sqrt(r2 - h2);
+        yInts.push([0, k - dy]);
+        if (r2 > h2) yInts.push([0, k + dy]);
+      }
+      
+      const switchTask = (i) => { setTaskIdx(i); setH(tasks[i].c[0]); setK(tasks[i].c[1]); setR(tasks[i].r); };
+      
+      return (
+        <div className="card">
+          <div className="card-header"><h3>Q5: Axis Intersections (Analysis)</h3></div>
+          <div className="worksheet-content">
+            <p>For a circle with C(h, k) and radius r, compare r² with h² and k²:</p>
+            <div className="formula">
+              <strong>x-axis:</strong> compare r² with k² (0, 1, or 2 intersections)<br/>
+              <strong>y-axis:</strong> compare r² with h² (0, 1, or 2 intersections)
+            </div>
+            <div className="task-list">
+              {tasks.map((t, i) => (
+                <span key={i} className={`task-item ${i === taskIdx ? 'active' : ''}`} 
+                  onClick={() => switchTask(i)} style={{cursor:'pointer'}}>
+                  {String.fromCharCode(97+i)}) C({t.c[0]},{t.c[1]}), r={t.r}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-content">
+              <GridCanvas scale={sc}>
+                <circle cx={cScreen.x} cy={cScreen.y} r={r * sc} fill="rgba(59,130,246,0.12)" stroke="#3b82f6" strokeWidth={2} />
+                <circle cx={cScreen.x} cy={cScreen.y} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} />
+                <text x={cScreen.x} y={cScreen.y - 14} fontSize="13" fontWeight="bold" fill="#dc2626" textAnchor="middle">C</text>
+                {xInts.map(([x, y], i) => {
+                  const s = toScreen(x, y);
+                  return <circle key={`x${i}`} cx={s.x} cy={s.y} r={9} fill="#f59e0b" stroke="#fff" strokeWidth={2} />;
+                })}
+                {yInts.map(([x, y], i) => {
+                  const s = toScreen(x, y);
+                  return <circle key={`y${i}`} cx={s.x} cy={s.y} r={9} fill="#8b5cf6" stroke="#fff" strokeWidth={2} />;
+                })}
+              </GridCanvas>
+              <div className="controls">
+                <div className="coord-display">
+                  <div className="coord-title">Coordinates & Analysis</div>
+                  <div className="coord-row"><span className="coord-label">Centre C:</span><span className="coord-value center">({h}, {k})</span></div>
+                  <div className="coord-row"><span className="coord-label">Radius r:</span><span className="coord-value radius">{r}</span></div>
+                  <div className="coord-row"><span className="coord-label">r² = {r2}</span><span className="coord-label">h² = {h2}, k² = {k2}</span></div>
+                </div>
+                <label>h: <strong>{h}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={h} onChange={e => setH(+e.target.value)} />
+                </label>
+                <label>k: <strong>{k}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={k} onChange={e => setK(+e.target.value)} />
+                </label>
+                <label>r: <strong>{r}</strong>
+                  <input type="range" min={1} max={12} step={1} value={r} onChange={e => setR(+e.target.value)} />
+                </label>
+                <div className="info-box green">
+                  <div style={{display:'flex', gap:'20px'}}>
+                    <div><span style={{color:'#f59e0b',fontWeight:'bold'}}>x-axis:</span> r²={r2} {r2 > k2 ? '>' : r2 === k2 ? '=' : '<'} k²={k2} → <strong>{xCount} pts</strong></div>
+                    <div><span style={{color:'#8b5cf6',fontWeight:'bold'}}>y-axis:</span> r²={r2} {r2 > h2 ? '>' : r2 === h2 ? '=' : '<'} h²={h2} → <strong>{yCount} pts</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========== Q6: x-intercepts ==========
+    const Q6Visual = () => {
+      const tasks = [
+        {c:[4,3],r:5}, {c:[-2,5],r:5}, {c:[1,6],r:5}, {c:[6,2],r:6}, {c:[8,-3],r:5}, {c:[-7,4],r:6}, {c:[5,-8],r:7}, {c:[-9,0],r:4}, {c:[3,-4],r:5}
+      ];
+      const [taskIdx, setTaskIdx] = useState(0);
+      const [h, setH] = useState(tasks[0].c[0]);
+      const [k, setK] = useState(tasks[0].c[1]);
+      const [r, setR] = useState(tasks[0].r);
+      
+      const r2 = r * r, k2 = k * k;
+      const disc = r2 - k2;
+      const hasInts = disc >= 0;
+      
+      const sc = Math.min(SCALE, 160 / Math.max(Math.abs(h) + r, Math.abs(k) + r, 8));
+      const toScreen = (x, y) => ({ x: 200 + x * sc, y: 200 - y * sc });
+      const cScreen = toScreen(h, k);
+      const axisY = toScreen(0, 0).y;
+      
+      let intercepts = [];
+      let interceptText = "None (r² < k²)";
+      if (hasInts) {
+        const dx = Math.sqrt(disc);
+        if (disc === 0) {
+          intercepts = [[h, 0]];
+          interceptText = `(${h}, 0)`;
+        } else {
+          intercepts = [[h - dx, 0], [h + dx, 0]];
+          interceptText = `(${(h-dx).toFixed(2)}, 0) and (${(h+dx).toFixed(2)}, 0)`;
+        }
+      }
+      
+      const switchTask = (i) => { setTaskIdx(i); setH(tasks[i].c[0]); setK(tasks[i].c[1]); setR(tasks[i].r); };
+      
+      return (
+        <div className="card">
+          <div className="card-header"><h3>Q6: Find x-intercepts (y = 0)</h3></div>
+          <div className="worksheet-content">
+            <p>Set y = 0 and solve for x:</p>
+            <div className="formula">(x − h)² = r² − k² → <strong>x = h ± √(r² − k²)</strong></div>
+            <div className="task-list">
+              {tasks.map((t, i) => (
+                <span key={i} className={`task-item ${i === taskIdx ? 'active' : ''}`} 
+                  onClick={() => switchTask(i)} style={{cursor:'pointer'}}>
+                  {String.fromCharCode(97+i)}) C({t.c[0]},{t.c[1]}), r={t.r}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-content">
+              <GridCanvas scale={sc}>
+                <line x1={0} y1={axisY} x2={400} y2={axisY} stroke="#f59e0b" strokeWidth={4} />
+                <circle cx={cScreen.x} cy={cScreen.y} r={r * sc} fill="rgba(59,130,246,0.12)" stroke="#3b82f6" strokeWidth={2} />
+                <circle cx={cScreen.x} cy={cScreen.y} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} />
+                <text x={cScreen.x} y={cScreen.y - 14} fontSize="13" fontWeight="bold" fill="#dc2626" textAnchor="middle">C</text>
+                {intercepts.map(([x, y], i) => {
+                  const s = toScreen(x, y);
+                  return (
+                    <g key={i}>
+                      <circle cx={s.x} cy={s.y} r={10} fill="#16a34a" stroke="#fff" strokeWidth={2} />
+                      <text x={s.x} y={s.y + 22} fontSize="11" fill="#16a34a" textAnchor="middle" fontWeight="bold">({x.toFixed(1)}, 0)</text>
+                    </g>
+                  );
+                })}
+              </GridCanvas>
+              <div className="controls">
+                <div className="coord-display">
+                  <div className="coord-title">Coordinates</div>
+                  <div className="coord-row"><span className="coord-label">Centre C:</span><span className="coord-value center">({h}, {k})</span></div>
+                  <div className="coord-row"><span className="coord-label">Radius r:</span><span className="coord-value radius">{r}</span></div>
+                  <div className="coord-row"><span className="coord-label">r² − k²:</span><span className="coord-value">{r2} − {k2} = {disc}</span></div>
+                </div>
+                <label>h: <strong>{h}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={h} onChange={e => setH(+e.target.value)} />
+                </label>
+                <label>k: <strong>{k}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={k} onChange={e => setK(+e.target.value)} />
+                </label>
+                <label>r: <strong>{r}</strong>
+                  <input type="range" min={1} max={12} step={1} value={r} onChange={e => setR(+e.target.value)} />
+                </label>
+                <div className={`info-box ${hasInts ? 'green' : 'red'}`}>
+                  <div className="calc">r² − k² = {r2} − {k2} = {disc}{hasInts && disc > 0 ? ` → √${disc} = ${Math.sqrt(disc).toFixed(2)}` : ''}</div>
+                  <div style={{marginTop:'8px'}}><strong>x-intercepts:</strong> {interceptText}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========== Q7: y-intercepts ==========
+    const Q7Visual = () => {
+      const tasks = [
+        {c:[3,-1],r:5}, {c:[6,2],r:6}, {c:[8,-3],r:5}, {c:[-7,4],r:6}, {c:[5,-8],r:7}, {c:[-9,0],r:4}, {c:[4,3],r:5}, {c:[-2,5],r:5}, {c:[1,6],r:5}
+      ];
+      const [taskIdx, setTaskIdx] = useState(0);
+      const [h, setH] = useState(tasks[0].c[0]);
+      const [k, setK] = useState(tasks[0].c[1]);
+      const [r, setR] = useState(tasks[0].r);
+      
+      const r2 = r * r, h2 = h * h;
+      const disc = r2 - h2;
+      const hasInts = disc >= 0;
+      
+      const sc = Math.min(SCALE, 160 / Math.max(Math.abs(h) + r, Math.abs(k) + r, 8));
+      const toScreen = (x, y) => ({ x: 200 + x * sc, y: 200 - y * sc });
+      const cScreen = toScreen(h, k);
+      const axisX = toScreen(0, 0).x;
+      
+      let intercepts = [];
+      let interceptText = "None (r² < h²)";
+      if (hasInts) {
+        const dy = Math.sqrt(disc);
+        if (disc === 0) {
+          intercepts = [[0, k]];
+          interceptText = `(0, ${k})`;
+        } else {
+          intercepts = [[0, k - dy], [0, k + dy]];
+          interceptText = `(0, ${(k-dy).toFixed(2)}) and (0, ${(k+dy).toFixed(2)})`;
+        }
+      }
+      
+      const switchTask = (i) => { setTaskIdx(i); setH(tasks[i].c[0]); setK(tasks[i].c[1]); setR(tasks[i].r); };
+      
+      return (
+        <div className="card">
+          <div className="card-header"><h3>Q7: Find y-intercepts (x = 0)</h3></div>
+          <div className="worksheet-content">
+            <p>Set x = 0 and solve for y:</p>
+            <div className="formula">(y − k)² = r² − h² → <strong>y = k ± √(r² − h²)</strong></div>
+            <div className="task-list">
+              {tasks.map((t, i) => (
+                <span key={i} className={`task-item ${i === taskIdx ? 'active' : ''}`} 
+                  onClick={() => switchTask(i)} style={{cursor:'pointer'}}>
+                  {String.fromCharCode(97+i)}) C({t.c[0]},{t.c[1]}), r={t.r}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-content">
+              <GridCanvas scale={sc}>
+                <line x1={axisX} y1={0} x2={axisX} y2={400} stroke="#8b5cf6" strokeWidth={4} />
+                <circle cx={cScreen.x} cy={cScreen.y} r={r * sc} fill="rgba(59,130,246,0.12)" stroke="#3b82f6" strokeWidth={2} />
+                <circle cx={cScreen.x} cy={cScreen.y} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} />
+                <text x={cScreen.x} y={cScreen.y - 14} fontSize="13" fontWeight="bold" fill="#dc2626" textAnchor="middle">C</text>
+                {intercepts.map(([x, y], i) => {
+                  const s = toScreen(x, y);
+                  return (
+                    <g key={i}>
+                      <circle cx={s.x} cy={s.y} r={10} fill="#16a34a" stroke="#fff" strokeWidth={2} />
+                      <text x={s.x + 18} y={s.y + 5} fontSize="11" fill="#16a34a" fontWeight="bold">(0, {y.toFixed(1)})</text>
+                    </g>
+                  );
+                })}
+              </GridCanvas>
+              <div className="controls">
+                <div className="coord-display">
+                  <div className="coord-title">Coordinates</div>
+                  <div className="coord-row"><span className="coord-label">Centre C:</span><span className="coord-value center">({h}, {k})</span></div>
+                  <div className="coord-row"><span className="coord-label">Radius r:</span><span className="coord-value radius">{r}</span></div>
+                  <div className="coord-row"><span className="coord-label">r² − h²:</span><span className="coord-value">{r2} − {h2} = {disc}</span></div>
+                </div>
+                <label>h: <strong>{h}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={h} onChange={e => setH(+e.target.value)} />
+                </label>
+                <label>k: <strong>{k}</strong>
+                  <input type="range" min={-10} max={10} step={1} value={k} onChange={e => setK(+e.target.value)} />
+                </label>
+                <label>r: <strong>{r}</strong>
+                  <input type="range" min={1} max={12} step={1} value={r} onChange={e => setR(+e.target.value)} />
+                </label>
+                <div className={`info-box ${hasInts ? 'green' : 'red'}`}>
+                  <div className="calc">r² − h² = {r2} − {h2} = {disc}{hasInts && disc > 0 ? ` → √${disc} = ${Math.sqrt(disc).toFixed(2)}` : ''}</div>
+                  <div style={{marginTop:'8px'}}><strong>y-intercepts:</strong> {interceptText}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========== Q8: Diameter endpoints ==========
+    const Q8Visual = () => {
+      const tasks = [
+        {a:[-8,4], b:[2,4]}, {a:[-5,-6], b:[7,2]}, {a:[0,9], b:[0,-3]}, {a:[-9,2], b:[1,10]},
+        {a:[6,-8], b:[6,0]}, {a:[-4,7], b:[2,-5]}, {a:[-10,1], b:[4,1]}, {a:[3,-9], b:[3,3]}, {a:[8,-2], b:[-4,6]}
+      ];
+      const [taskIdx, setTaskIdx] = useState(0);
+      const [ax, setAx] = useState(tasks[0].a[0]);
+      const [ay, setAy] = useState(tasks[0].a[1]);
+      const [bx, setBx] = useState(tasks[0].b[0]);
+      const [by, setBy] = useState(tasks[0].b[1]);
+      
+      const h = (ax + bx) / 2;
+      const k = (ay + by) / 2;
+      const diam = Math.sqrt((bx - ax) ** 2 + (by - ay) ** 2);
+      const r = diam / 2;
+      const r2 = r * r;
+      
+      const centerX = h, centerY = k;
+      const sc = Math.min(SCALE, 160 / Math.max(r + 2, 8));
+      
+      const toScreen = (x, y) => ({ x: 200 + (x - centerX) * sc, y: 200 - (y - centerY) * sc });
+      const aScreen = toScreen(ax, ay);
+      const bScreen = toScreen(bx, by);
+      const cScreen = toScreen(h, k);
+      
+      const switchTask = (i) => { 
+        setTaskIdx(i); 
+        setAx(tasks[i].a[0]); setAy(tasks[i].a[1]); 
+        setBx(tasks[i].b[0]); setBy(tasks[i].b[1]); 
+      };
+      
+      return (
+        <div className="card">
+          <div className="card-header"><h3>Q8: Diameter Endpoints → Circle Equation</h3></div>
+          <div className="worksheet-content">
+            <p>Given diameter endpoints <strong>A(x_A, y_A)</strong> and <strong>B(x_B, y_B)</strong>:</p>
+            <div className="formula">
+              C = ((x_A + x_B)/2, (y_A + y_B)/2) &nbsp;&nbsp;&nbsp; r = ½|AB|
+            </div>
+            <div className="task-list">
+              {tasks.map((t, i) => (
+                <span key={i} className={`task-item ${i === taskIdx ? 'active' : ''}`} 
+                  onClick={() => switchTask(i)} style={{cursor:'pointer'}}>
+                  {String.fromCharCode(97+i)}) A({t.a[0]},{t.a[1]}), B({t.b[0]},{t.b[1]})
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-content">
+              <GridCanvas scale={sc} centerX={centerX} centerY={centerY}>
+                <circle cx={cScreen.x} cy={cScreen.y} r={r * sc} fill="rgba(59,130,246,0.12)" stroke="#3b82f6" strokeWidth={2} />
+                <line x1={aScreen.x} y1={aScreen.y} x2={bScreen.x} y2={bScreen.y} stroke="#16a34a" strokeWidth={3} />
+                <circle cx={aScreen.x} cy={aScreen.y} r={10} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
+                <circle cx={bScreen.x} cy={bScreen.y} r={10} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
+                <circle cx={cScreen.x} cy={cScreen.y} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} />
+                <text x={aScreen.x} y={aScreen.y - 14} fontSize="13" fontWeight="bold" fill="#f59e0b" textAnchor="middle">A</text>
+                <text x={bScreen.x} y={bScreen.y - 14} fontSize="13" fontWeight="bold" fill="#f59e0b" textAnchor="middle">B</text>
+                <text x={cScreen.x} y={cScreen.y - 14} fontSize="13" fontWeight="bold" fill="#dc2626" textAnchor="middle">C</text>
+              </GridCanvas>
+              <div className="controls">
+                <div className="coord-display">
+                  <div className="coord-title">Coordinates</div>
+                  <div className="coord-row"><span className="coord-label">Point A:</span><span className="coord-value tangent">({ax}, {ay})</span></div>
+                  <div className="coord-row"><span className="coord-label">Point B:</span><span className="coord-value tangent">({bx}, {by})</span></div>
+                  <div className="coord-row"><span className="coord-label">Centre C:</span><span className="coord-value center">({h}, {k})</span></div>
+                  <div className="coord-row"><span className="coord-label">|AB| (diameter):</span><span className="coord-value">{diam.toFixed(2)}</span></div>
+                  <div className="coord-row"><span className="coord-label">r:</span><span className="coord-value radius">{r.toFixed(2)}</span></div>
+                </div>
+                <div className="grid-2">
+                  <label style={{fontSize:'12px'}}>A x: <strong>{ax}</strong>
+                    <input type="range" min={-12} max={8} step={1} value={ax} onChange={e => setAx(+e.target.value)} />
+                  </label>
+                  <label style={{fontSize:'12px'}}>A y: <strong>{ay}</strong>
+                    <input type="range" min={-10} max={10} step={1} value={ay} onChange={e => setAy(+e.target.value)} />
+                  </label>
+                  <label style={{fontSize:'12px'}}>B x: <strong>{bx}</strong>
+                    <input type="range" min={-8} max={12} step={1} value={bx} onChange={e => setBx(+e.target.value)} />
+                  </label>
+                  <label style={{fontSize:'12px'}}>B y: <strong>{by}</strong>
+                    <input type="range" min={-10} max={10} step={1} value={by} onChange={e => setBy(+e.target.value)} />
+                  </label>
+                </div>
+                <div className="info-box yellow">
+                  <div className="calc" style={{fontSize:'11px'}}>
+                    C = (({ax}+{bx})/2, ({ay}+{by})/2) = ({h}, {k})<br/>
+                    r = {diam.toFixed(2)}/2 = {r.toFixed(2)} → r² = {r2.toFixed(1)}
+                  </div>
+                  <div className="equation" style={{fontSize:'14px'}}>(x−{h})² + (y−{k})² = {r2.toFixed(1)}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========== Q9: Tangent at point P ==========
+    const Q9Visual = () => {
+      const tasks = [
+        {c:[1,2], p:[5,2]}, {c:[-3,1], p:[-3,6]}, {c:[2,-4], p:[6,-1]}, {c:[-2,-3], p:[0,1]},
+        {c:[4,0], p:[1,4]}, {c:[-5,2], p:[-1,0]}, {c:[0,5], p:[3,1]}, {c:[7,-2], p:[4,-6]}
+      ];
+      const [taskIdx, setTaskIdx] = useState(0);
+      
+      const {c, p} = tasks[taskIdx];
+      const h = c[0], k = c[1];
+      const px = p[0], py = p[1];
+      const dx = px - h, dy = py - k;
+      const r = Math.sqrt(dx * dx + dy * dy);
+      
+      let tangentInfo, slopeText;
+      if (dx === 0) {
+        tangentInfo = { type: 'horizontal', eq: `y = ${py}` };
+        slopeText = "CP is vertical → tangent is horizontal";
+      } else if (dy === 0) {
+        tangentInfo = { type: 'vertical', eq: `x = ${px}` };
+        slopeText = "CP is horizontal → tangent is vertical";
+      } else {
+        const mCP = dy / dx;
+        const mTan = -dx / dy;
+        const c_int = py - mTan * px;
+        tangentInfo = { type: 'sloped', slope: mTan, eq: `y = ${mTan.toFixed(2)}x ${c_int >= 0 ? '+' : ''}${c_int.toFixed(2)}` };
+        slopeText = `m_CP = ${dy}/${dx} = ${mCP.toFixed(2)} → m_tan = ${mTan.toFixed(2)}`;
+      }
+      
+      const centerX = (h + px) / 2;
+      const centerY = (k + py) / 2;
+      const sc = Math.min(28, 160 / Math.max(r + 2, 6));
+      
+      const toScreen = (x, y) => ({ x: 200 + (x - centerX) * sc, y: 200 - (y - centerY) * sc });
+      const cScreen = toScreen(h, k);
+      const pScreen = toScreen(px, py);
+      
+      // Tangent line endpoints
+      let tanLine = null;
+      if (tangentInfo.type === 'horizontal') {
+        tanLine = <line x1={0} y1={pScreen.y} x2={400} y2={pScreen.y} stroke="#16a34a" strokeWidth={3} />;
+      } else if (tangentInfo.type === 'vertical') {
+        tanLine = <line x1={pScreen.x} y1={0} x2={pScreen.x} y2={400} stroke="#16a34a" strokeWidth={3} />;
+      } else {
+        const m = tangentInfo.slope;
+        const x1 = px - 8, x2 = px + 8;
+        const y1 = py + m * (-8), y2 = py + m * (8);
+        const s1 = toScreen(x1, y1), s2 = toScreen(x2, y2);
+        tanLine = <line x1={s1.x} y1={s1.y} x2={s2.x} y2={s2.y} stroke="#16a34a" strokeWidth={3} />;
+      }
+      
+      // Right angle marker
+      const angleSize = 12;
+      let rightAngle = null;
+      if (tangentInfo.type === 'horizontal') {
+        rightAngle = <path d={`M ${pScreen.x} ${pScreen.y - angleSize} L ${pScreen.x - angleSize} ${pScreen.y - angleSize} L ${pScreen.x - angleSize} ${pScreen.y}`} fill="none" stroke="#666" strokeWidth={1.5} />;
+      } else if (tangentInfo.type === 'vertical') {
+        rightAngle = <path d={`M ${pScreen.x + angleSize} ${pScreen.y} L ${pScreen.x + angleSize} ${pScreen.y - angleSize} L ${pScreen.x} ${pScreen.y - angleSize}`} fill="none" stroke="#666" strokeWidth={1.5} />;
+      }
+      
+      return (
+        <div className="card">
+          <div className="card-header"><h3>Q9: Tangent at Point P</h3></div>
+          <div className="worksheet-content">
+            <p>If <strong>C(h, k)</strong> is the centre and <strong>P(x₁, y₁)</strong> lies on the circle, then radius CP ⊥ tangent at P:</p>
+            <div className="formula">
+              m_CP = (y₁ − k)/(x₁ − h) → <strong>m_tangent = −1/m_CP</strong><br/>
+              <span style={{fontSize:'12px',color:'#666'}}>(If CP is horizontal → tangent is vertical. If CP is vertical → tangent is horizontal.)</span>
+            </div>
+            <div className="task-list">
+              {tasks.map((t, i) => (
+                <span key={i} className={`task-item ${i === taskIdx ? 'active' : ''}`} 
+                  onClick={() => setTaskIdx(i)} style={{cursor:'pointer'}}>
+                  {String.fromCharCode(97+i)}) C({t.c[0]},{t.c[1]}), P({t.p[0]},{t.p[1]})
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="card-content">
+              <GridCanvas scale={sc} centerX={centerX} centerY={centerY}>
+                {tanLine}
+                <circle cx={cScreen.x} cy={cScreen.y} r={r * sc} fill="rgba(59,130,246,0.12)" stroke="#3b82f6" strokeWidth={2} />
+                <line x1={cScreen.x} y1={cScreen.y} x2={pScreen.x} y2={pScreen.y} stroke="#dc2626" strokeWidth={2} />
+                {rightAngle}
+                <circle cx={cScreen.x} cy={cScreen.y} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} />
+                <circle cx={pScreen.x} cy={pScreen.y} r={10} fill="#16a34a" stroke="#fff" strokeWidth={2} />
+                <text x={cScreen.x} y={cScreen.y - 14} fontSize="13" fontWeight="bold" fill="#dc2626" textAnchor="middle">C</text>
+                <text x={pScreen.x} y={pScreen.y - 16} fontSize="13" fontWeight="bold" fill="#16a34a" textAnchor="middle">P</text>
+              </GridCanvas>
+              <div className="controls">
+                <div className="coord-display">
+                  <div className="coord-title">Coordinates</div>
+                  <div className="coord-row"><span className="coord-label">Centre C:</span><span className="coord-value center">({h}, {k})</span></div>
+                  <div className="coord-row"><span className="coord-label">Point P:</span><span className="coord-value point">({px}, {py})</span></div>
+                  <div className="coord-row"><span className="coord-label">Δx, Δy:</span><span className="coord-value">{dx}, {dy}</span></div>
+                  <div className="coord-row"><span className="coord-label">Radius r:</span><span className="coord-value radius">{r.toFixed(2)}</span></div>
+                </div>
+                <div className="info-box green" style={{background:'#dcfce7'}}>
+                  <div><strong>Slope Calculation:</strong></div>
+                  <div className="calc">{slopeText}</div>
+                  <div className="equation" style={{color:'#16a34a', marginTop:'10px'}}>
+                    Tangent: <strong>{tangentInfo.eq}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // Main App
+    function App() {
+      const [activeQ, setActiveQ] = useState(null);
+      
+      const questions = [
+        { id: 1, label: "Q1: Origin", component: Q1Visual },
+        { id: 2, label: "Q2: General", component: Q2Visual },
+        { id: 3, label: "Q3: x-tangent", component: Q3Visual },
+        { id: 4, label: "Q4: y-tangent", component: Q4Visual },
+        { id: 5, label: "Q5: Intersections", component: Q5Visual },
+        { id: 6, label: "Q6: x-intercepts", component: Q6Visual },
+        { id: 7, label: "Q7: y-intercepts", component: Q7Visual },
+        { id: 8, label: "Q8: Diameter", component: Q8Visual },
+        { id: 9, label: "Q9: Tangent@P", component: Q9Visual },
+      ];
+      
+      return (
+        <div className="container">
+          <h1>Circle Core Skills — Interactive Worksheet</h1>
+          <p className="subtitle">Click tasks to switch. Use sliders to explore. All visualizations start on Task (a).</p>
+          
+          <div className="nav">
+            <button className={activeQ === null ? 'active' : ''} onClick={() => setActiveQ(null)}>All</button>
+            {questions.map(q => (
+              <button key={q.id} className={activeQ === q.id ? 'active' : ''} onClick={() => setActiveQ(q.id)}>{q.label}</button>
+            ))}
+          </div>
+          
+          {questions.filter(q => activeQ === null || activeQ === q.id).map(q => {
+            const Component = q.component;
+            return <Component key={q.id} />;
+          })}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>

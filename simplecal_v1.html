@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr Downes - simplecal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: #f8f8f8;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            max-width: 420px;
+            width: 100%;
+            border: 2px solid #ddd;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 900;
+            color: #000;
+        }
+
+        .brand-sub {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ef4444;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vocab-word {
+            font-size: 13px;
+            font-weight: bold;
+            color: #3b82f6;
+            cursor: pointer;
+            text-decoration: underline dotted;
+        }
+
+        .vocab-word:hover {
+            color: #2563eb;
+        }
+
+        .history-btn {
+            font-size: 16px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .history-btn:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .history-btn.disabled {
+            color: #ccc;
+            cursor: default;
+        }
+
+        .history-btn.disabled:hover {
+            background: transparent;
+            color: #ccc;
+        }
+
+        .dot-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .dot-row {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot-line {
+            width: 24px;
+            height: 2px;
+            background: #333;
+            margin: 3px 0;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .dot.flying {
+            position: fixed;
+            transition: none;
+            z-index: 1000;
+        }
+
+        .dot.blue { background: #3b82f6; }
+        .dot.red { background: #ef4444; }
+        .dot.green { background: #22c55e; }
+        .dot.black { background: #1a1a1a; }
+
+        .display-container {
+            background: #e0e0e0;
+            border: 3px solid #333;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .display-inner {
+            background: #c8dcc8;
+            border: 2px solid #555;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 120px;
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: block;
+        }
+
+        .display-small {
+            font-size: 14px;
+            color: #444;
+            text-align: right;
+            min-height: 18px;
+            font-weight: 600;
+        }
+
+        .display {
+            color: #000;
+            font-size: 36px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-align: right;
+            word-break: break-all;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .display.frayer-mode {
+            display: block;
+            text-align: left;
+            min-height: auto;
+        }
+
+        .frayer-display {
+            text-align: left;
+            font-family: Arial, sans-serif;
+        }
+
+        .frayer-term {
+            font-size: 18px;
+            font-weight: bold;
+            color: #3b82f6;
+            text-align: center;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+        }
+
+        .frayer-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .frayer-graph {
+            display: flex;
+            justify-content: center;
+            padding: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+        }
+
+        .frayer-graph svg {
+            max-width: 180px;
+            height: auto;
+        }
+
+        .frayer-section {
+            background: rgba(255,255,255,0.5);
+            padding: 6px;
+            border-radius: 4px;
+        }
+
+        .frayer-label {
+            font-weight: bold;
+            color: #555;
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .frayer-content {
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .key {
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+            position: relative;
+        }
+
+        .key:active {
+            transform: scale(0.95);
+            background: #e0e0e0;
+        }
+
+        .key-shift {
+            position: absolute;
+            top: 2px;
+            font-size: 9px;
+            color: #8b8b6b;
+            font-weight: bold;
+        }
+
+        .key.shift.active {
+            background: #f9a825;
+            color: #fff;
+        }
+
+        .key.empty-key {
+            background: transparent;
+            border: 2px dashed #ccc;
+            cursor: default;
+        }
+
+        .key.empty-key:active {
+            transform: none;
+            background: transparent;
+        }
+
+        .x-recip {
+            font-size: 16px;
+            color: #000;
+        }
+
+        .x-recip sup {
+            font-size: 9px;
+            vertical-align: top;
+            position: relative;
+            top: -3px;
+        }
+
+        .sup-small {
+            font-size: 11px;
+            vertical-align: super;
+            line-height: 0;
+        }
+
+        .fraction-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .frac-num, .frac-den { font-size: 12px; }
+
+        .frac-bar {
+            width: 16px;
+            height: 2px;
+            background: #333;
+            margin: 1px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator" id="calculator">
+        <div class="header">
+            <div class="brand-text">
+                <span class="brand-name">Mr Downes</span>
+                <span class="brand-sub">simplecal</span>
+            </div>
+            <div class="header-right">
+                <span class="history-btn" id="historyBtn" onclick="goBack()">◀</span>
+                <span class="vocab-word" id="vocabWord" onclick="showDefinition()"></span>
+                <div class="dot-container" id="dotContainer" onclick="startDotChaos()">
+                    <div class="dot-row">
+                        <span class="dot blue" id="dot1"></span>
+                        <span class="dot red" id="dot2"></span>
+                    </div>
+                    <div class="dot-line"></div>
+                    <div class="dot-row">
+                        <span class="dot green" id="dot3"></span>
+                        <span class="dot black" id="dot4"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="display-container">
+            <div class="display-inner">
+                <div class="display-small" id="previousDisplay"></div>
+                <div class="display" id="display">0</div>
+            </div>
+        </div>
+
+        <div class="keypad">
+            <!-- Row 1: SHIFT a/b 1/▮ x^-1 AC -->
+            <button class="key shift" id="shiftBtn" onclick="toggleShift()">SHIFT</button>
+            <button class="key" onclick="inputFraction()">
+                <svg width="24" height="28" viewBox="0 0 24 28">
+                    <rect x="4" y="2" width="16" height="8" fill="#000"/>
+                    <line x1="2" y1="14" x2="22" y2="14" stroke="#000" stroke-width="2"/>
+                    <rect x="6" y="18" width="12" height="8" fill="none" stroke="#000" stroke-width="2"/>
+                </svg>
+            </button>
+            <button class="key" onclick="inputOneOver()">
+                <div class="fraction-display">
+                    <span class="frac-num">1</span>
+                    <span class="frac-bar"></span>
+                    <span class="frac-den">▮</span>
+                </div>
+            </button>
+            <button class="key" onclick="inputReciprocal()">
+                <span style="font-family: 'Times New Roman', serif; font-size: 28px; font-style: italic; font-weight: bold;">x</span><sup style="font-size: 12px; font-weight: bold; position: relative; top: -9px;">−1</sup>
+            </button>
+            <button class="key" onclick="clearAll()">AC</button>
+
+            <!-- Row 2: ( ) π randint , -->
+            <button class="key" onclick="inputChar('(')">(</button>
+            <button class="key" onclick="inputChar(')')">)</button>
+            <button class="key" onclick="inputPi()">π</button>
+            <button class="key" onclick="inputRandint()">RanInt</button>
+            <button class="key" onclick="inputChar(',')">,</button>
+
+            <!-- Row 3: 7 8 9 × ÷ -->
+            <button class="key" onclick="inputDigit('7')">7</button>
+            <button class="key" onclick="inputDigit('8')">8</button>
+            <button class="key" onclick="inputDigit('9')">9</button>
+            <button class="key" onclick="inputChar('×')">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <line x1="3" y1="3" x2="17" y2="17" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="17" y1="3" x2="3" y2="17" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <button class="key" onclick="inputChar('÷')">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <circle cx="10" cy="4" r="2" fill="#000"/>
+                    <line x1="3" y1="10" x2="17" y2="10" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="10" cy="16" r="2" fill="#000"/>
+                </svg>
+            </button>
+
+            <!-- Row 4: 4 5 6 + − -->
+            <button class="key" onclick="inputDigit('4')">4</button>
+            <button class="key" onclick="inputDigit('5')">5</button>
+            <button class="key" onclick="inputDigit('6')">6</button>
+            <button class="key" onclick="inputChar('+')">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <line x1="10" y1="3" x2="10" y2="17" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="3" y1="10" x2="17" y2="10" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <button class="key" onclick="inputChar('-')">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <line x1="3" y1="10" x2="17" y2="10" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </button>
+
+            <!-- Row 5: 1 2 3 FACT DEL -->
+            <button class="key" onclick="inputDigit('1')">1</button>
+            <button class="key" onclick="inputDigit('2')">2</button>
+            <button class="key" onclick="inputDigit('3')">3</button>
+            <button class="key" onclick="factorize()">FACT</button>
+            <button class="key" onclick="deleteChar()">DEL</button>
+
+            <!-- Row 6: 0 . Ans √ = -->
+            <button class="key" onclick="inputDigit('0')">0</button>
+            <button class="key" onclick="inputChar('.')">.</button>
+            <button class="key" onclick="inputAns()">Ans</button>
+            <button class="key" onclick="inputSqrt()">
+                <svg width="30" height="22" viewBox="0 0 30 22">
+                    <path d="M1 14 L5 14 L9 20 L15 3 L29 3" fill="none" stroke="#000" stroke-width="2.5" stroke-linejoin="miter" stroke-linecap="square"/>
+                    <rect x="18" y="7" width="9" height="9" fill="#000"/>
+                </svg>
+            </button>
+            <button class="key" onclick="calculate()">
+                <span class="key-shift">≈</span>
+                =
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const ARITHMETIC_VOCAB = [
+            { term: "VAT", def: "Value Added Tax – a tax charged by the state on spending", 
+              example: "23% VAT on chocolate biscuits, 13.5% on haircuts", nonExample: "Income tax, property tax", 
+              fact: "Different products have different VAT rates; some items have 0% VAT" },
+            { term: "Percentage", def: "A number expressed as a fraction of 100", 
+              example: "25% = 25/100 = 0.25", nonExample: "1/4 written as a fraction", 
+              fact: "Per cent means 'per hundred' in Latin" },
+            { term: "Percentage increase", def: "(Increase ÷ Original) × 100", 
+              example: "€10 to €12 = (2÷10)×100 = 20% increase", nonExample: "€12 to €10 (that's a decrease)", 
+              fact: "Always divide by the ORIGINAL amount" },
+            { term: "Percentage decrease", def: "(Decrease ÷ Original) × 100", 
+              example: "€100 to €85 = (15÷100)×100 = 15% decrease", nonExample: "€85 to €100 (that's an increase)", 
+              fact: "Used to calculate discounts and depreciation" },
+            { term: "Ratio", def: "A way to compare quantities by division", 
+              example: "Pizza shared 2:3 means 2 parts and 3 parts", nonExample: "2+3 (that's addition)", 
+              fact: "Ratios can be simplified like fractions" },
+            { term: "Proportion", def: "When two ratios are equal", 
+              example: "1:2 = 3:6 (both simplify to 1:2)", nonExample: "1:2 and 2:3 (different ratios)", 
+              fact: "Direct proportion: as one increases, so does the other" },
+            { term: "Exchange rate", def: "How much one currency is worth in another currency", 
+              example: "€1 = £0.85 means 1 euro buys 85 pence", nonExample: "Interest rate (that's for loans)", 
+              fact: "Exchange rates change daily based on markets" },
+            { term: "Standing charge", def: "A fixed charge you pay regardless of usage", 
+              example: "€14.62 standing charge for 58 days of electricity service", nonExample: "The cost per unit of electricity used", 
+              fact: "Common on utility bills like electricity and gas" },
+            { term: "Unit rate", def: "The cost or value of one single unit", 
+              example: "14.10 cent per kWh of electricity", nonExample: "The total bill amount", 
+              fact: "Useful for comparing value for money" },
+            { term: "Price before VAT", def: "The original price of goods/services excluding tax", 
+              example: "If total is €56.75 at 13.5% VAT, original is €50", nonExample: "The price you actually pay at the till", 
+              fact: "To find it: divide total by (1 + VAT rate as decimal)" },
+            { term: "Price after VAT", def: "The final price including the tax", 
+              example: "€250 + 23% VAT = €307.50", nonExample: "The price tag before tax is added", 
+              fact: "Multiply price by (1 + VAT rate as decimal)" },
+            { term: "Value for money", def: "Comparing products to find which gives the best deal", 
+              example: "€1.07 per 100g vs €1.30 per 100g – first is better value", nonExample: "Just choosing the cheapest item", 
+              fact: "Calculate price per unit (e.g., per 100g) to compare fairly" },
+            { term: "kWh", def: "Kilowatt-hour – unit for measuring electricity used", 
+              example: "472 kWh used = Present reading − Previous reading", nonExample: "Kilowatts (that's power, not energy)", 
+              fact: "1 kWh = using 1000 watts for 1 hour" },
+            { term: "Direct proportion", def: "When one quantity increases, the other increases by the same factor", 
+              example: "2 hours of chores = €12, so 3 hours = €18", nonExample: "As price goes up, demand goes down", 
+              fact: "The ratio between the quantities stays constant" }
+        ];
+
+        let display = '';
+        let previousDisplay = '';
+        let lastAnswer = 0;
+        let shiftMode = false;
+        let dotsFlying = false;
+        let currentVocab = null;
+        let showingDefinition = false;
+        let lastRanIntExpr = null;
+        let ranIntMode = false;
+        let history = [];
+        let historyIndex = -1;
+
+        function updateHistoryBtn() {
+            const btn = document.getElementById('historyBtn');
+            if (history.length === 0 || historyIndex <= 0) {
+                btn.classList.add('disabled');
+            } else {
+                btn.classList.remove('disabled');
+            }
+        }
+
+        function goBack() {
+            if (history.length === 0 || historyIndex <= 0) return;
+            clearDefinition();
+            historyIndex--;
+            const item = history[historyIndex];
+            previousDisplay = item.expression + ' =';
+            display = item.result;
+            updateDisplay();
+            updateHistoryBtn();
+        }
+
+        function getRandomVocab() {
+            return ARITHMETIC_VOCAB[Math.floor(Math.random() * ARITHMETIC_VOCAB.length)];
+        }
+
+        function showNewWord() {
+            currentVocab = getRandomVocab();
+            document.getElementById('vocabWord').textContent = currentVocab.term;
+            showingDefinition = false;
+        }
+
+        function showDefinition() {
+            if (!currentVocab) return;
+            showingDefinition = true;
+            
+            let graphHtml = '';
+            if (currentVocab.term === 'Direct proportion') {
+                graphHtml = `<div class="frayer-graph">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Axes -->
+                        <line x1="10" y1="90" x2="10" y2="10" stroke="#333" stroke-width="1"/>
+                        <line x1="10" y1="90" x2="95" y2="90" stroke="#333" stroke-width="1"/>
+                        <!-- Axis labels -->
+                        <text x="90" y="88" font-size="6" fill="#333">x</text>
+                        <text x="12" y="15" font-size="6" fill="#333">y</text>
+                        <!-- Direct proportion line through origin -->
+                        <line x1="10" y1="90" x2="85" y2="15" stroke="#3b82f6" stroke-width="2"/>
+                        <!-- Label -->
+                        <text x="50" y="35" font-size="7" fill="#3b82f6" font-style="italic">y = kx</text>
+                        <!-- Points -->
+                        <circle cx="30" cy="70" r="3" fill="#ef4444"/>
+                        <circle cx="50" cy="50" r="3" fill="#ef4444"/>
+                        <circle cx="70" cy="30" r="3" fill="#ef4444"/>
+                    </svg>
+                </div>`;
+            } else if (currentVocab.term === 'Percentage increase' || currentVocab.term === 'Percentage decrease') {
+                graphHtml = `<div class="frayer-graph">
+                    <svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Original bar -->
+                        <rect x="10" y="15" width="40" height="30" fill="#3b82f6" opacity="0.7"/>
+                        <text x="30" y="55" font-size="6" fill="#333" text-anchor="middle">Original</text>
+                        <!-- Arrow -->
+                        <path d="M55 30 L65 30" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <!-- New bar -->
+                        <rect x="70" y="${currentVocab.term === 'Percentage increase' ? '5' : '25'}" width="40" height="${currentVocab.term === 'Percentage increase' ? '40' : '20'}" fill="${currentVocab.term === 'Percentage increase' ? '#22c55e' : '#ef4444'}" opacity="0.7"/>
+                        <text x="90" y="55" font-size="6" fill="#333" text-anchor="middle">New</text>
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>`;
+            }
+            
+            document.getElementById('display').innerHTML = 
+                '<div class="frayer-display">' +
+                '<div class="frayer-term">' + currentVocab.term + '</div>' +
+                '<div class="frayer-grid">' +
+                '<div class="frayer-section"><div class="frayer-label">Definition</div><div class="frayer-content">' + currentVocab.def + '</div></div>' +
+                '<div class="frayer-section"><div class="frayer-label">Examples</div><div class="frayer-content">' + currentVocab.example + '</div></div>' +
+                '<div class="frayer-section"><div class="frayer-label">Non-Examples</div><div class="frayer-content">' + currentVocab.nonExample + '</div></div>' +
+                '<div class="frayer-section"><div class="frayer-label">Key Fact</div><div class="frayer-content">' + currentVocab.fact + '</div></div>' +
+                graphHtml +
+                '</div></div>';
+            document.getElementById('display').classList.add('frayer-mode');
+            document.getElementById('previousDisplay').textContent = '';
+            document.querySelector('.display-inner').scrollTop = 0;
+        }
+
+        function clearDefinition() {
+            if (showingDefinition) {
+                showingDefinition = false;
+                document.getElementById('display').classList.remove('frayer-mode');
+                updateDisplay();
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('display').textContent = display || '0';
+            document.getElementById('previousDisplay').textContent = previousDisplay;
+            
+            const shiftBtn = document.getElementById('shiftBtn');
+            if (shiftMode) {
+                shiftBtn.classList.add('active');
+            } else {
+                shiftBtn.classList.remove('active');
+            }
+        }
+
+        function toggleShift() {
+            clearDefinition();
+            shiftMode = !shiftMode;
+            updateDisplay();
+        }
+
+        function inputDigit(d) {
+            clearDefinition();
+            ranIntMode = false;
+            lastRanIntExpr = null;
+            if (display === '0' || display === 'Error') {
+                display = d;
+            } else {
+                display += d;
+            }
+            updateDisplay();
+        }
+
+        function inputChar(c) {
+            clearDefinition();
+            ranIntMode = false;
+            lastRanIntExpr = null;
+            if (display === 'Error') display = '';
+            display += c;
+            updateDisplay();
+        }
+
+        function inputFraction() {
+            clearDefinition();
+            display += '/';
+            updateDisplay();
+        }
+
+        function inputOneOver() {
+            clearDefinition();
+            if (display === '' || display === '0' || display === 'Error') return;
+            display = '1/(' + display + ')';
+            updateDisplay();
+        }
+
+        function inputReciprocal() {
+            clearDefinition();
+            if (display === '' || display === '0' || display === 'Error') return;
+            display = '(' + display + ')^(-1)';
+            updateDisplay();
+        }
+
+        function inputAns() {
+            clearDefinition();
+            if (display === '0' || display === '' || display === 'Error') {
+                display = String(lastAnswer);
+            } else {
+                display += String(lastAnswer);
+            }
+            updateDisplay();
+        }
+
+        function inputSqrt() {
+            clearDefinition();
+            if (display === 'Error') display = '';
+            display += '√(';
+            updateDisplay();
+        }
+
+        function inputPi() {
+            clearDefinition();
+            if (display === '0' || display === '' || display === 'Error') {
+                display = 'π';
+            } else {
+                display += 'π';
+            }
+            updateDisplay();
+        }
+
+        function inputRandint() {
+            clearDefinition();
+            if (display === 'Error') display = '';
+            display += 'RanInt#(';
+            updateDisplay();
+        }
+
+        function deleteChar() {
+            clearDefinition();
+            if (display.length > 1) {
+                display = display.slice(0, -1);
+            } else {
+                display = '';
+            }
+            updateDisplay();
+        }
+
+        function clearAll() {
+            clearDefinition();
+            display = '';
+            previousDisplay = '';
+            shiftMode = false;
+            ranIntMode = false;
+            lastRanIntExpr = null;
+            historyIndex = history.length;
+            updateDisplay();
+            updateHistoryBtn();
+            showNewWord();
+        }
+
+        function factorize() {
+            clearDefinition();
+            let num = parseInt(display);
+            if (isNaN(num) || num < 2) {
+                display = 'Error';
+                updateDisplay();
+                return;
+            }
+            
+            const originalExpr = display;
+            previousDisplay = display + ' =';
+            
+            // Prime factorization
+            let factors = [];
+            let n = num;
+            let d = 2;
+            
+            while (n > 1) {
+                let count = 0;
+                while (n % d === 0) {
+                    count++;
+                    n = n / d;
+                }
+                if (count > 0) {
+                    if (count === 1) {
+                        factors.push(d.toString());
+                    } else {
+                        factors.push(d + '^' + count);
+                    }
+                }
+                d++;
+                if (d * d > n && n > 1) {
+                    factors.push(n.toString());
+                    break;
+                }
+            }
+            
+            display = factors.join(' × ');
+            
+            // Save to history
+            history.push({ expression: originalExpr + ' (FACT)', result: display });
+            historyIndex = history.length;
+            updateHistoryBtn();
+            
+            updateDisplay();
+            showNewWord();
+        }
+
+        function calculate() {
+            clearDefinition();
+            
+            // If we just got a result and press = again while in ranIntMode, regenerate
+            if (ranIntMode && lastRanIntExpr && !display.includes('RanInt#')) {
+                display = lastRanIntExpr;
+            }
+            
+            const hadRanInt = display.includes('RanInt#');
+            const originalExpr = display;
+            
+            // Store the expression if it has RanInt
+            if (hadRanInt) {
+                lastRanIntExpr = display;
+                ranIntMode = true;
+            }
+            
+            try {
+                let expr = display;
+                const openCount = (expr.match(/\(/g) || []).length;
+                const closeCount = (expr.match(/\)/g) || []).length;
+                if (openCount > closeCount) {
+                    expr += ')'.repeat(openCount - closeCount);
+                }
+                
+                let e = expr
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/−/g, '-')
+                    .replace(/π/g, 'Math.PI')
+                    .replace(/√\(/g, 'Math.sqrt(')
+                    .replace(/RanInt#\((\d+),(\d+)\)/g, (m, a, b) => Math.floor(Math.random() * (parseInt(b) - parseInt(a) + 1)) + parseInt(a))
+                    .replace(/\^/g, '**');
+                
+                let result = eval(e);
+                
+                if (isNaN(result) || !isFinite(result)) {
+                    display = 'Error';
+                    previousDisplay = '';
+                } else {
+                    lastAnswer = result;
+                    
+                    if (shiftMode) {
+                        previousDisplay = display + ' ≈';
+                        display = parseFloat(result.toPrecision(10)).toString();
+                    } else {
+                        previousDisplay = display + ' =';
+                        display = decimalToFraction(result);
+                    }
+                    
+                    // Save to history
+                    history.push({ expression: originalExpr, result: display });
+                    historyIndex = history.length;
+                    updateHistoryBtn();
+                }
+            } catch (err) {
+                display = 'Error';
+                previousDisplay = '';
+            }
+            shiftMode = false;
+            updateDisplay();
+            if (!ranIntMode) {
+                showNewWord();
+            }
+        }
+
+        function decimalToFraction(decimal) {
+            if (Number.isInteger(decimal)) return decimal.toString();
+            
+            const sign = decimal < 0 ? '-' : '';
+            decimal = Math.abs(decimal);
+            
+            const tolerance = 1e-10;
+            let num = 1, den = 1;
+            let frac = num / den;
+            
+            while (Math.abs(frac - decimal) > tolerance && den < 10000) {
+                if (frac < decimal) num++;
+                else { den++; num = Math.round(decimal * den); }
+                frac = num / den;
+            }
+            
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const d = gcd(num, den);
+            num /= d;
+            den /= d;
+            
+            if (den === 1) return sign + num;
+            if (den > 1000) return sign + parseFloat(decimal.toPrecision(10));
+            return sign + num + '/' + den;
+        }
+
+        // Dot chaos animation
+        function startDotChaos() {
+            if (dotsFlying) return;
+            dotsFlying = true;
+
+            const calc = document.getElementById('calculator');
+            const calcRect = calc.getBoundingClientRect();
+            const dots = [];
+
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById('dot' + i);
+                if (!dot) continue;
+                const rect = dot.getBoundingClientRect();
+                dots.push({
+                    el: dot,
+                    originalX: rect.left,
+                    originalY: rect.top,
+                    x: rect.left,
+                    y: rect.top,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15
+                });
+                dot.classList.add('flying');
+                dot.style.left = rect.left + 'px';
+                dot.style.top = rect.top + 'px';
+            }
+
+            const startTime = Date.now();
+            const duration = 3000;
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const remaining = duration - elapsed;
+
+                if (remaining <= 0) {
+                    dots.forEach(d => {
+                        d.el.classList.remove('flying');
+                        d.el.style.left = '';
+                        d.el.style.top = '';
+                    });
+                    dotsFlying = false;
+                    return;
+                }
+
+                const slowFactor = remaining < 500 ? remaining / 500 : 1;
+
+                dots.forEach(d => {
+                    d.x += d.vx * slowFactor;
+                    d.y += d.vy * slowFactor;
+
+                    if (d.x < calcRect.left + 10) { d.x = calcRect.left + 10; d.vx = Math.abs(d.vx) * 0.9; }
+                    if (d.x > calcRect.right - 20) { d.x = calcRect.right - 20; d.vx = -Math.abs(d.vx) * 0.9; }
+                    if (d.y < calcRect.top + 10) { d.y = calcRect.top + 10; d.vy = Math.abs(d.vy) * 0.9; }
+                    if (d.y > calcRect.bottom - 20) { d.y = calcRect.bottom - 20; d.vy = -Math.abs(d.vy) * 0.9; }
+
+                    d.vx += (Math.random() - 0.5) * 2;
+                    d.vy += (Math.random() - 0.5) * 2;
+                    d.vx = Math.max(-12, Math.min(12, d.vx));
+                    d.vy = Math.max(-12, Math.min(12, d.vy));
+
+                    if (remaining < 500) {
+                        const pull = (500 - remaining) / 500 * 0.15;
+                        d.vx += (d.originalX - d.x) * pull;
+                        d.vy += (d.originalY - d.y) * pull;
+                    }
+
+                    d.el.style.left = d.x + 'px';
+                    d.el.style.top = d.y + 'px';
+                });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') inputDigit(e.key);
+            else if (e.key === '+') inputChar('+');
+            else if (e.key === '-') inputChar('-');
+            else if (e.key === '*') inputChar('×');
+            else if (e.key === '/') inputFraction();
+            else if (e.key === '.') inputChar('.');
+            else if (e.key === '(') inputChar('(');
+            else if (e.key === ')') inputChar(')');
+            else if (e.key === 'Enter' || e.key === '=') calculate();
+            else if (e.key === 'Backspace') deleteChar();
+            else if (e.key === 'Escape') clearAll();
+            else if (e.key === 'Shift') toggleShift();
+            else if (e.key === 'ArrowLeft') goBack();
+        });
+
+        // Initialize
+        showNewWord();
+        updateDisplay();
+        updateHistoryBtn();
+    </script>
+</body>
+</html>

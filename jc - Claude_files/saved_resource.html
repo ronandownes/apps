@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<!-- saved from url=(0012)about:srcdoc -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.13/html-to-image.min.js" integrity="sha512-iZ2ORl595Wx6miw+GuadDet4WQbdSWS3JLMoNfY8cRGoEFy6oT3G9IbcrBeL6AfkgpA51ETt/faX6yLV+/gFJg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      (function() {
+        const originalConsole = window.console;
+        window.console = {
+          log: (...args) => {
+            originalConsole.log(...args);
+            window.parent.postMessage({ type: 'console', message: args.join(' ') }, '*');
+          },
+          error: (...args) => {
+            originalConsole.error(...args);
+            window.parent.postMessage({ type: 'console', message: 'Error: ' + args.join(' ') }, '*');
+          },
+          warn: (...args) => {
+            originalConsole.warn(...args);
+            window.parent.postMessage({ type: 'console', message: 'Warning: ' + args.join(' ') }, '*');
+          }
+        };
+
+        let requestId = 0;
+        let callbacksMap = new Map();
+        let streamControllers = new Map();
+        
+        window.claude = {
+          complete: (prompt) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'claudeComplete', id, prompt }, '*');
+            });
+          }
+        };
+
+        window.storage = {
+          get: (key, shared = false) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageGet', id, key, shared }, '*');
+            });
+          },
+          set: (key, value, shared = false) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageSet', id, key, value, shared }, '*');
+            });
+          },
+          delete: (key, shared = false) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageDelete', id, key, shared }, '*');
+            });
+          },
+          list: (prefix, shared = false) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageList', id, prefix, shared }, '*');
+            });
+          }
+        };
+
+        let pendingBlobs = new Map();
+        URL.createObjectURL = (blob) => {
+          // Store the blob and create an ID and URL for it
+          const blobId = `blob-${Date.now()}-${Math.random()}`;
+          pendingBlobs.set(blobId, blob);
+          return `blob-request://${blobId}`;
+        };
+
+        URL.revokeObjectURL = (url) => {
+          // Remove the blob from our store
+          const blobId = url.replace("blob-request://", "");
+          pendingBlobs.delete(blobId);
+        };
+
+        const getBlobFromURL = (url) => {
+          const blobId = url.replace("blob-request://", "");
+          return pendingBlobs.get(blobId);
+        };
+
+        // Override global fetch with streaming support
+        window.fetch = (url, init = {}) => {
+          return new Promise((resolve, reject) => {
+            const id = requestId++;
+            const channelId = `fetch-${id}-${Date.now()}`;
+            
+            callbacksMap.set(id, { 
+              resolve: (response) => {
+                // Create a ReadableStream for the response body
+                const stream = new ReadableStream({
+                  start(controller) {
+                    streamControllers.set(channelId, controller);
+                  },
+                  cancel() {
+                    streamControllers.delete(channelId);
+                  }
+                });
+                
+                // Create and return the Response with the stream
+                resolve(new Response(stream, {
+                  status: response.status,
+                  statusText: response.statusText,
+                  headers: response.headers
+                }));
+              },
+              reject,
+              channelId
+            });
+            
+            window.parent.postMessage({
+              type: 'proxyFetch',
+              id,
+              url,
+              init,
+              channelId
+            }, '*');
+          });
+        };
+
+        window.addEventListener('message', async (event) => {
+          if (event.data.type === 'takeScreenshot') {
+            const rootElement = document.getElementById('artifacts-component-root-html');
+            if (!rootElement) {
+              window.parent.postMessage({
+                type: 'screenshotError',
+                error: new Error('Root element not found'),
+              }, '*');
+            }
+            const screenshot = await htmlToImage.toPng(rootElement, {
+              imagePlaceholder:
+                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjePDgwX8ACOQDoNsk0PMAAAAASUVORK5CYII=",
+            });
+            window.parent.postMessage({
+              type: 'screenshotData',
+              data: screenshot,
+            }, '*');
+          } else if (event.data.type === 'claudeComplete') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.completion);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'proxyFetchResponse') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+              callbacksMap.delete(event.data.id);
+            } else {
+              // Initial response with headers, status, etc.
+              callback.resolve({
+                status: event.data.status,
+                statusText: event.data.statusText,
+                headers: event.data.headers
+              });
+              // Don't delete the callback yet if streaming
+              if (!event.data.body) {
+                callbacksMap.delete(event.data.id);
+              }
+            }
+          } else if (event.data.type === 'proxyFetchStream') {
+            // Handle streaming data chunks
+            const controller = streamControllers.get(event.data.channelId);
+            if (controller) {
+              if (event.data.error) {
+                controller.error(new Error(event.data.error));
+                streamControllers.delete(event.data.channelId);
+              } else if (event.data.done) {
+                controller.close();
+                streamControllers.delete(event.data.channelId);
+                // Clean up the callback
+                const callback = Array.from(callbacksMap.entries()).find(
+                  ([_, value]) => value.channelId === event.data.channelId
+                );
+                if (callback) {
+                  callbacksMap.delete(callback[0]);
+                }
+              } else if (event.data.chunk) {
+                controller.enqueue(new Uint8Array(event.data.chunk));
+              }
+            }
+          } else if (event.data.type === 'storageGet') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'storageSet') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'storageDelete') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'storageList') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          }
+        });
+
+        window.addEventListener('click', (event) => {
+          const isEl = event.target instanceof HTMLElement;
+          if (!isEl) return;
+    
+          // find ancestor links
+          const linkEl = event.target.closest("a");
+          if (!linkEl || !linkEl.href) return;
+    
+          event.preventDefault();
+          event.stopImmediatePropagation();
+    
+          if (linkEl.href.startsWith("blob-request:")) {
+            const blob = getBlobFromURL(linkEl.href);
+            if (!blob) return;
+            void blob.arrayBuffer().then((data) => {
+              window.parent.postMessage({
+                type: "downloadFile",
+                filename: linkEl.download,
+                data,
+                mimeType: blob.type || "application/octet-stream",
+              });
+            });
+          } else if (linkEl.href.startsWith("data:")) {
+            const [header, base64Data] = linkEl.href.split(",");
+            const mimeMatch = header.match(/data:([^;]+)/);
+            const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+            const binaryString = atob(base64Data);
+            const data = Uint8Array.from(binaryString, (c) =>
+              c.charCodeAt(0),
+            ).buffer;
+            window.parent.postMessage({
+              type: "downloadFile",
+              filename: linkEl.download,
+              data,
+              mimeType,
+            });
+          } else {
+            let linkUrl;
+            try {
+              linkUrl = new URL(linkEl.href);
+            } catch (error) {
+              return;
+            }
+    
+            if (linkUrl.hostname === window.location.hostname) return;
+      
+            window.parent.postMessage({
+              type: 'openExternal',
+              href: linkEl.href,
+            }, '*');
+          }
+      });
+
+        const originalOpen = window.open;
+        window.open = function (url) {
+          window.parent.postMessage({
+            type: "openExternal",
+            href: url,
+          }, "*");
+        };
+
+        window.addEventListener('error', (event) => {
+          window.parent.postMessage({ type: 'console', message: 'Uncaught Error: ' + event.message }, '*');
+        });
+      })();
+    </script>
+  
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's Lesson - Mr Downes Maths</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #1a1a1a; }
+
+        /* Header */
+        .topbar {
+            background: #e8e8e8;
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #22c55e, #3b82f6, #ef4444, #1a1a1a) 1;
+            position: sticky;
+            top: 0;
+            z-index: 300;
+        }
+        .topbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.15em;
+            color: #1a1a1a;
+            opacity: 0;
+            animation: textFadeIn 0.6s ease-out 0.1s forwards;
+        }
+        .tagline {
+            color: #555;
+            font-size: 0.9em;
+            opacity: 0;
+            animation: textFadeIn 0.6s ease-out 0.3s forwards;
+        }
+        @keyframes textFadeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dots */
+        .mark { display: flex; gap: 4px; }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: dotBounce 0.8s ease-out forwards;
+        }
+        .mark-left .dot:nth-child(1) { animation-delay: 0.5s; }
+        .mark-left .dot:nth-child(2) { animation-delay: 0.6s; }
+        .mark-left .dot:nth-child(3) { animation-delay: 0.7s; }
+        .mark-left .dot:nth-child(4) { animation-delay: 0.8s; }
+        .mark-right .dot:nth-child(1) { animation-delay: 0.9s; }
+        .mark-right .dot:nth-child(2) { animation-delay: 1.0s; }
+        .mark-right .dot:nth-child(3) { animation-delay: 1.1s; }
+        .mark-right .dot:nth-child(4) { animation-delay: 1.2s; }
+        @keyframes dotBounce {
+            0% { transform: translateY(-30px) scale(0.3); opacity: 0; }
+            25% { transform: translateY(8px) scale(1.2); opacity: 1; }
+            40% { transform: translateY(-12px) scale(0.9); }
+            55% { transform: translateY(5px) scale(1.05); }
+            70% { transform: translateY(-4px) scale(0.98); }
+            85% { transform: translateY(2px) scale(1.01); }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .dot.green { background: #22c55e; }
+        .dot.blue { background: #3b82f6; }
+        .dot.red { background: #ef4444; }
+        .dot.black { background: #1a1a1a; }
+
+        .lesson-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .lesson-input label { font-size: 0.9em; color: #444; font-weight: 600; }
+        .lesson-input input {
+            padding: 8px 14px;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            font-size: 1em;
+            width: 200px;
+            background: white;
+        }
+        .lesson-input input:focus { outline: none; border-color: #00a6a0; }
+
+        /* Layout */
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: width 0.3s, margin-left 0.3s;
+        }
+        .sidebar.collapsed {
+            width: 0;
+            overflow: hidden;
+            border: none;
+        }
+        .sidebar-toggle {
+            position: fixed;
+            left: 10px;
+            top: 70px;
+            width: 36px;
+            height: 36px;
+            background: #00a6a0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 250;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: left 0.3s;
+        }
+        .sidebar-toggle:hover { background: #00b8b0; }
+        .sidebar:not(.collapsed) ~ .sidebar-toggle { left: 330px; }
+
+        /* Today's Selection - at top of sidebar */
+        .global-controls {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 8px;
+        }
+        .global-controls button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .global-controls .select-all-btn { background: #00a6a0; color: white; }
+        .global-controls .select-all-btn:hover { background: #00b8b0; }
+        .global-controls .clear-all-btn { background: #e0e0e0; color: #444; }
+        .global-controls .clear-all-btn:hover { background: #d0d0d0; }
+        
+        .today-section {
+            background: #f0fafa;
+            border-bottom: 2px solid #00a6a0;
+            padding: 12px 15px;
+        }
+        .today-section h3 {
+            font-size: 0.85em;
+            color: #00a6a0;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .today-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 28px;
+        }
+        .today-tag {
+            background: #00a6a0;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        .today-empty { color: #999; font-size: 0.8em; font-style: italic; }
+
+        /* Strand sections */
+        .strand-section { border-bottom: 1px solid #eee; }
+        .strand-toggle {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            text-align: left;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .strand-toggle:hover { background: #fafafa; }
+        .strand-toggle .arrow { transition: transform 0.2s; font-size: 0.7em; color: #999; }
+        .strand-section.open .strand-toggle .arrow { transform: rotate(90deg); }
+        .strand-controls {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+            margin-right: 8px;
+        }
+        .strand-controls button {
+            background: #e8e8e8;
+            border: none;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            cursor: pointer;
+            color: #555;
+        }
+        .strand-controls button:hover { background: #ddd; }
+        .strand-items { display: none; padding: 5px 10px 10px; }
+        .strand-section.open .strand-items { display: block; }
+
+        .lo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            line-height: 1.35;
+        }
+        .lo-item:hover { background: #f5f5f5; }
+        .lo-item input { margin-top: 2px; accent-color: #00a6a0; }
+        .lo-item .code {
+            background: #e5e5e5;
+            color: #444;
+            padding: 2px 7px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .lo-item .text { color: #444; }
+        .hl { color: #3b82f6; font-size: 0.85em; font-weight: 600; }
+
+        /* Main area */
+        .main {
+            flex: 1;
+            padding: 20px;
+            padding-left: 60px;
+            transition: padding-left 0.3s;
+        }
+        .sidebar.collapsed ~ .main { padding-left: 60px; }
+
+        /* Controls bar */
+        .controls-bar {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: sticky;
+            top: 60px;
+            z-index: 100;
+        }
+        .controls-left {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .btn {
+            background: #00a6a0;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: #00b8b0; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn.secondary { background: #e0e0e0; color: #444; }
+        .btn.secondary:hover { background: #d0d0d0; }
+        .btn.active { background: #007a75; }
+
+        .nav-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .controls-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .counter { font-size: 0.85em; color: #666; min-width: 70px; text-align: center; }
+
+        /* Overview mode - strand header */
+        .strand-header-card {
+            background: linear-gradient(135deg, #00a6a0, #007a75);
+            color: white;
+            border-radius: 10px;
+            padding: 25px 30px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .strand-header-card h2 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+        .strand-header-card .count {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        body.overview-mode .today-section { display: none; }
+        body.overview-mode .strand-section { display: none; }
+
+        .toggle-label {
+            font-size: 0.8em;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .toggle-label input { accent-color: #00a6a0; }
+
+        /* Cards area - responsive grid */
+        .cards-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .lo-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px 18px;
+            flex: 1 1 300px;
+            max-width: 100%;
+            transition: all 0.3s;
+        }
+        .lo-card.hidden-blur {
+            filter: blur(8px);
+            opacity: 0.3;
+            user-select: none;
+        }
+        .lo-card.revealed { filter: none; opacity: 1; }
+        .lo-card .code-pill {
+            display: inline-block;
+            background: #e5e5e5;
+            color: #444;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        .lo-card .lo-text {
+            font-size: 1.15em;
+            line-height: 1.45;
+            color: #1a1a1a;
+        }
+        .lo-card .official {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.85em;
+            color: #888;
+            display: none;
+        }
+        body.show-official .lo-card .official { display: block; }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 60px 20px;
+            width: 100%;
+        }
+        .empty-state .icon { font-size: 3em; margin-bottom: 15px; }
+
+        /* Single slide mode */
+        body.slide-mode .cards-area { justify-content: center; }
+        body.slide-mode .lo-card { display: none; flex: none; width: 100%; max-width: 700px; }
+        body.slide-mode .lo-card.active { display: block; }
+        body.slide-mode .lo-card .lo-text { font-size: 1.6em; text-align: center; }
+        body.slide-mode .lo-card .code-pill { font-size: 1em; }
+
+        @media (max-width: 800px) {
+            .sidebar { position: fixed; left: 0; top: 56px; height: calc(100vh - 56px); z-index: 200; }
+            .sidebar.collapsed { margin-left: -320px; width: 320px; }
+            .main { padding-left: 20px; }
+            .lo-card { flex: 1 1 100%; }
+        }
+    </style>
+</head>
+<body id="artifacts-component-root-html">
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="mark mark-left">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="brand-text">Mr Downes Maths</span>
+                <span class="mark mark-right">
+                    <span class="dot green"></span>
+                    <span class="dot blue"></span>
+                    <span class="dot red"></span>
+                    <span class="dot black"></span>
+                </span>
+                <span class="tagline">— Designed for learning on your terms</span>
+            </div>
+            <div class="lesson-input">
+                <label>Today's Lesson:</label>
+                <input type="text" id="lessonTitle" placeholder="e.g. Percentages">
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <!-- Global controls -->
+            <div class="global-controls">
+                <button class="select-all-btn" onclick="selectAll()">✓ Select All</button>
+                <button class="clear-all-btn" onclick="clearAll()">✕ Clear All</button>
+            </div>
+
+            <!-- Today's Selection at TOP -->
+            <div class="today-section">
+                <h3>📌 Today's Focus</h3>
+                <div class="today-tags" id="todayTags"><span class="today-empty">Select outcomes from strands below</span></div>
+            </div>
+
+            <!-- Unifying -->
+            <div class="strand-section open">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
+                    Unifying
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        </span></button><button onclick="selectStrand(&#39;unifying&#39;)">All</button>
+                        <button onclick="clearStrand(&#39;unifying&#39;)">None</button>
+                    
+                    <span class="arrow">▶</span>
+                
+                <div class="strand-items" id="unifying-items"><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="0">
+                        <span class="code">U.1</span>
+                        <span class="text">Know, understand, explain and correctly use core maths ideas and methods</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="1">
+                        <span class="code">U.2</span>
+                        <span class="text">Use mathematical methods accurately and appropriately</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="2">
+                        <span class="code">U.3</span>
+                        <span class="text">Understand that = means both sides have the same value</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="3">
+                        <span class="code">U.4</span>
+                        <span class="text">Show maths in different ways (numbers, algebra, graphs, diagrams, words) and move between them</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="4">
+                        <span class="code">U.5</span>
+                        <span class="text">See how different parts of maths link together</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="5">
+                        <span class="code">U.6</span>
+                        <span class="text">Apply maths to real-life situations</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="6">
+                        <span class="code">U.7</span>
+                        <span class="text">Understand a problem and turn it into maths</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="7">
+                        <span class="code">U.8</span>
+                        <span class="text">Break problems into smaller steps and solve them</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="8">
+                        <span class="code">U.9</span>
+                        <span class="text">Check your answer makes sense for the original question</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="9">
+                        <span class="code">U.10</span>
+                        <span class="text">Judge whether answers are reasonable and consider other approaches</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="10">
+                        <span class="code">U.11</span>
+                        <span class="text">Spot patterns and make general rules from examples</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="11">
+                        <span class="code">U.12</span>
+                        <span class="text">Build and check mathematical arguments</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="unifying" data-index="12">
+                        <span class="code">U.13</span>
+                        <span class="text">Explain your maths clearly using correct language and notation</span>
+                    </label></div>
+            </div>
+
+            <!-- Number -->
+            <div class="strand-section open">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
+                    Number
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        </span></button><button onclick="selectStrand(&#39;number&#39;)">All</button>
+                        <button onclick="clearStrand(&#39;number&#39;)">None</button>
+                    
+                    <span class="arrow">▶</span>
+                
+                <div class="strand-items" id="number-items"><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="0">
+                        <span class="code">N.1a</span>
+                        <span class="text">Use models (number lines, groups, diagrams) to understand +, −, ×, ÷</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="1">
+                        <span class="code">N.1b</span>
+                        <span class="text">Carry out the four operations correctly and understand the rules they follow <span class="hl">including surds [HL]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="2">
+                        <span class="code">N.1c.I</span>
+                        <span class="text">Move easily between whole numbers and index (power) form</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="3">
+                        <span class="code">N.1c.II</span>
+                        <span class="text">Use the laws of indices correctly <span class="hl">[HL: all real numbers]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="4">
+                        <span class="code">N.1c.III</span>
+                        <span class="text">Use zero, negative, and fractional indices <span class="hl">[HL only]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="5">
+                        <span class="code">N.1c.IV</span>
+                        <span class="text">Spot patterns in calculations involving indices</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="6">
+                        <span class="code">N.1c.V</span>
+                        <span class="text">Use the correct order of operations</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="7">
+                        <span class="code">N.1d</span>
+                        <span class="text">Find and use factors, HCF, multiples, LCM, and prime numbers</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="8">
+                        <span class="code">N.1e</span>
+                        <span class="text">Give answers to the required level of accuracy</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="9">
+                        <span class="code">N.1f</span>
+                        <span class="text">Write numbers in standard form <span class="hl">[HL: small numbers]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="10">
+                        <span class="code">N.2a</span>
+                        <span class="text">Convert between fractions, decimals, and percentages</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="11">
+                        <span class="code">N.2b</span>
+                        <span class="text">Use ratio and proportion</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="12">
+                        <span class="code">N.2c</span>
+                        <span class="text">Solve real-life money problems (profit/loss, interest, tax) <span class="hl">[HL: mark-up, margin]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="13">
+                        <span class="code">N.3a</span>
+                        <span class="text">Compare quantities using absolute and relative comparisons</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="14">
+                        <span class="code">N.3b</span>
+                        <span class="text">Solve proportional problems (currency, speed–distance–time)</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="15">
+                        <span class="code">N.4</span>
+                        <span class="text">Recognise, describe, and continue number patterns</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="16">
+                        <span class="code">N.5a</span>
+                        <span class="text">Understand what a set is</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="17">
+                        <span class="code">N.5b</span>
+                        <span class="text">Describe sets by listing or rule <span class="hl">[HL: 3-set Venn]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="18">
+                        <span class="code">N.5c</span>
+                        <span class="text">Use set notation (∅, ⊂, ∈, ∩, ∪)</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="19">
+                        <span class="code">N.5d</span>
+                        <span class="text">Carry out set operations <span class="hl">[HL: 3 sets]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="number" data-index="20">
+                        <span class="code">N.5e</span>
+                        <span class="text">Investigate set operation properties <span class="hl">[HL only]</span></span>
+                    </label></div>
+            </div>
+
+            <!-- Geometry -->
+            <div class="strand-section open">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
+                    Geometry &amp; Trigonometry
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        </span></button><button onclick="selectStrand(&#39;geometry&#39;)">All</button>
+                        <button onclick="clearStrand(&#39;geometry&#39;)">None</button>
+                    
+                    <span class="arrow">▶</span>
+                
+                <div class="strand-items" id="geometry-items"><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="0">
+                        <span class="code">GT.1</span>
+                        <span class="text">Use units of length, area, volume, mass, time, angle</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="1">
+                        <span class="code">GT.2a</span>
+                        <span class="text">Draw and interpret scaled diagrams</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="2">
+                        <span class="code">GT.2b</span>
+                        <span class="text">Draw nets of solids</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="3">
+                        <span class="code">GT.2c</span>
+                        <span class="text">Find perimeter and area of shapes</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="4">
+                        <span class="code">GT.2d</span>
+                        <span class="text">Find volume of solids <span class="hl">[HL: spheres]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="5">
+                        <span class="code">GT.2e</span>
+                        <span class="text">Find surface area of solids</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="6">
+                        <span class="code">GT.3a</span>
+                        <span class="text">Carry out geometric constructions</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="7">
+                        <span class="code">GT.3b</span>
+                        <span class="text">Use theorems and results to solve problems</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="8">
+                        <span class="code">GT.3c</span>
+                        <span class="text">Understand geometric language (theorem, proof)</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="9">
+                        <span class="code">GT.3d</span>
+                        <span class="text">Create and evaluate proofs</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="10">
+                        <span class="code">GT.3e</span>
+                        <span class="text">Understand how key proofs work</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="11">
+                        <span class="code">GT.4</span>
+                        <span class="text">Use sin, cos, tan for right-angled triangles</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="12">
+                        <span class="code">GT.5a</span>
+                        <span class="text">Find distance, midpoint, slope, intersections</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="13">
+                        <span class="code">GT.5b</span>
+                        <span class="text">Draw and interpret line graphs</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="14">
+                        <span class="code">GT.5c</span>
+                        <span class="text">Find equations of lines (y = mx + c)</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="15">
+                        <span class="code">GT.6a</span>
+                        <span class="text">Recognise shapes after transformations</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="geometry" data-index="16">
+                        <span class="code">GT.6b</span>
+                        <span class="text">Draw axes of symmetry</span>
+                    </label></div>
+            </div>
+
+            <!-- Algebra -->
+            <div class="strand-section open">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
+                    Algebra &amp; Functions
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        </span></button><button onclick="selectStrand(&#39;algebra&#39;)">All</button>
+                        <button onclick="clearStrand(&#39;algebra&#39;)">None</button>
+                    
+                    <span class="arrow">▶</span>
+                
+                <div class="strand-items" id="algebra-items"><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="0">
+                        <span class="code">AF.1a</span>
+                        <span class="text">Show patterns using tables and graphs</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="1">
+                        <span class="code">AF.1b</span>
+                        <span class="text">Write general rules for patterns <span class="hl">[HL: quadratic]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="2">
+                        <span class="code">AF.1c</span>
+                        <span class="text">Identify pattern types <span class="hl">[HL: quad, exp]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="3">
+                        <span class="code">AF.2a</span>
+                        <span class="text">Write and understand algebraic expressions</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="4">
+                        <span class="code">AF.2b</span>
+                        <span class="text">Substitute values into expressions</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="5">
+                        <span class="code">AF.2c</span>
+                        <span class="text">Write and interpret equations</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="6">
+                        <span class="code">AF.3a</span>
+                        <span class="text">Add, subtract, simplify expressions <span class="hl">[HL: fractions]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="7">
+                        <span class="code">AF.3b.I</span>
+                        <span class="text">Multiply out single brackets</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="8">
+                        <span class="code">AF.3b.II</span>
+                        <span class="text">Multiply two brackets <span class="hl">[HL: trinomials]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="9">
+                        <span class="code">AF.3c</span>
+                        <span class="text">Divide expressions <span class="hl">[HL: cubic]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="10">
+                        <span class="code">AF.3d</span>
+                        <span class="text">Factorise and expand <span class="hl">[HL: harder]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="11">
+                        <span class="code">AF.4a</span>
+                        <span class="text">Solve linear equations</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="12">
+                        <span class="code">AF.4b</span>
+                        <span class="text">Solve quadratic equations <span class="hl">[HL: irrational]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="13">
+                        <span class="code">AF.4c</span>
+                        <span class="text">Solve simultaneous equations</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="14">
+                        <span class="code">AF.4d</span>
+                        <span class="text">Solve inequalities</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="15">
+                        <span class="code">AF.5</span>
+                        <span class="text">Build quadratic from roots <span class="hl">[HL only]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="16">
+                        <span class="code">AF.6</span>
+                        <span class="text">Change the subject of a formula <span class="hl">[HL only]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="17">
+                        <span class="code">AF.7a</span>
+                        <span class="text">Understand what a function is</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="18">
+                        <span class="code">AF.7b</span>
+                        <span class="text">Represent functions in different ways</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="19">
+                        <span class="code">AF.7c</span>
+                        <span class="text">Use graphs to find solutions <span class="hl">[HL: inequalities]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="algebra" data-index="20">
+                        <span class="code">AF.7d</span>
+                        <span class="text">Connect graph shapes to real situations</span>
+                    </label></div>
+            </div>
+
+            <!-- Stats -->
+            <div class="strand-section open">
+                <button class="strand-toggle" onclick="this.parentElement.classList.toggle(&#39;open&#39;)">
+                    Statistics &amp; Probability
+                    <span class="strand-controls" onclick="event.stopPropagation()">
+                        </span></button><button onclick="selectStrand(&#39;stats&#39;)">All</button>
+                        <button onclick="clearStrand(&#39;stats&#39;)">None</button>
+                    
+                    <span class="arrow">▶</span>
+                
+                <div class="strand-items" id="stats-items"><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="0">
+                        <span class="code">SP.1a</span>
+                        <span class="text">List outcomes using tree diagrams and tables</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="1">
+                        <span class="code">SP.1b</span>
+                        <span class="text">Use counting methods</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="2">
+                        <span class="code">SP.2a</span>
+                        <span class="text">Probability as a number from 0 to 1</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="3">
+                        <span class="code">SP.2b</span>
+                        <span class="text">Calculate probability = favourable ÷ total</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="4">
+                        <span class="code">SP.2c</span>
+                        <span class="text">Estimate probability from experiments</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="5">
+                        <span class="code">SP.3a</span>
+                        <span class="text">Ask a good statistical question</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="6">
+                        <span class="code">SP.3b</span>
+                        <span class="text">Collect fair, representative data</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="7">
+                        <span class="code">SP.3c</span>
+                        <span class="text">Classify data (categorical/numerical)</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="8">
+                        <span class="code">SP.3d</span>
+                        <span class="text">Choose and draw appropriate charts</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="9">
+                        <span class="code">SP.3e</span>
+                        <span class="text">Calculate mean, median, mode, range <span class="hl">[HL: grouped]</span></span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="10">
+                        <span class="code">SP.3f</span>
+                        <span class="text">Judge which graph is best</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="11">
+                        <span class="code">SP.3g</span>
+                        <span class="text">Identify misuse of statistics</span>
+                    </label><label class="lo-item">
+                        <input type="checkbox" data-strand="stats" data-index="12">
+                        <span class="code">SP.3h</span>
+                        <span class="text">Understand limitations of conclusions</span>
+                    </label></div>
+            </div>
+        </aside>
+
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
+
+        <main class="main">
+            <div class="controls-bar">
+                <div class="controls-left">
+                    <button class="btn" id="overviewBtn" onclick="toggleOverview()">📊 Overview</button>
+                    <button class="btn secondary" id="hideAllBtn" onclick="hideAll()">Hide All</button>
+                    <button class="btn secondary" id="showAllBtn" onclick="showAll()">Show All</button>
+                </div>
+                <div class="nav-controls">
+                    <button class="btn secondary" id="prevBtn" onclick="goPrev()">◀ Back</button>
+                    <span class="counter" id="counter">0 / 0</span>
+                    <button class="btn secondary" id="nextBtn" onclick="goNext()">Next ▶</button>
+                </div>
+                <div class="controls-right">
+                    <button class="btn secondary" id="slideModeBtn" onclick="toggleSlideMode()">Slide Mode</button>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="officialToggle" onchange="document.body.classList.toggle(&#39;show-official&#39;, this.checked)">
+                        Official wording
+                    </label>
+                </div>
+            </div>
+
+            <div class="cards-area" id="cardsArea"><div class="empty-state"><div class="icon">📋</div><p>Select learning outcomes from the sidebar, or use <strong>Overview</strong> to browse all strands</p></div></div>
+        </main>
+    </div>
+
+    <script>
+        const allLOs = {
+            unifying: [
+                { code: 'U.1', text: 'Know, understand, explain and correctly use core maths ideas and methods', official: 'recall and demonstrate understanding of the fundamental concepts and procedures that underpin each strand' },
+                { code: 'U.2', text: 'Use mathematical methods accurately and appropriately', official: 'apply the procedures associated with each strand accurately, effectively, and appropriately' },
+                { code: 'U.3', text: 'Understand that = means both sides have the same value', official: 'recognise that equality is a relationship in which two mathematical expressions have the same value' },
+                { code: 'U.4', text: 'Show maths in different ways (numbers, algebra, graphs, diagrams, words) and move between them', official: 'represent a mathematical situation in a variety of different ways' },
+                { code: 'U.5', text: 'See how different parts of maths link together', official: 'make connections within and between strands' },
+                { code: 'U.6', text: 'Apply maths to real-life situations', official: 'make connections between mathematics and the real world' },
+                { code: 'U.7', text: 'Understand a problem and turn it into maths', official: 'make sense of a given problem, and if necessary mathematise a situation' },
+                { code: 'U.8', text: 'Break problems into smaller steps and solve them', official: 'apply their knowledge and skills to solve a problem, including decomposing it into manageable parts' },
+                { code: 'U.9', text: 'Check your answer makes sense for the original question', official: 'interpret their solution to a problem in terms of the original question' },
+                { code: 'U.10', text: 'Judge whether answers are reasonable and consider other approaches', official: 'evaluate different possible solutions to a problem' },
+                { code: 'U.11', text: 'Spot patterns and make general rules from examples', official: 'generate general mathematical statements or conjectures based on specific instances' },
+                { code: 'U.12', text: 'Build and check mathematical arguments', official: 'generate and evaluate mathematical arguments and proofs' },
+                { code: 'U.13', text: 'Explain your maths clearly using correct language and notation', official: 'communicate mathematics effectively' }
+            ],
+            number: [
+                { code: 'N.1a', text: 'Use models (number lines, groups, diagrams) to understand +, −, ×, ÷', official: 'represent the operations using models including the number line' },
+                { code: 'N.1b', text: 'Carry out the four operations correctly and understand the rules they follow', hl: 'including surds [HL]', official: 'perform the operations and understand commutative, associative and distributive properties' },
+                { code: 'N.1c.I', text: 'Move easily between whole numbers and index (power) form', official: 'flexibly translate between whole numbers and index representation' },
+                { code: 'N.1c.II', text: 'Use the laws of indices correctly', hl: '[HL: all real numbers]', official: 'use and apply generalisations such as aᵖaᵍ = aᵖ⁺ᵍ' },
+                { code: 'N.1c.III', text: 'Use zero, negative, and fractional indices', hl: '[HL only]', official: 'use and apply generalisations such as a⁰ = 1' },
+                { code: 'N.1c.IV', text: 'Spot patterns in calculations involving indices', official: 'generalise numerical relationships involving index form' },
+                { code: 'N.1c.V', text: 'Use the correct order of operations', official: 'correctly use the order of arithmetic and index operations' },
+                { code: 'N.1d', text: 'Find and use factors, HCF, multiples, LCM, and prime numbers', official: 'calculate and interpret factors, multiples, and prime numbers' },
+                { code: 'N.1e', text: 'Give answers to the required level of accuracy', official: 'present numerical answers to the degree of accuracy specified' },
+                { code: 'N.1f', text: 'Write numbers in standard form', hl: '[HL: small numbers]', official: 'convert the number to the form a × 10ⁿ' },
+                { code: 'N.2a', text: 'Convert between fractions, decimals, and percentages', official: 'flexibly convert between fractions, decimals, and percentages' },
+                { code: 'N.2b', text: 'Use ratio and proportion', official: 'use and understand ratio and proportion' },
+                { code: 'N.2c', text: 'Solve real-life money problems (profit/loss, interest, tax)', hl: '[HL: mark-up, margin]', official: 'solve money-related problems' },
+                { code: 'N.3a', text: 'Compare quantities using absolute and relative comparisons', official: 'use absolute and relative comparison' },
+                { code: 'N.3b', text: 'Solve proportional problems (currency, speed–distance–time)', official: 'solve problems involving proportionality' },
+                { code: 'N.4', text: 'Recognise, describe, and continue number patterns', official: 'analyse numerical patterns' },
+                { code: 'N.5a', text: 'Understand what a set is', official: 'understand the concept of a set' },
+                { code: 'N.5b', text: 'Describe sets by listing or rule', hl: '[HL: 3-set Venn]', official: 'define sets' },
+                { code: 'N.5c', text: 'Use set notation (∅, ⊂, ∈, ∩, ∪)', official: 'use and understand set notation' },
+                { code: 'N.5d', text: 'Carry out set operations', hl: '[HL: 3 sets]', official: 'perform intersection and union' },
+                { code: 'N.5e', text: 'Investigate set operation properties', hl: '[HL only]', official: 'investigate commutative/associative' }
+            ],
+            geometry: [
+                { code: 'GT.1', text: 'Use units of length, area, volume, mass, time, angle', official: 'calculate, interpret, and apply units' },
+                { code: 'GT.2a', text: 'Draw and interpret scaled diagrams', official: 'draw and interpret scaled diagrams' },
+                { code: 'GT.2b', text: 'Draw nets of solids', official: 'draw and interpret nets' },
+                { code: 'GT.2c', text: 'Find perimeter and area of shapes', official: 'find perimeter and area' },
+                { code: 'GT.2d', text: 'Find volume of solids', hl: '[HL: spheres]', official: 'find volume' },
+                { code: 'GT.2e', text: 'Find surface area of solids', official: 'find surface area' },
+                { code: 'GT.3a', text: 'Carry out geometric constructions', official: 'perform constructions 1-15' },
+                { code: 'GT.3b', text: 'Use theorems and results to solve problems', official: 'recall and use theorems' },
+                { code: 'GT.3c', text: 'Understand geometric language (theorem, proof)', official: 'use and explain terms' },
+                { code: 'GT.3d', text: 'Create and evaluate proofs', official: 'create proofs' },
+                { code: 'GT.3e', text: 'Understand how key proofs work', official: 'display understanding of proofs' },
+                { code: 'GT.4', text: 'Use sin, cos, tan for right-angled triangles', official: 'evaluate trigonometric ratios' },
+                { code: 'GT.5a', text: 'Find distance, midpoint, slope, intersections', official: 'find and interpret distance, midpoint, slope' },
+                { code: 'GT.5b', text: 'Draw and interpret line graphs', official: 'draw graphs of line segments' },
+                { code: 'GT.5c', text: 'Find equations of lines (y = mx + c)', official: 'find equation of a line' },
+                { code: 'GT.6a', text: 'Recognise shapes after transformations', official: 'recognise images under transformation' },
+                { code: 'GT.6b', text: 'Draw axes of symmetry', official: 'draw axes of symmetry' }
+            ],
+            algebra: [
+                { code: 'AF.1a', text: 'Show patterns using tables and graphs', official: 'represent patterns in tables and graphs' },
+                { code: 'AF.1b', text: 'Write general rules for patterns', hl: '[HL: quadratic]', official: 'generate expressions for patterns' },
+                { code: 'AF.1c', text: 'Identify pattern types', hl: '[HL: quad, exp]', official: 'categorise patterns' },
+                { code: 'AF.2a', text: 'Write and understand algebraic expressions', official: 'generate and interpret expressions' },
+                { code: 'AF.2b', text: 'Substitute values into expressions', official: 'find value of expressions' },
+                { code: 'AF.2c', text: 'Write and interpret equations', official: 'use concept of equality' },
+                { code: 'AF.3a', text: 'Add, subtract, simplify expressions', hl: '[HL: fractions]', official: 'add, subtract, simplify' },
+                { code: 'AF.3b.I', text: 'Multiply out single brackets', official: 'multiply a(bx + c)' },
+                { code: 'AF.3b.II', text: 'Multiply two brackets', hl: '[HL: trinomials]', official: 'multiply (ax + b)(cx + d)' },
+                { code: 'AF.3c', text: 'Divide expressions', hl: '[HL: cubic]', official: 'divide expressions' },
+                { code: 'AF.3d', text: 'Factorise and expand', hl: '[HL: harder]', official: 'convert between forms' },
+                { code: 'AF.4a', text: 'Solve linear equations', official: 'solve linear equations' },
+                { code: 'AF.4b', text: 'Solve quadratic equations', hl: '[HL: irrational]', official: 'solve quadratics' },
+                { code: 'AF.4c', text: 'Solve simultaneous equations', official: 'solve simultaneous equations' },
+                { code: 'AF.4d', text: 'Solve inequalities', official: 'solve linear inequalities' },
+                { code: 'AF.5', text: 'Build quadratic from roots', hl: '[HL only]', official: 'generate quadratics from roots' },
+                { code: 'AF.6', text: 'Change the subject of a formula', hl: '[HL only]', official: 'change subject' },
+                { code: 'AF.7a', text: 'Understand what a function is', official: 'understand concept of function' },
+                { code: 'AF.7b', text: 'Represent functions in different ways', official: 'represent and interpret functions' },
+                { code: 'AF.7c', text: 'Use graphs to find solutions', hl: '[HL: inequalities]', official: 'graphical methods' },
+                { code: 'AF.7d', text: 'Connect graph shapes to real situations', official: 'connections between graphs and phenomena' }
+            ],
+            stats: [
+                { code: 'SP.1a', text: 'List outcomes using tree diagrams and tables', official: 'generate sample space' },
+                { code: 'SP.1b', text: 'Use counting methods', official: 'fundamental principle of counting' },
+                { code: 'SP.2a', text: 'Probability as a number from 0 to 1', official: 'probability measure 0-1' },
+                { code: 'SP.2b', text: 'Calculate probability = favourable ÷ total', official: 'equally likely outcomes' },
+                { code: 'SP.2c', text: 'Estimate probability from experiments', official: 'relative frequency' },
+                { code: 'SP.3a', text: 'Ask a good statistical question', official: 'generate statistical question' },
+                { code: 'SP.3b', text: 'Collect fair, representative data', official: 'generate unbiased data' },
+                { code: 'SP.3c', text: 'Classify data (categorical/numerical)', official: 'classify data' },
+                { code: 'SP.3d', text: 'Choose and draw appropriate charts', official: 'graphical displays' },
+                { code: 'SP.3e', text: 'Calculate mean, median, mode, range', hl: '[HL: grouped]', official: 'summary statistics' },
+                { code: 'SP.3f', text: 'Judge which graph is best', official: 'evaluate graphs' },
+                { code: 'SP.3g', text: 'Identify misuse of statistics', official: 'misconceptions and misuses' },
+                { code: 'SP.3h', text: 'Understand limitations of conclusions', official: 'assumptions and limitations' }
+            ]
+        };
+
+        let selected = [];
+        let revealIndex = 0;
+        let slideMode = false;
+        let currentSlideIndex = 0;
+        let overviewMode = false;
+        let overviewStrandIndex = 0;
+        const strandNames = ['unifying', 'number', 'geometry', 'algebra', 'stats'];
+        const strandTitles = {
+            unifying: 'Unifying Strand',
+            number: 'Number Strand', 
+            geometry: 'Geometry & Trigonometry',
+            algebra: 'Algebra & Functions',
+            stats: 'Statistics & Probability'
+        };
+
+        // Build checkboxes
+        function buildCheckboxes() {
+            for (const [strand, items] of Object.entries(allLOs)) {
+                const container = document.getElementById(`${strand}-items`);
+                items.forEach((lo, i) => {
+                    const div = document.createElement('label');
+                    div.className = 'lo-item';
+                    div.innerHTML = `
+                        <input type="checkbox" data-strand="${strand}" data-index="${i}">
+                        <span class="code">${lo.code}</span>
+                        <span class="text">${lo.text}${lo.hl ? ` <span class="hl">${lo.hl}</span>` : ''}</span>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            document.querySelectorAll('.lo-item input').forEach(cb => {
+                cb.addEventListener('change', updateSelection);
+            });
+        }
+
+        function updateSelection() {
+            selected = [];
+            document.querySelectorAll('.lo-item input:checked').forEach(cb => {
+                const strand = cb.dataset.strand;
+                const index = parseInt(cb.dataset.index);
+                selected.push(allLOs[strand][index]);
+            });
+            updateTodayTags();
+            if (!overviewMode) {
+                buildCards();
+            }
+            revealIndex = 0;
+            currentSlideIndex = 0;
+            updateCounter();
+        }
+
+        function updateTodayTags() {
+            const container = document.getElementById('todayTags');
+            if (selected.length === 0) {
+                container.innerHTML = '<span class="today-empty">Select outcomes from strands below</span>';
+            } else if (selected.length <= 8) {
+                container.innerHTML = selected.map(lo => `<span class="today-tag">${lo.code}</span>`).join('');
+            } else {
+                container.innerHTML = `<span class="today-tag">${selected.length} outcomes selected</span>`;
+            }
+        }
+
+        function buildCards() {
+            const area = document.getElementById('cardsArea');
+            if (selected.length === 0) {
+                area.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>Select learning outcomes from the sidebar, or use <strong>Overview</strong> to browse all strands</p></div>`;
+                return;
+            }
+            area.innerHTML = selected.map((lo, i) => `
+                <div class="lo-card revealed ${i === 0 ? 'active' : ''}" data-index="${i}">
+                    <span class="code-pill">${lo.code}</span>
+                    <p class="lo-text">${lo.text}</p>
+                    <p class="official">${lo.official}</p>
+                </div>
+            `).join('');
+            revealIndex = selected.length;
+        }
+
+        // Overview mode - shows one strand at a time
+        function toggleOverview() {
+            overviewMode = !overviewMode;
+            document.body.classList.toggle('overview-mode', overviewMode);
+            document.getElementById('overviewBtn').classList.toggle('active', overviewMode);
+            document.getElementById('overviewBtn').textContent = overviewMode ? '✕ Exit Overview' : '📊 Overview';
+            
+            if (overviewMode) {
+                overviewStrandIndex = 0;
+                showOverviewStrand();
+            } else {
+                buildCards();
+                updateCounter();
+            }
+        }
+
+        function showOverviewStrand() {
+            const strandKey = strandNames[overviewStrandIndex];
+            const items = allLOs[strandKey];
+            const area = document.getElementById('cardsArea');
+            
+            area.innerHTML = `
+                <div class="strand-header-card">
+                    <h2>${strandTitles[strandKey]}</h2>
+                    <div class="count">${items.length} learning outcomes</div>
+                </div>
+                ${items.map((lo, i) => `
+                    <div class="lo-card revealed" data-index="${i}">
+                        <span class="code-pill">${lo.code}</span>
+                        <p class="lo-text">${lo.text}</p>
+                        <p class="official">${lo.official}</p>
+                    </div>
+                `).join('')}
+            `;
+            
+            document.getElementById('counter').textContent = `Strand ${overviewStrandIndex + 1} / ${strandNames.length}`;
+        }
+
+        function hideAll() {
+            document.querySelectorAll('.lo-card').forEach(card => {
+                card.classList.add('hidden-blur');
+                card.classList.remove('revealed', 'active');
+            });
+            revealIndex = 0;
+            currentSlideIndex = 0;
+            updateCounter();
+        }
+
+        function showAll() {
+            document.querySelectorAll('.lo-card').forEach((card, i) => {
+                card.classList.remove('hidden-blur');
+                card.classList.add('revealed');
+                if (i === 0) card.classList.add('active');
+            });
+            revealIndex = selected.length;
+            updateCounter();
+        }
+
+        function goNext() {
+            if (overviewMode) {
+                // Navigate to next strand
+                if (overviewStrandIndex < strandNames.length - 1) {
+                    overviewStrandIndex++;
+                    showOverviewStrand();
+                }
+            } else if (slideMode) {
+                // In slide mode, go to next slide
+                const cards = document.querySelectorAll('.lo-card');
+                if (currentSlideIndex < selected.length - 1) {
+                    cards[currentSlideIndex].classList.remove('active');
+                    currentSlideIndex++;
+                    cards[currentSlideIndex].classList.add('active');
+                    cards[currentSlideIndex].classList.remove('hidden-blur');
+                    cards[currentSlideIndex].classList.add('revealed');
+                }
+                updateCounter();
+            } else {
+                // In cards mode, reveal next hidden card
+                const cards = document.querySelectorAll('.lo-card');
+                if (revealIndex < cards.length) {
+                    cards[revealIndex].classList.remove('hidden-blur');
+                    cards[revealIndex].classList.add('revealed');
+                    revealIndex++;
+                }
+                updateCounter();
+            }
+        }
+
+        function goPrev() {
+            if (overviewMode) {
+                // Navigate to previous strand
+                if (overviewStrandIndex > 0) {
+                    overviewStrandIndex--;
+                    showOverviewStrand();
+                }
+            } else if (slideMode) {
+                // In slide mode, go to previous slide
+                const cards = document.querySelectorAll('.lo-card');
+                if (currentSlideIndex > 0) {
+                    cards[currentSlideIndex].classList.remove('active');
+                    currentSlideIndex--;
+                    cards[currentSlideIndex].classList.add('active');
+                }
+                updateCounter();
+            }
+        }
+
+        function updateCounter() {
+            const total = selected.length;
+            if (overviewMode) {
+                document.getElementById('counter').textContent = `Strand ${overviewStrandIndex + 1} / ${strandNames.length}`;
+            } else if (slideMode) {
+                document.getElementById('counter').textContent = total > 0 ? `${currentSlideIndex + 1} / ${total}` : '0 / 0';
+            } else {
+                document.getElementById('counter').textContent = `${revealIndex} / ${total}`;
+            }
+        }
+
+        function toggleSlideMode() {
+            slideMode = !slideMode;
+            document.body.classList.toggle('slide-mode', slideMode);
+            document.getElementById('slideModeBtn').classList.toggle('active', slideMode);
+            document.getElementById('slideModeBtn').textContent = slideMode ? 'Cards Mode' : 'Slide Mode';
+            
+            if (slideMode) {
+                currentSlideIndex = 0;
+                document.querySelectorAll('.lo-card').forEach((card, i) => {
+                    card.classList.toggle('active', i === 0);
+                });
+            }
+            updateCounter();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('sidebarToggle').textContent = 
+                document.getElementById('sidebar').classList.contains('collapsed') ? '☰' : '✕';
+        }
+
+        // Keyboard navigation (for clicker)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                goNext();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                goPrev();
+            }
+        });
+
+        // Global select/clear
+        function selectAll() {
+            document.querySelectorAll('.lo-item input').forEach(cb => cb.checked = true);
+            updateSelection();
+        }
+
+        function clearAll() {
+            document.querySelectorAll('.lo-item input').forEach(cb => cb.checked = false);
+            updateSelection();
+        }
+
+        // Strand-level select/clear
+        function selectStrand(strand) {
+            document.querySelectorAll(`.lo-item input[data-strand="${strand}"]`).forEach(cb => cb.checked = true);
+            updateSelection();
+        }
+
+        function clearStrand(strand) {
+            document.querySelectorAll(`.lo-item input[data-strand="${strand}"]`).forEach(cb => cb.checked = false);
+            updateSelection();
+        }
+
+        // Initialize - start with nothing selected
+        buildCheckboxes();
+        updateSelection();
+    </script>
+
+
+</body></html>

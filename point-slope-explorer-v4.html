@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point-Slope Form Explorer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%); min-height: 100vh; padding: 10px; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .header h1 { font-size: 1.8rem; color: #2c3e50; margin-bottom: 4px; }
+        .dots-logo { display: flex; justify-content: center; gap: 5px; margin-bottom: 6px; }
+        .dot-logo { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
+        .dot-logo.green { background: #27ae60; }
+        .dot-logo.blue { background: #3498db; }
+        .dot-logo.red { background: #e74c3c; }
+        .dot-logo.black { background: #2c3e50; }
+        .tagline { color: #5a6c7d; font-style: italic; font-size: 1rem; }
+        .lo-badge { display: inline-block; background: #e8f4f8; color: #2980b9; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem; margin-top: 4px; }
+        .lo-badge code { background: #3498db; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; margin-right: 5px; }
+        .mode-tabs { display: flex; justify-content: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+        .mode-tab { padding: 8px 16px; font-size: 1rem; border: none; border-radius: 18px; cursor: pointer; background: white; color: #2c3e50; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.08); transition: all 0.3s; }
+        .mode-tab:hover { transform: translateY(-1px); }
+        .mode-tab.active { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .content-area { background: white; border-radius: 10px; padding: 12px; box-shadow: 0 3px 15px rgba(0,0,0,0.08); }
+        .hidden { display: none !important; }
+
+        /* Equation Display */
+        .equation-display { text-align: center; padding: 10px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 10px; margin-bottom: 10px; }
+        .equation-main { font-size: 1.8rem; font-family: 'Times New Roman', serif; color: #2c3e50; }
+        .equation-main .val-m { color: #27ae60; }
+        .equation-main .val-x1 { color: #3498db; }
+        .equation-main .val-y1 { color: #e74c3c; }
+        .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 2px; }
+        .frac .num { font-size: 0.85em; line-height: 1; }
+        .frac .den { font-size: 0.85em; line-height: 1; border-top: 2px solid currentColor; padding-top: 1px; min-width: 1em; }
+        .equation-label { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 3px; }
+
+        /* Canvas */
+        .canvas-container { text-align: center; overflow: visible; }
+        canvas { border: 2px solid #bdc3c7; border-radius: 8px; cursor: crosshair; max-width: 100%; }
+        
+        /* Instructions */
+        .instructions { background: #e8f4f8; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; font-size: 0.85rem; color: #2c3e50; text-align: center; }
+
+        /* Calculator Mode */
+        .calc-container { max-width: 500px; margin: 0 auto; }
+        .calc-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+        @media (max-width: 450px) { .calc-inputs { grid-template-columns: 1fr 1fr 1fr; gap: 6px; } }
+        .calc-input-box { background: #f8f9fa; padding: 10px 6px; border-radius: 8px; text-align: center; }
+        .calc-input-box h4 { color: #2c3e50; font-size: 0.75rem; margin-bottom: 6px; }
+        .calc-input-box h4 .blue { color: #3498db; }
+        .calc-input-box h4 .red { color: #e74c3c; }
+        .calc-input-box h4 .green { color: #27ae60; }
+        .spinner { display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .spinner button { width: 28px; height: 28px; border: none; border-radius: 50%; font-size: 1rem; cursor: pointer; background: #3498db; color: white; transition: all 0.2s; }
+        .spinner button:hover { background: #2980b9; }
+        .spinner .value { font-size: 1.4rem; font-weight: bold; min-width: 35px; font-family: 'Courier New', monospace; }
+        .slope-spinner { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .slope-spinner .frac-line { width: 30px; height: 2px; background: #27ae60; }
+        .calc-result { text-align: center; padding: 12px; background: linear-gradient(135deg, #74b9ff, #0984e3); border-radius: 10px; color: white; margin-bottom: 10px; }
+        .calc-result h3 { font-size: 0.85rem; margin-bottom: 6px; opacity: 0.9; }
+        .calc-result .equation { font-size: 1.6rem; font-family: 'Times New Roman', serif; }
+        .calc-result .equation .val-m { color: #55efc4; }
+        .calc-result .equation .val-x1 { color: #81ecec; }
+        .calc-result .equation .val-y1 { color: #fab1a0; }
+        .calc-grid { text-align: center; }
+        .calc-grid canvas { max-width: 320px; width: 100%; }
+
+        /* Quiz */
+        .quiz-container { max-width: 600px; margin: 0 auto; }
+        .mini-dots { display: flex; justify-content: center; gap: 4px; margin-bottom: 8px; }
+        .mini-dots .dot-logo { width: 10px; height: 10px; }
+        .quiz-progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; }
+        .quiz-progress .question-num { font-weight: bold; color: #2c3e50; font-size: 0.95rem; }
+        .quiz-progress .score { color: #27ae60; font-weight: bold; font-size: 1rem; }
+        .progress-dots { display: flex; gap: 5px; }
+        .progress-dot { width: 18px; height: 18px; border-radius: 50%; background: #bdc3c7; transition: all 0.3s; }
+        .progress-dot.correct { background: #27ae60; }
+        .progress-dot.wrong { background: #e74c3c; }
+        .progress-dot.current { transform: scale(1.15); box-shadow: 0 0 6px rgba(52, 152, 219, 0.5); background: #3498db; }
+        .quiz-question { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 12px; }
+        .quiz-question .prompt { font-size: 1.05rem; color: #2c3e50; margin-bottom: 10px; }
+        .quiz-question .given { font-size: 1.3rem; color: #2c3e50; margin: 8px 0; font-family: 'Times New Roman', serif; }
+        .quiz-question .given .label { font-size: 0.85rem; color: #7f8c8d; display: block; margin-bottom: 5px; font-family: 'Segoe UI', sans-serif; }
+        .quiz-question .given .val-m { color: #27ae60; }
+        .quiz-question .given .val-pt { color: #2c3e50; }
+        .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .quiz-option { padding: 12px 8px; font-size: 1.15rem; border: 3px solid #ecf0f1; border-radius: 8px; background: white; cursor: pointer; font-weight: 500; color: #2c3e50; transition: all 0.2s; font-family: 'Times New Roman', serif; line-height: 1.3; }
+        .quiz-option:hover { border-color: #3498db; transform: translateY(-2px); }
+        .quiz-option.correct { background: #d4edda; border-color: #27ae60; color: #27ae60; }
+        .quiz-option.incorrect { background: #f8d7da; border-color: #e74c3c; color: #e74c3c; }
+        .quiz-option .val-m { color: #27ae60; }
+        .quiz-feedback { text-align: center; padding: 10px; margin-top: 8px; border-radius: 8px; font-size: 1rem; display: none; }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct { background: #d4edda; color: #155724; }
+        .quiz-feedback.incorrect { background: #f8d7da; color: #721c24; }
+        .encourage-msg { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); padding: 10px; border-radius: 8px; margin: 8px 0; text-align: center; }
+        .encourage-msg h3 { color: #d68910; font-size: 1rem; margin-bottom: 2px; }
+        .encourage-msg p { color: #856404; font-size: 0.9rem; }
+        .next-btn { background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 10px 22px; font-size: 1rem; border-radius: 18px; cursor: pointer; margin-top: 8px; }
+        .next-btn:hover { transform: translateY(-2px); }
+
+        /* Celebration */
+        .celebration-container { text-align: center; padding: 20px; }
+        .celebration-container h2 { font-size: 1.6rem; color: #2c3e50; margin-bottom: 8px; }
+        .trophy { font-size: 3.5rem; margin: 8px 0; animation: trophyBounce 0.5s ease-in-out infinite alternate; }
+        @keyframes trophyBounce { from { transform: scale(1) rotate(-5deg); } to { transform: scale(1.1) rotate(5deg); } }
+        .final-score { font-size: 2.5rem; font-weight: bold; color: #27ae60; margin: 10px 0; }
+        .final-score.perfect { background: linear-gradient(135deg, #27ae60, #3498db, #e74c3c, #2c3e50); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: rainbowShift 2s linear infinite; background-size: 200% 200%; }
+        @keyframes rainbowShift { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+        .certificate { background: linear-gradient(135deg, #fff9e6, #fff); border: 4px double #d4af37; border-radius: 10px; padding: 20px; margin: 12px auto; max-width: 340px; position: relative; }
+        .certificate::before { content: '⭐'; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 1.6rem; }
+        .certificate h3 { font-size: 0.9rem; color: #b8860b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .certificate .award-text { font-size: 1.2rem; color: #2c3e50; font-weight: bold; margin: 10px 0; }
+        .certificate .dots-award { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
+        .certificate .dot-award { width: 12px; height: 12px; border-radius: 50%; }
+        .certificate .dot-award:nth-child(1) { background: #27ae60; }
+        .certificate .dot-award:nth-child(2) { background: #3498db; }
+        .certificate .dot-award:nth-child(3) { background: #e74c3c; }
+        .certificate .dot-award:nth-child(4) { background: #2c3e50; }
+        .certificate .tagline-award { color: #7f8c8d; font-style: italic; font-size: 0.85rem; }
+        .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 1000; }
+        .confetti { position: absolute; top: -20px; animation: confettiFall linear forwards; }
+        .confetti.circle { width: 10px; height: 10px; border-radius: 50%; }
+        .confetti.strip { width: 8px; height: 20px; border-radius: 3px; }
+        @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0.7; } }
+
+        /* Practice */
+        .practice-container { max-width: 600px; margin: 0 auto; }
+        .streak-display { text-align: center; padding: 6px; background: linear-gradient(135deg, #ffeaa7, #fdcb6e); border-radius: 8px; margin-bottom: 10px; font-size: 0.95rem; }
+        .streak-display span { font-size: 1.2rem; font-weight: bold; color: #d68910; }
+        .practice-question { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 12px; }
+        .practice-question .prompt { font-size: 1.05rem; color: #2c3e50; margin-bottom: 8px; }
+        .practice-question .given { font-size: 1.25rem; color: #2c3e50; font-family: 'Times New Roman', serif; }
+        .practice-input-area { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+        .practice-input { font-size: 1.3rem; padding: 10px 12px; border: 3px solid #ecf0f1; border-radius: 8px; width: 260px; text-align: center; font-family: 'Times New Roman', serif; }
+        .practice-input:focus { outline: none; border-color: #3498db; }
+        .practice-input.correct { border-color: #27ae60; background: #d4edda; }
+        .practice-input.incorrect { border-color: #f39c12; background: #fef9e7; }
+        .check-btn { background: #27ae60; color: white; border: none; padding: 10px 20px; font-size: 1rem; border-radius: 18px; cursor: pointer; }
+        .check-btn:hover { background: #219a52; }
+        .practice-hint { color: #7f8c8d; font-size: 0.85rem; text-align: center; margin-top: 8px; }
+        .practice-feedback { text-align: center; margin-top: 8px; font-size: 1rem; min-height: 25px; }
+        .practice-feedback.correct { color: #27ae60; }
+        .practice-feedback.incorrect { color: #e67e22; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="dots-logo" id="dotsLogo"></div>
+        <h1>Point-Slope Form Explorer</h1>
+        <p class="tagline">"Maths that meets you where you are"</p>
+        <div class="lo-badge"><code>A.3</code> Understand and apply point-slope form</div>
+    </div>
+
+    <div class="container">
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="explore">🔍 Explore</button>
+            <button class="mode-tab" data-mode="calculator">🧮 Calculator</button>
+            <button class="mode-tab" data-mode="quiz">📝 Quiz</button>
+            <button class="mode-tab" data-mode="practice">✏️ Practice</button>
+        </div>
+
+        <div id="exploreMode">
+            <div class="content-area">
+                <div class="equation-display">
+                    <div class="equation-label">Point-Slope Form</div>
+                    <div class="equation-main" id="mainEquation">
+                        y − <span class="val-y1">y₁</span> = <span class="val-m">m</span>(x − <span class="val-x1">x₁</span>)
+                    </div>
+                </div>
+                <div class="instructions">
+                    <strong>Translate</strong> (drag) the point (<span style="color:#e74c3c">x₁</span>, <span style="color:#e74c3c">y₁</span>) to move the line. 
+                    <strong>Rotate</strong> (drag) the <span style="color:#27ae60">slope point</span> to change the slope.
+                </div>
+                <div class="canvas-container">
+                    <canvas id="exploreCanvas" width="420" height="420"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="calculatorMode" class="hidden">
+            <div class="content-area">
+                <div class="calc-container">
+                    <div class="mini-dots" id="calcDots"></div>
+                    <div class="calc-inputs">
+                        <div class="calc-input-box">
+                            <h4><span class="blue">x₁</span></h4>
+                            <div class="spinner">
+                                <button onclick="adjustCalc('x1', -1)">−</button>
+                                <span class="value" id="calcX1" style="color:#3498db">0</span>
+                                <button onclick="adjustCalc('x1', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="calc-input-box">
+                            <h4><span class="red">y₁</span></h4>
+                            <div class="spinner">
+                                <button onclick="adjustCalc('y1', -1)">−</button>
+                                <span class="value" id="calcY1" style="color:#e74c3c">0</span>
+                                <button onclick="adjustCalc('y1', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="calc-input-box">
+                            <h4><span class="green">slope m</span></h4>
+                            <div class="slope-spinner">
+                                <div class="spinner">
+                                    <button onclick="adjustCalc('mNum', -1)">−</button>
+                                    <span class="value" id="calcMNum" style="color:#27ae60;font-size:1.2rem">1</span>
+                                    <button onclick="adjustCalc('mNum', 1)">+</button>
+                                </div>
+                                <div class="frac-line"></div>
+                                <div class="spinner">
+                                    <button onclick="adjustCalc('mDen', -1)">−</button>
+                                    <span class="value" id="calcMDen" style="color:#27ae60;font-size:1.2rem">1</span>
+                                    <button onclick="adjustCalc('mDen', 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="calc-result">
+                        <h3>Your Equation</h3>
+                        <div class="equation" id="calcEquation">y = x</div>
+                    </div>
+                    <div class="calc-grid">
+                        <canvas id="calcCanvas" width="300" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quizMode" class="hidden">
+            <div class="content-area">
+                <div class="quiz-container" id="quizContainer"></div>
+            </div>
+        </div>
+
+        <div id="practiceMode" class="hidden">
+            <div class="content-area">
+                <div class="practice-container" id="practiceContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <script>
+        // Build header dots
+        const dotsLogo = document.getElementById('dotsLogo');
+        for (let i = 0; i < 16; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot-logo ' + ['green','blue','red','black'][i % 4];
+            dot.onclick = () => dotEffect(i, 'dotsLogo');
+            dotsLogo.appendChild(dot);
+        }
+
+        function buildMiniDots(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot-logo ' + ['green','blue','red','black'][i % 4];
+                dot.onclick = () => dotEffect(i, containerId);
+                container.appendChild(dot);
+            }
+        }
+
+        function dotEffect(dotIndex, containerId) {
+            const dots = document.querySelectorAll(`#${containerId} .dot-logo`);
+            dots.forEach((dot, i) => {
+                const dist = Math.abs(i - dotIndex);
+                setTimeout(() => animateSine(dot, 14 * Math.exp(-dist * 0.18), 4, 0.988, 2000, i), dist * 30);
+            });
+        }
+
+        function animateSine(dot, amp, lambda, damping, dur, idx) {
+            const start = performance.now(), freq = (2 * Math.PI) / (lambda * 160);
+            (function animate(now) {
+                const t = now - start;
+                if (t > dur) { dot.style.transform = 'translateY(0)'; return; }
+                const y = Math.sin(t * freq + idx * 2 * Math.PI / lambda) * amp * Math.pow(damping, t / 10);
+                dot.style.transform = `translateY(${-y}px)`;
+                requestAnimationFrame(animate);
+            })(start);
+        }
+
+        setTimeout(() => {
+            const dots = document.querySelectorAll('#dotsLogo .dot-logo');
+            dots.forEach((d, i) => setTimeout(() => animateSine(d, 7, 4, 0.99, 1800, i), i * 30));
+        }, 300);
+
+        // Mode switching
+        document.querySelectorAll('.mode-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const m = tab.dataset.mode;
+                document.getElementById('exploreMode').classList.toggle('hidden', m !== 'explore');
+                document.getElementById('calculatorMode').classList.toggle('hidden', m !== 'calculator');
+                document.getElementById('quizMode').classList.toggle('hidden', m !== 'quiz');
+                document.getElementById('practiceMode').classList.toggle('hidden', m !== 'practice');
+                if (m === 'explore') initExplore();
+                if (m === 'calculator') initCalculator();
+                if (m === 'quiz') initQuiz();
+                if (m === 'practice') initPractice();
+            });
+        });
+
+        // ============ EXPLORE MODE ============
+        let exploreState = { x1: 1, y1: 1, x2: 3, y2: 2, dragging: null };
+
+        function initExplore() {
+            const canvas = document.getElementById('exploreCanvas');
+            drawExploreGrid();
+
+            canvas.onmousedown = (e) => startDrag(e, canvas);
+            canvas.ontouchstart = (e) => {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const px = (touch.clientX - rect.left) * scaleX;
+                const py = (touch.clientY - rect.top) * scaleY;
+                const [gx, gy] = pixelToGrid(px, py, canvas);
+                
+                const d1 = Math.hypot(gx - exploreState.x1, gy - exploreState.y1);
+                const d2 = Math.hypot(gx - exploreState.x2, gy - exploreState.y2);
+                
+                if (d1 < 1) { exploreState.dragging = 'p1'; e.preventDefault(); }
+                else if (d2 < 1) { exploreState.dragging = 'p2'; e.preventDefault(); }
+            };
+            canvas.onmousemove = (e) => moveDrag(e, canvas);
+            canvas.ontouchmove = (e) => {
+                if (exploreState.dragging) {
+                    e.preventDefault();
+                    moveDrag(e.touches[0], canvas);
+                }
+            };
+            canvas.onmouseup = canvas.ontouchend = canvas.onmouseleave = () => { exploreState.dragging = null; };
+        }
+
+        function startDrag(e, canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const px = (e.clientX - rect.left) * scaleX;
+            const py = (e.clientY - rect.top) * scaleY;
+            const [gx, gy] = pixelToGrid(px, py, canvas);
+            
+            const d1 = Math.hypot(gx - exploreState.x1, gy - exploreState.y1);
+            const d2 = Math.hypot(gx - exploreState.x2, gy - exploreState.y2);
+            
+            if (d1 < 0.8) exploreState.dragging = 'p1';
+            else if (d2 < 0.8) exploreState.dragging = 'p2';
+        }
+
+        function moveDrag(e, canvas) {
+            if (!exploreState.dragging) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const px = (e.clientX - rect.left) * scaleX;
+            const py = (e.clientY - rect.top) * scaleY;
+            let [gx, gy] = pixelToGrid(px, py, canvas);
+            
+            gx = Math.round(gx);
+            gy = Math.round(gy);
+            gx = Math.max(-5, Math.min(5, gx));
+            gy = Math.max(-5, Math.min(5, gy));
+            
+            if (exploreState.dragging === 'p1') {
+                exploreState.x1 = gx;
+                exploreState.y1 = gy;
+            } else if (exploreState.dragging === 'p2') {
+                if (gx !== exploreState.x1 || gy !== exploreState.y1) {
+                    exploreState.x2 = gx;
+                    exploreState.y2 = gy;
+                }
+            }
+            drawExploreGrid();
+        }
+
+        function pixelToGrid(px, py, canvas) {
+            const w = canvas.width, h = canvas.height;
+            const margin = 45;
+            const gridW = w - 2 * margin;
+            const gridH = h - 2 * margin;
+            const gx = ((px - margin) / gridW) * 10 - 5;
+            const gy = 5 - ((py - margin) / gridH) * 10;
+            return [gx, gy];
+        }
+
+        function gridToPixel(gx, gy, canvas) {
+            const w = canvas.width, h = canvas.height;
+            const margin = 45;
+            const gridW = w - 2 * margin;
+            const gridH = h - 2 * margin;
+            const px = margin + ((gx + 5) / 10) * gridW;
+            const py = margin + ((5 - gy) / 10) * gridH;
+            return [px, py];
+        }
+
+        function drawExploreGrid() {
+            const canvas = document.getElementById('exploreCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const margin = 45;
+            
+            // Pure white background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            // Darker grid lines
+            ctx.strokeStyle = '#aab7c4';
+            ctx.lineWidth = 1;
+            for (let i = -5; i <= 5; i++) {
+                const [px] = gridToPixel(i, 0, canvas);
+                const [, py] = gridToPixel(0, i, canvas);
+                ctx.beginPath(); ctx.moveTo(px, margin); ctx.lineTo(px, h - margin); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(margin, py); ctx.lineTo(w - margin, py); ctx.stroke();
+            }
+
+            // Axes - bold black
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 2.5;
+            const [ox, oy] = gridToPixel(0, 0, canvas);
+            ctx.beginPath(); ctx.moveTo(margin, oy); ctx.lineTo(w - margin, oy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, margin); ctx.lineTo(ox, h - margin); ctx.stroke();
+
+            // Axis labels - BIGGER and darker
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 16px Segoe UI';
+            ctx.textAlign = 'center';
+            for (let i = -5; i <= 5; i++) {
+                if (i === 0) continue;
+                const [px] = gridToPixel(i, 0, canvas);
+                ctx.fillText(i, px, oy + 20);
+                const [, py] = gridToPixel(0, i, canvas);
+                ctx.fillText(i, ox - 18, py + 5);
+            }
+            
+            // Axis names
+            ctx.font = 'bold 18px Segoe UI';
+            ctx.fillText('x', w - margin + 18, oy + 6);
+            ctx.fillText('y', ox, margin - 15);
+
+            const { x1, y1, x2, y2 } = exploreState;
+            const rise = y2 - y1;
+            const run = x2 - x1;
+            let m = run !== 0 ? rise / run : Infinity;
+
+            // Draw line
+            if (run !== 0) {
+                ctx.strokeStyle = '#3498db';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                const lineY = (x) => y1 + m * (x - x1);
+                const [lx1, ly1] = gridToPixel(-6, lineY(-6), canvas);
+                const [lx2, ly2] = gridToPixel(6, lineY(6), canvas);
+                ctx.moveTo(lx1, ly1);
+                ctx.lineTo(lx2, ly2);
+                ctx.stroke();
+            }
+
+            // Calculate intermediate grid points (shows slope reduction)
+            const g = gcd(Math.abs(rise), Math.abs(run));
+            if (g > 1 && run !== 0) {
+                const stepX = run / g;
+                const stepY = rise / g;
+                ctx.fillStyle = '#2c3e50';
+                for (let i = 1; i < g; i++) {
+                    const intX = x1 + stepX * i;
+                    const intY = y1 + stepY * i;
+                    const [ipx, ipy] = gridToPixel(intX, intY, canvas);
+                    ctx.beginPath();
+                    ctx.arc(ipx, ipy, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Slope triangle
+            if (run !== 0 && (rise !== 0 || run !== 0)) {
+                const [p1px, p1py] = gridToPixel(x1, y1, canvas);
+                const [p2px, p2py] = gridToPixel(x2, y2, canvas);
+                const [cornerX, cornerY] = gridToPixel(x2, y1, canvas);
+                
+                ctx.strokeStyle = '#27ae60';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath();
+                ctx.moveTo(p1px, p1py);
+                ctx.lineTo(cornerX, cornerY);
+                ctx.lineTo(p2px, p2py);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Rise/Run labels - bigger
+                ctx.font = 'bold 14px Segoe UI';
+                ctx.fillStyle = '#27ae60';
+                
+                const runLabelX = (p1px + cornerX) / 2;
+                const runLabelY = y1 >= 0 ? cornerY + 18 : cornerY - 10;
+                ctx.textAlign = 'center';
+                ctx.fillText(`run=${run}`, runLabelX, runLabelY);
+                
+                const riseLabelX = run > 0 ? cornerX + 10 : cornerX - 10;
+                const riseLabelY = (cornerY + p2py) / 2;
+                ctx.textAlign = run > 0 ? 'left' : 'right';
+                ctx.fillText(`rise=${rise}`, riseLabelX, riseLabelY + 5);
+            }
+
+            // Points - colored endpoints
+            const [p1px, p1py] = gridToPixel(x1, y1, canvas);
+            const [p2px, p2py] = gridToPixel(x2, y2, canvas);
+
+            // Red point (x1, y1) - translation point
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(p1px, p1py, 7, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Green point (slope control) - rotation point
+            ctx.fillStyle = '#27ae60';
+            ctx.beginPath();
+            ctx.arc(p2px, p2py, 7, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Coordinate labels - BIGGER, color coded
+            ctx.font = 'bold 16px Courier New';
+            
+            // Red point label
+            const labelOffset = 22;
+            let label1X, label1Y;
+            if (m >= 0) {
+                label1X = x1 <= 0 ? p1px + labelOffset : p1px - labelOffset;
+                label1Y = p1py + (y1 >= 0 ? labelOffset : -labelOffset + 5);
+            } else {
+                label1X = x1 <= 0 ? p1px + labelOffset : p1px - labelOffset;
+                label1Y = p1py + (y1 <= 0 ? -labelOffset + 5 : labelOffset);
+            }
+            ctx.textAlign = x1 <= 0 ? 'left' : 'right';
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillText(`(${x1}, ${y1})`, label1X, label1Y);
+
+            // Green point label
+            let label2X, label2Y;
+            label2Y = y2 > y1 ? p2py - labelOffset + 5 : p2py + labelOffset;
+            label2X = x2 > x1 ? p2px + 12 : p2px - 12;
+            ctx.textAlign = x2 > x1 ? 'left' : 'right';
+            ctx.fillStyle = '#27ae60';
+            ctx.fillText(`(${x2}, ${y2})`, label2X, label2Y);
+
+            // Slope display - green, stacked fraction, sign BEFORE fraction
+            let mHTML = '';
+            if (run === 0) {
+                mHTML = 'undefined';
+            } else {
+                let numR = rise / g;
+                let denR = run / g;
+                if (denR < 0) { numR = -numR; denR = -denR; }
+                if (denR === 1) {
+                    mHTML = `<span class="val-m">${numR}</span>`;
+                } else {
+                    // Sign before fraction
+                    const sign = numR < 0 ? '−' : '';
+                    const absNum = Math.abs(numR);
+                    mHTML = `<span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${denR}</span></span></span>`;
+                }
+            }
+
+            // Draw slope on canvas - BIGGER, sign before fraction
+            ctx.fillStyle = '#27ae60';
+            ctx.font = 'bold 16px Segoe UI';
+            ctx.textAlign = 'left';
+            const slopeX = margin + 5;
+            const slopeY = margin - 8;
+            
+            if (run === 0) {
+                ctx.fillText('m = undefined', slopeX, slopeY);
+            } else {
+                let numR = rise / g;
+                let denR = run / g;
+                if (denR < 0) { numR = -numR; denR = -denR; }
+                
+                ctx.fillText('m =', slopeX, slopeY);
+                
+                if (denR === 1) {
+                    ctx.fillText(numR.toString(), slopeX + 38, slopeY);
+                } else {
+                    // Sign BEFORE fraction
+                    const sign = numR < 0 ? '−' : '';
+                    const absNum = Math.abs(numR);
+                    let offsetX = slopeX + 38;
+                    
+                    if (sign) {
+                        ctx.fillText(sign, offsetX, slopeY);
+                        offsetX += 12;
+                    }
+                    
+                    // Draw stacked fraction
+                    ctx.font = 'bold 14px Segoe UI';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(absNum.toString(), offsetX + 8, slopeY - 7);
+                    ctx.fillRect(offsetX, slopeY - 3, 16, 2);
+                    ctx.fillText(denR.toString(), offsetX + 8, slopeY + 11);
+                }
+            }
+
+            // Update equation display
+            updateEquationDisplay(x1, y1, mHTML);
+        }
+
+        function updateEquationDisplay(x1, y1, mHTML) {
+            const eq = document.getElementById('mainEquation');
+            
+            // All black except colored values
+            let yPart = y1 >= 0 
+                ? `y − <span class="val-y1">${y1}</span>`
+                : `y + <span class="val-y1">${-y1}</span>`;
+            
+            let xPart = x1 >= 0
+                ? `(x − <span class="val-x1">${x1}</span>)`
+                : `(x + <span class="val-x1">${-x1}</span>)`;
+            
+            eq.innerHTML = `${yPart} = ${mHTML}${xPart}`;
+        }
+
+        function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+        // ============ CALCULATOR MODE ============
+        let calcState = { x1: 0, y1: 0, mNum: 1, mDen: 1 };
+
+        function initCalculator() {
+            buildMiniDots('calcDots');
+            updateCalcDisplay();
+            drawCalcGrid();
+        }
+
+        function adjustCalc(prop, delta) {
+            if (prop === 'mDen') {
+                calcState[prop] += delta;
+                if (calcState[prop] === 0) calcState[prop] += delta;
+                calcState[prop] = Math.max(-10, Math.min(10, calcState[prop]));
+            } else {
+                calcState[prop] += delta;
+                calcState[prop] = Math.max(-5, Math.min(5, calcState[prop]));
+            }
+            updateCalcDisplay();
+            drawCalcGrid();
+        }
+
+        function updateCalcDisplay() {
+            document.getElementById('calcX1').textContent = calcState.x1;
+            document.getElementById('calcY1').textContent = calcState.y1;
+            document.getElementById('calcMNum').textContent = calcState.mNum;
+            document.getElementById('calcMDen').textContent = calcState.mDen;
+
+            const { x1, y1, mNum, mDen } = calcState;
+            
+            let yPart = y1 >= 0 
+                ? `y − <span class="val-y1">${y1}</span>`
+                : `y + <span class="val-y1">${-y1}</span>`;
+            
+            let xPart = x1 >= 0
+                ? `(x − <span class="val-x1">${x1}</span>)`
+                : `(x + <span class="val-x1">${-x1}</span>)`;
+            
+            const g = gcd(Math.abs(mNum), Math.abs(mDen));
+            let sNum = mNum / g;
+            let sDen = mDen / g;
+            if (sDen < 0) { sNum = -sNum; sDen = -sDen; }
+            
+            let mPart;
+            if (sDen === 1) {
+                mPart = `<span class="val-m">${sNum}</span>`;
+            } else {
+                const sign = sNum < 0 ? '−' : '';
+                const absNum = Math.abs(sNum);
+                mPart = `<span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${sDen}</span></span></span>`;
+            }
+            
+            document.getElementById('calcEquation').innerHTML = `${yPart} = ${mPart}${xPart}`;
+        }
+
+        function drawCalcGrid() {
+            const canvas = document.getElementById('calcCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const margin = 30;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = '#aab7c4';
+            ctx.lineWidth = 1;
+            for (let i = -5; i <= 5; i++) {
+                const [px] = gridToPixelCalc(i, 0, canvas);
+                const [, py] = gridToPixelCalc(0, i, canvas);
+                ctx.beginPath(); ctx.moveTo(px, margin); ctx.lineTo(px, h - margin); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(margin, py); ctx.lineTo(w - margin, py); ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 2;
+            const [ox, oy] = gridToPixelCalc(0, 0, canvas);
+            ctx.beginPath(); ctx.moveTo(margin, oy); ctx.lineTo(w - margin, oy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, margin); ctx.lineTo(ox, h - margin); ctx.stroke();
+
+            const { x1, y1, mNum, mDen } = calcState;
+            const m = mNum / mDen;
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const lineY = (x) => y1 + m * (x - x1);
+            const [lx1, ly1] = gridToPixelCalc(-6, lineY(-6), canvas);
+            const [lx2, ly2] = gridToPixelCalc(6, lineY(6), canvas);
+            ctx.moveTo(lx1, ly1);
+            ctx.lineTo(lx2, ly2);
+            ctx.stroke();
+
+            const [px, py] = gridToPixelCalc(x1, y1, canvas);
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function gridToPixelCalc(gx, gy, canvas) {
+            const w = canvas.width, h = canvas.height;
+            const margin = 30;
+            const gridW = w - 2 * margin;
+            const gridH = h - 2 * margin;
+            const px = margin + ((gx + 5) / 10) * gridW;
+            const py = margin + ((5 - gy) / 10) * gridH;
+            return [px, py];
+        }
+
+        // ============ QUIZ MODE ============
+        let quizState = { questions: [], current: 0, score: 0, answered: false, results: [] };
+
+        const ENCOURAGEMENTS = [
+            { emoji: '🎯', msg: 'Excellent focus!' },
+            { emoji: '⚡', msg: 'You\'re on fire!' },
+            { emoji: '🌟', msg: 'Brilliant work!' },
+            { emoji: '💪', msg: 'Keep it up!' },
+            { emoji: '🚀', msg: 'Unstoppable!' }
+        ];
+
+        function initQuiz() {
+            quizState = { questions: generateQuizQuestions(6), current: 0, score: 0, answered: false, results: [] };
+            renderQuizQuestion();
+        }
+
+        function generateQuizQuestions(n) {
+            const questions = [];
+            const types = ['findEq', 'findSlope', 'findPoint'];
+            const points = [
+                {x: 1, y: 2}, {x: 2, y: 3}, {x: -1, y: 2}, {x: 3, y: -1},
+                {x: -2, y: -3}, {x: 0, y: 4}, {x: 4, y: 0}, {x: -3, y: 1}
+            ];
+            const slopes = [
+                {n: 1, d: 1}, {n: 2, d: 1}, {n: 1, d: 2}, {n: -1, d: 1},
+                {n: -2, d: 1}, {n: 3, d: 2}, {n: -1, d: 2}, {n: 2, d: 3}
+            ];
+
+            const used = new Set();
+            while (questions.length < n) {
+                const type = types[questions.length % 3];
+                const pt = points[Math.floor(Math.random() * points.length)];
+                const sl = slopes[Math.floor(Math.random() * slopes.length)];
+                const key = `${type}-${pt.x}-${pt.y}-${sl.n}-${sl.d}`;
+                
+                if (used.has(key)) continue;
+                used.add(key);
+                questions.push(makeQuizQuestion(type, pt, sl));
+            }
+            return questions;
+        }
+
+        function makeQuizQuestion(type, pt, sl) {
+            const mFrac = formatSlopeFrac(sl.n, sl.d);
+            const q = { type, pt, sl };
+
+            if (type === 'findEq') {
+                q.prompt = 'Write the equation in point-slope form:';
+                q.givenHTML = `Point: (${pt.x}, ${pt.y}), Slope: m = ${mFrac}`;
+                q.answer = formatEquationClean(pt.x, pt.y, sl.n, sl.d);
+                q.options = generateEqOptions(pt, sl);
+            } else if (type === 'findSlope') {
+                q.prompt = 'What is the slope in this equation?';
+                q.givenHTML = formatEquationHTML(pt.x, pt.y, sl.n, sl.d);
+                q.answer = formatSlopeAnswer(sl.n, sl.d);
+                q.options = generateSlopeOptions(sl);
+            } else {
+                q.prompt = 'Name one point this line passes through:';
+                q.givenHTML = formatEquationHTML(pt.x, pt.y, sl.n, sl.d);
+                q.answer = `(${pt.x}, ${pt.y})`;
+                q.options = generatePointOptions(pt);
+            }
+            return q;
+        }
+
+        function formatSlopeFrac(num, den) {
+            if (den === 1) return `<span class="val-m">${num}</span>`;
+            const sign = num < 0 ? '−' : '';
+            const absNum = Math.abs(num);
+            return `<span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${den}</span></span></span>`;
+        }
+
+        function formatSlopeAnswer(num, den) {
+            if (den === 1) return num.toString();
+            return `${num}/${den}`;
+        }
+
+        function formatEquationClean(x1, y1, mNum, mDen) {
+            let yPart = y1 >= 0 ? `y − ${y1}` : `y + ${-y1}`;
+            let xPart = x1 >= 0 ? `(x − ${x1})` : `(x + ${-x1})`;
+            let mPart = mDen === 1 ? mNum.toString() : `${mNum}/${mDen}`;
+            return `${yPart} = ${mPart}${xPart}`;
+        }
+
+        function formatEquationHTML(x1, y1, mNum, mDen) {
+            let yPart = y1 >= 0 ? `y − ${y1}` : `y + ${-y1}`;
+            let xPart = x1 >= 0 ? `(x − ${x1})` : `(x + ${-x1})`;
+            let mPart = formatSlopeFrac(mNum, mDen);
+            return `${yPart} = ${mPart}${xPart}`;
+        }
+
+        function generateEqOptions(pt, sl) {
+            const correct = formatEquationClean(pt.x, pt.y, sl.n, sl.d);
+            const opts = [correct];
+            const wrongs = [
+                formatEquationClean(pt.x, pt.y, -sl.n, sl.d),
+                formatEquationClean(pt.y, pt.x, sl.n, sl.d),
+                formatEquationClean(pt.x + 1, pt.y, sl.n, sl.d),
+                formatEquationClean(-pt.x, -pt.y, sl.n, sl.d)
+            ];
+            for (const w of wrongs) {
+                if (!opts.includes(w) && opts.length < 4) opts.push(w);
+            }
+            return shuffle(opts);
+        }
+
+        function generateSlopeOptions(sl) {
+            const correct = formatSlopeAnswer(sl.n, sl.d);
+            const opts = [correct];
+            const wrongs = [
+                formatSlopeAnswer(-sl.n, sl.d),
+                formatSlopeAnswer(sl.n + 1, sl.d),
+                formatSlopeAnswer(sl.d, sl.n === 0 ? 1 : sl.n),
+                formatSlopeAnswer(sl.n, sl.d + 1)
+            ];
+            for (const w of wrongs) {
+                if (!opts.includes(w) && opts.length < 4) opts.push(w);
+            }
+            return shuffle(opts);
+        }
+
+        function generatePointOptions(pt) {
+            const correct = `(${pt.x}, ${pt.y})`;
+            const opts = [correct];
+            const wrongs = [
+                `(${pt.y}, ${pt.x})`,
+                `(${pt.x + 1}, ${pt.y})`,
+                `(${-pt.x}, ${-pt.y})`,
+                `(${pt.x}, ${pt.y + 1})`
+            ];
+            for (const w of wrongs) {
+                if (!opts.includes(w) && opts.length < 4) opts.push(w);
+            }
+            return shuffle(opts);
+        }
+
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function renderQuizQuestion() {
+            const container = document.getElementById('quizContainer');
+            const q = quizState.questions[quizState.current];
+            
+            if (!q) { renderQuizComplete(); return; }
+
+            let dots = '';
+            for (let i = 0; i < 6; i++) {
+                let cls = 'progress-dot';
+                if (i < quizState.results.length) cls += quizState.results[i] ? ' correct' : ' wrong';
+                if (i === quizState.current) cls += ' current';
+                dots += `<div class="${cls}"></div>`;
+            }
+
+            container.innerHTML = `
+                <div class="mini-dots" id="quizDots"></div>
+                <div class="quiz-progress">
+                    <span class="question-num">Q${quizState.current + 1}/6</span>
+                    <div class="progress-dots">${dots}</div>
+                    <span class="score">${quizState.score}/6</span>
+                </div>
+                <div class="quiz-question">
+                    <p class="prompt">${q.prompt}</p>
+                    <div class="given"><span class="label">Given:</span>${q.givenHTML}</div>
+                </div>
+                <div class="quiz-options">
+                    ${q.options.map(o => `<button class="quiz-option" data-answer="${escapeAttr(o)}">${formatOptionDisplay(o, q.type)}</button>`).join('')}
+                </div>
+                <div class="quiz-feedback" id="quizFeedback"></div>
+            `;
+
+            document.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.onclick = () => checkQuizAnswer(btn.dataset.answer);
+            });
+
+            buildMiniDots('quizDots');
+            quizState.answered = false;
+        }
+
+        function escapeAttr(s) {
+            return s.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function formatOptionDisplay(opt, type) {
+            if (type === 'findSlope' && opt.includes('/')) {
+                const [n, d] = opt.split('/');
+                const num = parseInt(n);
+                const sign = num < 0 ? '−' : '';
+                const absNum = Math.abs(num);
+                return `<span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${d}</span></span></span>`;
+            }
+            // Color the slope in equation options
+            if (type === 'findEq') {
+                return opt.replace(/= (-?\d+(?:\/\d+)?)\(/, (match, slope) => {
+                    if (slope.includes('/')) {
+                        const [n, d] = slope.split('/');
+                        const num = parseInt(n);
+                        const sign = num < 0 ? '−' : '';
+                        const absNum = Math.abs(num);
+                        return `= <span class="val-m">${sign}<span class="frac"><span class="num">${absNum}</span><span class="den">${d}</span></span></span>(`;
+                    }
+                    return `= <span class="val-m">${slope}</span>(`;
+                });
+            }
+            return opt;
+        }
+
+        function checkQuizAnswer(selected) {
+            if (quizState.answered) return;
+            quizState.answered = true;
+
+            const q = quizState.questions[quizState.current];
+            const isCorrect = selected === q.answer;
+
+            document.querySelectorAll('.quiz-option').forEach(btn => {
+                if (btn.dataset.answer === q.answer) btn.classList.add('correct');
+                else if (btn.dataset.answer === selected && !isCorrect) btn.classList.add('incorrect');
+                btn.style.pointerEvents = 'none';
+            });
+
+            quizState.results.push(isCorrect);
+            if (isCorrect) quizState.score++;
+
+            const fb = document.getElementById('quizFeedback');
+            fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+
+            if (quizState.current === 2) {
+                const enc = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
+                fb.innerHTML = `
+                    ${isCorrect ? '✓ Correct!' : '✗ Answer: ' + q.answer}
+                    <div class="encourage-msg">
+                        <h3>${enc.emoji} Halfway there!</h3>
+                        <p>${enc.msg} Three more to go!</p>
+                    </div>
+                    <button class="next-btn" onclick="nextQuizQuestion()">Continue →</button>
+                `;
+            } else {
+                fb.innerHTML = isCorrect ? '✓ Correct!' : `✗ Answer: ${q.answer}`;
+                setTimeout(() => { quizState.current++; renderQuizQuestion(); }, 1000);
+            }
+        }
+
+        function nextQuizQuestion() {
+            quizState.current++;
+            renderQuizQuestion();
+        }
+
+        function renderQuizComplete() {
+            const container = document.getElementById('quizContainer');
+            
+            if (quizState.score === 6) {
+                confetti();
+                container.innerHTML = `
+                    <div class="celebration-container">
+                        <div class="trophy">🏆</div>
+                        <h2>🎉 PERFECT SCORE! 🎉</h2>
+                        <div class="final-score perfect">6/6</div>
+                        <div class="certificate">
+                            <h3>Certificate of Achievement</h3>
+                            <div class="award-text">Point-Slope Form Master!</div>
+                            <div class="dots-award">
+                                <div class="dot-award"></div><div class="dot-award"></div>
+                                <div class="dot-award"></div><div class="dot-award"></div>
+                            </div>
+                            <p class="tagline-award">"Maths that meets you where you are"</p>
+                        </div>
+                        <button class="next-btn" onclick="initQuiz()">🔄 Try Again</button>
+                    </div>
+                `;
+            } else {
+                const msg = quizState.score >= 5 ? 'So close!' : quizState.score >= 4 ? 'Great work!' : quizState.score >= 3 ? 'Good effort!' : 'Keep practicing!';
+                container.innerHTML = `
+                    <div class="celebration-container">
+                        <h2>${quizState.score >= 4 ? '🌟' : '👍'} Quiz Complete!</h2>
+                        <div class="final-score">${quizState.score}/6</div>
+                        <p style="color:#5a6c7d;margin:10px 0">${msg}</p>
+                        <div class="progress-dots" style="justify-content:center;margin:12px 0">
+                            ${quizState.results.map(r => `<div class="progress-dot ${r ? 'correct' : 'wrong'}"></div>`).join('')}
+                        </div>
+                        <button class="next-btn" onclick="initQuiz()">🔄 Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        function confetti() {
+            const container = document.getElementById('confettiContainer');
+            container.innerHTML = '';
+            const colors = ['#27ae60', '#3498db', '#e74c3c', '#2c3e50', '#f39c12'];
+            for (let i = 0; i < 80; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti ' + (Math.random() > 0.5 ? 'circle' : 'strip');
+                    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.animationDuration = (2 + Math.random() * 2) + 's';
+                    container.appendChild(c);
+                    setTimeout(() => c.remove(), 4000);
+                }, i * 20);
+            }
+        }
+
+        // ============ PRACTICE MODE ============
+        let practiceState = { streak: 0, question: null, attempts: 0 };
+
+        function initPractice() {
+            practiceState = { streak: 0, question: null, attempts: 0 };
+            generatePracticeQuestion();
+        }
+
+        function generatePracticeQuestion() {
+            practiceState.attempts = 0;
+            
+            const types = ['writeEq', 'findM', 'findPoint'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            const x1 = Math.floor(Math.random() * 9) - 4;
+            const y1 = Math.floor(Math.random() * 9) - 4;
+            const mNum = Math.floor(Math.random() * 5) - 2;
+            const mDen = [1, 2, 3][Math.floor(Math.random() * 3)];
+            
+            const q = { type, x1, y1, mNum, mDen };
+            const mStr = mDen === 1 ? mNum.toString() : `${mNum}/${mDen}`;
+            
+            if (type === 'writeEq') {
+                q.prompt = 'Write the point-slope equation:';
+                q.given = `Point: (${x1}, ${y1}), Slope: m = ${mStr}`;
+                q.hint = 'Format: y - y₁ = m(x - x₁) or y + ... if negative';
+                q.answers = generateAcceptableAnswers(x1, y1, mNum, mDen);
+            } else if (type === 'findM') {
+                q.prompt = 'What is the slope (m)?';
+                q.given = formatEquationClean(x1, y1, mNum, mDen);
+                q.hint = 'Enter as integer or fraction (e.g., 2 or -1/2)';
+                q.answers = [mDen === 1 ? mNum.toString() : `${mNum}/${mDen}`, (mNum/mDen).toString()];
+                if (mDen !== 1) q.answers.push(`${mNum}/${mDen}`);
+            } else {
+                q.prompt = 'What point (x₁, y₁) is on the line?';
+                q.given = formatEquationClean(x1, y1, mNum, mDen);
+                q.hint = 'Format: (x, y)';
+                q.answers = [`(${x1}, ${y1})`, `(${x1},${y1})`, `${x1}, ${y1}`, `${x1},${y1}`];
+            }
+            
+            practiceState.question = q;
+            renderPracticeQuestion();
+        }
+
+        function generateAcceptableAnswers(x1, y1, mNum, mDen) {
+            const answers = [];
+            const mStr = mDen === 1 ? mNum.toString() : `${mNum}/${mDen}`;
+            
+            const yParts = y1 >= 0 ? [`y - ${y1}`, `y-${y1}`, `y − ${y1}`] : [`y + ${-y1}`, `y+${-y1}`];
+            const xParts = x1 >= 0 ? [`(x - ${x1})`, `(x-${x1})`, `(x − ${x1})`] : [`(x + ${-x1})`, `(x+${-x1})`];
+            
+            for (const y of yParts) {
+                for (const x of xParts) {
+                    answers.push(`${y} = ${mStr}${x}`);
+                    answers.push(`${y}=${mStr}${x}`);
+                }
+            }
+            return answers;
+        }
+
+        function renderPracticeQuestion() {
+            const container = document.getElementById('practiceContainer');
+            const q = practiceState.question;
+            
+            container.innerHTML = `
+                <div class="mini-dots" id="practiceDots"></div>
+                <div class="streak-display">🔥 Streak: <span id="streakCount">${practiceState.streak}</span></div>
+                <div class="practice-question">
+                    <p class="prompt">${q.prompt}</p>
+                    <div class="given">${q.given}</div>
+                </div>
+                <div class="practice-input-area">
+                    <input type="text" class="practice-input" id="practiceInput" placeholder="Your answer..." onkeypress="if(event.key==='Enter')checkPractice()">
+                    <button class="check-btn" onclick="checkPractice()">Check</button>
+                </div>
+                <p class="practice-hint">${q.hint}</p>
+                <div class="practice-feedback" id="practiceFeedback"></div>
+            `;
+            
+            buildMiniDots('practiceDots');
+            document.getElementById('practiceInput').focus();
+        }
+
+        function checkPractice() {
+            const input = document.getElementById('practiceInput');
+            const fb = document.getElementById('practiceFeedback');
+            const q = practiceState.question;
+            
+            const normalize = s => s.toLowerCase().replace(/\s+/g, '').replace(/−/g, '-').replace(/–/g, '-');
+            const userAnswer = normalize(input.value.trim());
+            const isCorrect = q.answers.some(a => normalize(a) === userAnswer);
+            
+            practiceState.attempts++;
+            
+            if (isCorrect) {
+                practiceState.streak++;
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+                fb.className = 'practice-feedback correct';
+                fb.innerHTML = '✓ Correct!';
+                document.getElementById('streakCount').textContent = practiceState.streak;
+                setTimeout(generatePracticeQuestion, 800);
+            } else {
+                input.classList.remove('correct');
+                input.classList.add('incorrect');
+                fb.className = 'practice-feedback incorrect';
+                
+                if (practiceState.attempts < 2) {
+                    fb.innerHTML = 'Try again!';
+                    input.value = '';
+                    input.focus();
+                } else {
+                    practiceState.streak = 0;
+                    document.getElementById('streakCount').textContent = '0';
+                    fb.innerHTML = `Answer: ${q.answers[0]} <button class="next-btn" style="padding:6px 16px;font-size:0.9rem;margin-left:8px" onclick="generatePracticeQuestion()">Next →</button>`;
+                }
+            }
+        }
+
+        // Initialize
+        window.onload = () => { initExplore(); };
+    </script>
+</body>
+</html>

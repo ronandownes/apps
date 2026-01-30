@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractions, Decimals & Percentages Explorer V2</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%); min-height: 100vh; padding: 10px; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .header h1 { font-size: 2rem; color: #2c3e50; margin-bottom: 4px; }
+        .dots-logo { display: flex; justify-content: center; gap: 5px; margin-bottom: 6px; }
+        .dot-logo { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
+        .dot-logo.green { background: #27ae60; }
+        .dot-logo.blue { background: #3498db; }
+        .dot-logo.red { background: #e74c3c; }
+        .dot-logo.black { background: #2c3e50; }
+        .tagline { color: #5a6c7d; font-style: italic; font-size: 1rem; }
+        .lo-badge { display: inline-block; background: #e8f4f8; color: #2980b9; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem; margin-top: 4px; }
+        .lo-badge code { background: #3498db; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; margin-right: 5px; }
+        .mode-tabs { display: flex; justify-content: center; gap: 6px; margin-bottom: 10px; }
+        .mode-tab { padding: 8px 20px; font-size: 1rem; border: none; border-radius: 18px; cursor: pointer; background: white; color: #2c3e50; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.08); transition: all 0.3s; }
+        .mode-tab:hover { transform: translateY(-1px); }
+        .mode-tab.active { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .content-area { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 3px 15px rgba(0,0,0,0.08); }
+        .fraction-selector { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-bottom: 10px; padding: 8px; background: #e8eaed; border-radius: 8px; }
+        .fraction-btn { padding: 8px 14px; font-size: 1.15rem; border: none; border-radius: 6px; cursor: pointer; background: white; color: #2c3e50; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.2s; }
+        .fraction-btn:hover { transform: scale(1.05); background: #3498db; color: white; }
+        .fraction-btn.active { background: #2c3e50; color: white; }
+        .conversion-display { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; padding: 10px; background: #f8f9fa; border-radius: 8px; }
+        @media (max-width: 600px) { .conversion-display { grid-template-columns: repeat(2, 1fr); } }
+        .conversion-box { text-align: center; padding: 8px 4px; background: white; border-radius: 6px; }
+        .conversion-box .label { font-size: 0.7rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; font-weight: 600; }
+        .conversion-box .value { font-size: 1.3rem; font-weight: bold; font-family: 'Courier New', monospace; }
+        .conversion-box.fraction .value { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; line-height: 1; }
+        .conversion-box .numerator { color: #e74c3c; font-size: 1.4rem; }
+        .conversion-box .denominator { color: #3498db; font-size: 1.4rem; }
+        .conversion-box .frac-line { width: 30px; height: 2px; background: #2c3e50; margin: 2px 0; }
+        .conversion-box.expanded .value { color: #2c3e50; font-size: 1.1rem; }
+        .conversion-box.recurring .value { color: #8e44ad; font-size: 1.2rem; }
+        .conversion-box.percent .value { color: #27ae60; font-size: 1.3rem; }
+        .overbar { text-decoration: overline; text-decoration-thickness: 2px; }
+        .type-note { text-align: center; color: #5a6c7d; font-size: 0.9rem; margin-bottom: 8px; padding: 5px; background: #f8f9fa; border-radius: 5px; }
+        .type-note.terminating { border-left: 3px solid #27ae60; }
+        .type-note.repeating { border-left: 3px solid #e74c3c; }
+        .visuals-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        @media (max-width: 550px) { .visuals-row { flex-direction: column; } }
+        .visual-panel { flex: 1; background: #f8f9fa; border-radius: 8px; padding: 10px; text-align: center; }
+        .visual-panel h3 { color: #2c3e50; margin-bottom: 6px; font-size: 0.95rem; }
+        .dot-array { display: flex; justify-content: center; align-items: center; min-height: 80px; }
+        .dot-array.vertical { flex-direction: column; gap: 5px; }
+        .dot-array.grid { display: grid; gap: 5px; justify-content: center; }
+        .dot { width: 22px; height: 22px; border-radius: 50%; background: #3498db; transition: all 0.3s ease; opacity: 0; transform: scale(0); }
+        .dot.visible { opacity: 1; transform: scale(1); }
+        .dot.selected { background: #e74c3c; box-shadow: 0 0 8px rgba(231, 76, 60, 0.5); transform: scale(1.1); }
+        .pie-container { display: flex; justify-content: center; align-items: center; min-height: 90px; }
+        .pie-chart { width: 80px; height: 80px; border-radius: 50%; cursor: grab; position: relative; }
+        .pie-label { position: absolute; font-size: 0.8rem; font-weight: bold; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.4); top: 58%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        .play-btn { background: #27ae60; color: white; border: none; padding: 5px 14px; font-size: 0.85rem; border-radius: 12px; cursor: pointer; margin-top: 5px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        @media (max-width: 650px) { .info-grid { grid-template-columns: 1fr; } }
+        .insight-box { background: linear-gradient(135deg, #74b9ff, #0984e3); color: white; padding: 12px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; }
+        .insight-box h4 { margin-bottom: 5px; font-size: 1rem; }
+        .concept-box { background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: white; padding: 12px; border-radius: 8px; font-size: 0.9rem; line-height: 1.4; }
+        .concept-box h4 { margin-bottom: 5px; font-size: 1rem; }
+        .concept-box .key-point { background: rgba(255,255,255,0.2); padding: 6px 10px; border-radius: 6px; margin-top: 6px; font-size: 0.85rem; }
+        .extension-box { background: #f5f5f5; color: #2c3e50; padding: 10px; border-radius: 8px; font-size: 0.9rem; line-height: 1.4; grid-column: 1 / -1; }
+        .extension-box h4 { margin-bottom: 4px; font-size: 0.95rem; }
+        .extension-box .wonder { font-style: italic; margin-top: 6px; font-size: 0.85rem; color: #666; }
+        .sevenths-magic { background: #f5f6fa; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+        .sevenths-magic h3 { font-size: 1.05rem; margin-bottom: 8px; color: #2c3e50; }
+        .cycle-container { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0; }
+        .cycle-digits { font-size: 1.8rem; font-family: 'Courier New', monospace; letter-spacing: 3px; display: flex; }
+        .cycle-digits span { display: inline-block; padding: 5px 8px; margin: 1px; background: white; border-radius: 5px; min-width: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.3s; }
+        .cycle-digits span.moving { animation: digitMove 0.4s ease; }
+        @keyframes digitMove { 0% { transform: translateY(0); } 50% { transform: translateY(-8px) scale(1.08); } 100% { transform: translateY(0); } }
+        .bouncing-dots { display: flex; gap: 4px; }
+        .bouncing-dots .bd { width: 8px; height: 8px; border-radius: 50%; animation: bounce 0.5s ease-in-out infinite; }
+        .bouncing-dots .bd:nth-child(1) { background: #27ae60; animation-delay: 0s; }
+        .bouncing-dots .bd:nth-child(2) { background: #3498db; animation-delay: 0.1s; }
+        .bouncing-dots .bd:nth-child(3) { background: #e74c3c; animation-delay: 0.2s; }
+        .bouncing-dots .bd:nth-child(4) { background: #2c3e50; animation-delay: 0.3s; }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        .sevenths-fractions { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 8px; }
+        .seventh-btn { padding: 6px 12px; font-size: 1rem; border: 2px solid #3498db; border-radius: 6px; background: white; cursor: pointer; font-weight: 700; transition: all 0.2s; }
+        .seventh-btn:hover, .seventh-btn.active { background: #3498db; color: white; }
+        .multiples-section { margin-top: 10px; }
+        .multiples-section h3 { color: #2c3e50; margin-bottom: 8px; font-size: 1rem; }
+        .multiples-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; }
+        .multiple-card { background: white; padding: 10px 6px; border-radius: 8px; text-align: center; cursor: pointer; border: 2px solid #ecf0f1; transition: all 0.2s; }
+        .multiple-card:hover { border-color: #3498db; transform: translateY(-2px); }
+        .multiple-card.active { border-color: #e74c3c; background: #fff5f5; }
+        .multiple-card .frac { font-size: 1.15rem; font-weight: bold; }
+        .multiple-card .frac .num { color: #e74c3c; }
+        .multiple-card .frac .den { color: #3498db; }
+        .multiple-card .dec { font-size: 0.9rem; color: #2c3e50; font-family: 'Courier New', monospace; margin: 2px 0; }
+        .multiple-card .pct { font-size: 0.85rem; color: #27ae60; font-weight: 600; }
+        /* Quiz */
+        .quiz-container { max-width: 600px; margin: 0 auto; }
+        .mini-dots { display: flex; justify-content: center; gap: 4px; margin-bottom: 8px; }
+        .mini-dots .dot-logo { width: 10px; height: 10px; }
+        .quiz-progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; }
+        .quiz-progress .question-num { font-weight: bold; color: #2c3e50; font-size: 0.95rem; }
+        .quiz-progress .score { color: #27ae60; font-weight: bold; font-size: 1rem; }
+        .progress-dots { display: flex; gap: 5px; }
+        .progress-dot { width: 18px; height: 18px; border-radius: 50%; background: #3498db; transition: all 0.3s; }
+        .progress-dot.answered { background: #e74c3c; }
+        .progress-dot.current { transform: scale(1.15); box-shadow: 0 0 6px rgba(52, 152, 219, 0.5); }
+        .quiz-question { text-align: center; padding: 12px 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; }
+        .quiz-question .prompt { font-size: 1rem; color: #5a6c7d; margin-bottom: 6px; }
+        .quiz-question .value { font-size: 2.6rem; font-weight: bold; color: #2c3e50; }
+        .quiz-question .value.fraction { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+        .quiz-question .value .num { color: #e74c3c; }
+        .quiz-question .value .den { color: #3498db; }
+        .quiz-question .frac-line { width: 50px; height: 4px; background: #2c3e50; margin: 5px 0; }
+        .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .quiz-option { padding: 12px 8px; font-size: 1.2rem; border: 2px solid #ecf0f1; border-radius: 8px; background: white; cursor: pointer; font-weight: 700; color: #2c3e50; transition: all 0.2s; }
+        .quiz-option:hover { border-color: #3498db; }
+        .quiz-option.correct { background: #d4edda; border-color: #27ae60; color: #27ae60; }
+        .quiz-option.incorrect { background: #f8d7da; border-color: #e74c3c; color: #e74c3c; }
+        .quiz-feedback { text-align: center; padding: 8px; margin-top: 6px; border-radius: 6px; font-size: 1rem; display: none; }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.correct { background: #d4edda; color: #155724; }
+        .quiz-feedback.incorrect { background: #f8d7da; color: #721c24; }
+        .halfway-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 999; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .halfway-card { background: white; border-radius: 16px; padding: 30px 40px; text-align: center; max-width: 400px; margin: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: popIn 0.4s ease; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .halfway-card .emoji { font-size: 3.5rem; margin-bottom: 10px; }
+        .halfway-card h2 { font-size: 1.6rem; color: #2c3e50; margin-bottom: 8px; }
+        .halfway-card p { font-size: 1.1rem; color: #5a6c7d; margin-bottom: 15px; line-height: 1.5; }
+        .halfway-card .btn { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; border: none; padding: 14px 35px; font-size: 1.15rem; border-radius: 25px; cursor: pointer; font-weight: 600; transition: transform 0.2s; }
+        .halfway-card .btn:hover { transform: scale(1.05); }
+        .halfway-message { padding: 8px 12px; background: linear-gradient(135deg, #ffeaa7, #fdcb6e); border-radius: 6px; margin: 6px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .halfway-message h2 { color: #d68910; font-size: 1.1rem; margin: 0; }
+        .halfway-message p { color: #856404; font-size: 0.9rem; margin: 0; }
+        .next-btn { background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 10px 25px; font-size: 1rem; border-radius: 18px; cursor: pointer; margin-top: 8px; }
+        .celebration-container { text-align: center; padding: 20px; }
+        .celebration-container h2 { font-size: 1.8rem; color: #2c3e50; margin-bottom: 8px; }
+        .celebration-container .trophy { font-size: 4rem; margin: 8px 0; animation: trophyBounce 0.5s ease-in-out infinite alternate; }
+        @keyframes trophyBounce { from { transform: scale(1) rotate(-5deg); } to { transform: scale(1.1) rotate(5deg); } }
+        .final-score { font-size: 3rem; font-weight: bold; color: #27ae60; margin: 10px 0; }
+        .final-score.perfect { background: linear-gradient(135deg, #27ae60, #3498db, #e74c3c, #2c3e50); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: rainbowShift 2s linear infinite; background-size: 200% 200%; }
+        @keyframes rainbowShift { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+        .certificate { background: linear-gradient(135deg, #fff9e6, #fff); border: 4px double #d4af37; border-radius: 10px; padding: 20px; margin: 12px auto; max-width: 350px; position: relative; }
+        .certificate::before { content: '⭐'; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 1.8rem; }
+        .certificate h3 { font-size: 1rem; color: #b8860b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .certificate .award-text { font-size: 1.2rem; color: #2c3e50; font-weight: bold; margin: 10px 0; }
+        .certificate .dots-award { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
+        .certificate .dots-award .dot-award { width: 12px; height: 12px; border-radius: 50%; }
+        .certificate .dots-award .dot-award:nth-child(1) { background: #27ae60; }
+        .certificate .dots-award .dot-award:nth-child(2) { background: #3498db; }
+        .certificate .dots-award .dot-award:nth-child(3) { background: #e74c3c; }
+        .certificate .dots-award .dot-award:nth-child(4) { background: #2c3e50; }
+        .certificate .tagline-award { color: #7f8c8d; font-style: italic; font-size: 0.9rem; }
+        .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 1000; }
+        .confetti { position: absolute; top: -20px; animation: confettiFall linear forwards; }
+        .confetti.circle { width: 8px; height: 8px; border-radius: 50%; }
+        .confetti.strip { width: 6px; height: 16px; border-radius: 2px; }
+        @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0.7; } }
+        .quiz-complete { text-align: center; padding: 25px; }
+        .quiz-complete h2 { font-size: 1.6rem; color: #2c3e50; margin-bottom: 10px; }
+        .quiz-complete p { font-size: 1rem; color: #7f8c8d; margin-bottom: 12px; }
+        /* Practice */
+        .practice-container { max-width: 650px; margin: 0 auto; }
+        .practice-layout { display: flex; gap: 10px; align-items: stretch; margin-bottom: 8px; }
+        @media (max-width: 500px) { .practice-layout { flex-direction: column; } }
+        .practice-question { flex: 1.3; text-align: center; padding: 12px; background: #f8f9fa; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; }
+        .practice-question .prompt { font-size: 1.05rem; color: #5a6c7d; margin-bottom: 6px; }
+        .practice-question .value { font-size: 2.6rem; font-weight: bold; }
+        .practice-question .value.fraction { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+        .practice-question .value .num { color: #e74c3c; }
+        .practice-question .value .den { color: #3498db; }
+        .practice-question .frac-line { width: 45px; height: 3px; background: #2c3e50; margin: 4px 0; }
+        .practice-visual { flex: 0.7; text-align: center; padding: 12px; background: #f8f9fa; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .practice-visual h4 { color: #5a6c7d; margin-bottom: 6px; font-size: 0.85rem; }
+        .practice-pie { width: 70px; height: 70px; border-radius: 50%; }
+        .practice-input-area { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 10px 0; }
+        .practice-input { font-size: 1.6rem; padding: 8px 12px; border: 3px solid #ecf0f1; border-radius: 8px; width: 120px; text-align: center; font-family: 'Courier New', monospace; }
+        .practice-input:focus { outline: none; border-color: #3498db; }
+        .practice-input.correct { border-color: #27ae60; background: #d4edda; }
+        .practice-input.incorrect { border-color: #f39c12; background: #fef9e7; }
+        .check-btn { background: #27ae60; color: white; border: none; padding: 10px 22px; font-size: 1rem; border-radius: 18px; cursor: pointer; }
+        .practice-hint { color: #5a6c7d; font-style: italic; font-size: 0.9rem; text-align: center; }
+        .streak-display { text-align: center; padding: 6px; background: linear-gradient(135deg, #ffeaa7, #fdcb6e); border-radius: 6px; margin-bottom: 8px; font-size: 1rem; }
+        .streak-display span { font-size: 1.2rem; font-weight: bold; color: #d68910; }
+        .practice-feedback { text-align: center; margin-top: 6px; font-size: 1rem; }
+        .practice-feedback.correct { color: #27ae60; }
+        .practice-feedback.incorrect { color: #e67e22; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="dots-logo" id="dotsLogo"></div>
+        <h1>Fractions, Decimals & Percentages</h1>
+        <p class="tagline">"Maths that meets you where you are"</p>
+        <div class="lo-badge"><code>N.2a</code> Convert confidently between fractions, decimals, and percentages</div>
+    </div>
+    <div class="container">
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="explore">🔍 Explore</button>
+            <button class="mode-tab" data-mode="quiz">📝 Quiz</button>
+            <button class="mode-tab" data-mode="practice">✏️ Practice</button>
+        </div>
+        <div id="exploreMode">
+            <div class="fraction-selector" id="fractionSelector"></div>
+            <div class="content-area" id="exploreContent">
+                <div style="text-align:center;padding:40px 10px;color:#7f8c8d;">
+                    <h2 style="font-size:1.5rem;margin-bottom:8px;">Choose a unit fraction to explore</h2>
+                    <p style="font-size:1.1rem;">What happens when we divide 1 into equal parts?</p>
+                </div>
+            </div>
+        </div>
+        <div id="quizMode" class="hidden"><div class="content-area"><div class="quiz-container" id="quizContainer"></div></div></div>
+        <div id="practiceMode" class="hidden"><div class="content-area"><div class="practice-container" id="practiceContainer"></div></div></div>
+    </div>
+    <div class="confetti-container" id="confettiContainer"></div>
+    <script>
+        // Build header dots
+        const dotsLogo = document.getElementById('dotsLogo');
+        for (let i = 0; i < 16; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot-logo ' + ['green','blue','red','black'][i % 4];
+            dot.onclick = () => dotEffect(i, 'dotsLogo');
+            dotsLogo.appendChild(dot);
+        }
+
+        // Build fraction buttons
+        const fractionSelector = document.getElementById('fractionSelector');
+        [2,3,4,5,6,7,8,9,10,11,12,13,17].forEach(d => {
+            const btn = document.createElement('button');
+            btn.className = 'fraction-btn';
+            btn.dataset.denom = d;
+            btn.textContent = d <= 10 ? ['','','½','⅓','¼','⅕','⅙','1/7','⅛','1/9','1/10'][d] : '1/' + d;
+            btn.onclick = () => {
+                document.querySelectorAll('.fraction-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                exploreFraction(d);
+            };
+            fractionSelector.appendChild(btn);
+        });
+
+        // Unique ripple per dot position
+        function dotEffect(dotIndex, containerId) {
+            const dots = document.querySelectorAll(`#${containerId} .dot-logo`);
+            const n = dots.length;
+            const pattern = dotIndex % 4;
+            const cfgs = [
+                { type: 'outward', lambda: 4, amp: 14, damping: 0.988, dur: 2600 },
+                { type: 'cascade', lambda: 3, amp: 16, damping: 0.985, dur: 2400 },
+                { type: 'pulse', lambda: 2, amp: 20, damping: 0.982, dur: 2200 },
+                { type: 'bounce', lambda: 1.5, amp: 24, damping: 0.978, dur: 2000 }
+            ];
+            const cfg = cfgs[pattern];
+            if (cfg.type === 'outward') {
+                dots.forEach((dot, i) => { const dist = Math.abs(i - dotIndex); setTimeout(() => animateSine(dot, cfg.amp * Math.exp(-dist * 0.18), cfg.lambda, cfg.damping, cfg.dur, i), dist * 30); });
+            } else if (cfg.type === 'cascade') {
+                dots.forEach((dot, i) => setTimeout(() => animateSine(dot, cfg.amp, cfg.lambda, cfg.damping, cfg.dur, i), i * 25));
+            } else if (cfg.type === 'pulse') {
+                dots.forEach((dot, i) => { const dist = Math.abs(i - dotIndex); setTimeout(() => animateSine(dot, Math.max(cfg.amp - dist * 1.5, 5), cfg.lambda, cfg.damping, cfg.dur, i), dist * 20); });
+            } else {
+                const order = []; for (let d = 0; d < n; d++) { order.push((dotIndex + d) % n); if ((dotIndex - d + n) % n !== (dotIndex + d) % n) order.push((dotIndex - d + n) % n); }
+                [...new Set(order)].forEach((i, idx) => setTimeout(() => animateSine(dots[i], cfg.amp, cfg.lambda, cfg.damping, cfg.dur, i), idx * 18));
+            }
+        }
+
+        function animateSine(dot, amp, lambda, damping, dur, idx) {
+            const start = performance.now(), freq = (2 * Math.PI) / (lambda * 160);
+            (function animate(now) {
+                const t = now - start;
+                if (t > dur) { dot.style.transform = 'translateY(0)'; return; }
+                const y = Math.sin(t * freq + idx * 2 * Math.PI / lambda) * amp * Math.pow(damping, t / 10);
+                dot.style.transform = `translateY(${-y}px)`;
+                requestAnimationFrame(animate);
+            })(start);
+        }
+
+        setTimeout(() => { const dots = document.querySelectorAll('#dotsLogo .dot-logo'); dots.forEach((d, i) => setTimeout(() => animateSine(d, 7, 4, 0.99, 1800, i), i * 30)); }, 300);
+
+        // Fraction data
+        const FD = {
+            2: { exp: '0.5', rec: '0.5', pct: '50%', pp: '50%', rep: false, rl: 0, term: true, lay: { t: 'v', c: 2 }, why: "2 is a factor of 10 → terminates!", mults: [{n:1,e:'0.5',r:'0.5',p:'50%'},{n:2,e:'1',r:'1',p:'100%'}] },
+            3: { exp: '0.333...', rec: '0.<span class="overbar">3</span>', pct: '≈33%', pp: '33.3̄%', rep: true, rl: 1, term: false, lay: { t: 'v', c: 3 }, why: "3 isn't a factor of any power of 10 → repeats forever!", mults: [{n:1,e:'0.333...',r:'0.<span class="overbar">3</span>',p:'≈33%'},{n:2,e:'0.666...',r:'0.<span class="overbar">6</span>',p:'≈67%'},{n:3,e:'1',r:'1',p:'100%'}] },
+            4: { exp: '0.25', rec: '0.25', pct: '25%', pp: '25%', rep: false, rl: 0, term: true, lay: { t: 'g', r: 2, c: 2 }, why: "4 = 2×2. Only 2s and 5s → terminates!", mults: [{n:1,e:'0.25',r:'0.25',p:'25%'},{n:2,e:'0.5',r:'0.5',p:'50%'},{n:3,e:'0.75',r:'0.75',p:'75%'},{n:4,e:'1',r:'1',p:'100%'}] },
+            5: { exp: '0.2', rec: '0.2', pct: '20%', pp: '20%', rep: false, rl: 0, term: true, lay: { t: 'v', c: 5 }, why: "5 × 2 = 10. Perfect fit for decimals!", mults: [{n:1,e:'0.2',r:'0.2',p:'20%'},{n:2,e:'0.4',r:'0.4',p:'40%'},{n:3,e:'0.6',r:'0.6',p:'60%'},{n:4,e:'0.8',r:'0.8',p:'80%'},{n:5,e:'1',r:'1',p:'100%'}] },
+            6: { exp: '0.1666...', rec: '0.1<span class="overbar">6</span>', pct: '≈17%', pp: '16.6̄%', rep: true, rl: 1, term: false, lay: { t: 'g', r: 2, c: 3 }, why: "6 = 2 × 3. The 3 causes repeating!", mults: [{n:1,e:'0.1666...',r:'0.1<span class="overbar">6</span>',p:'≈17%'},{n:2,e:'0.333...',r:'0.<span class="overbar">3</span>',p:'≈33%'},{n:3,e:'0.5',r:'0.5',p:'50%'},{n:4,e:'0.666...',r:'0.<span class="overbar">6</span>',p:'≈67%'},{n:5,e:'0.8333...',r:'0.8<span class="overbar">3</span>',p:'≈83%'},{n:6,e:'1',r:'1',p:'100%'}] },
+            7: { exp: '0.142857...', rec: '0.<span class="overbar">142857</span>', pct: '≈14%', pp: '14.28̄%', rep: true, rl: 6, term: false, lay: { t: 'v', c: 7 }, why: "7 is prime → repeats. Magic: 6-digit cycle (maximum for 7)!", mults: [{n:1,e:'0.142857...',r:'0.<span class="overbar">142857</span>',p:'≈14%',cy:'142857'},{n:2,e:'0.285714...',r:'0.<span class="overbar">285714</span>',p:'≈29%',cy:'285714'},{n:3,e:'0.428571...',r:'0.<span class="overbar">428571</span>',p:'≈43%',cy:'428571'},{n:4,e:'0.571428...',r:'0.<span class="overbar">571428</span>',p:'≈57%',cy:'571428'},{n:5,e:'0.714285...',r:'0.<span class="overbar">714285</span>',p:'≈71%',cy:'714285'},{n:6,e:'0.857142...',r:'0.<span class="overbar">857142</span>',p:'≈86%',cy:'857142'},{n:7,e:'1',r:'1',p:'100%'}] },
+            8: { exp: '0.125', rec: '0.125', pct: '12.5%', pp: '12.5%', rep: false, rl: 0, term: true, lay: { t: 'g', r: 2, c: 4 }, why: "8 = 2³. Pure powers of 2 always terminate!", mults: [{n:1,e:'0.125',r:'0.125',p:'12.5%'},{n:2,e:'0.25',r:'0.25',p:'25%'},{n:3,e:'0.375',r:'0.375',p:'37.5%'},{n:4,e:'0.5',r:'0.5',p:'50%'},{n:5,e:'0.625',r:'0.625',p:'62.5%'},{n:6,e:'0.75',r:'0.75',p:'75%'},{n:7,e:'0.875',r:'0.875',p:'87.5%'},{n:8,e:'1',r:'1',p:'100%'}] },
+            9: { exp: '0.111...', rec: '0.<span class="overbar">1</span>', pct: '≈11%', pp: '11.1̄%', rep: true, rl: 1, term: false, lay: { t: 'g', r: 3, c: 3 }, why: "9 = 3×3. Shortcut: repeating digit = numerator!", mults: [{n:1,e:'0.111...',r:'0.<span class="overbar">1</span>',p:'≈11%'},{n:2,e:'0.222...',r:'0.<span class="overbar">2</span>',p:'≈22%'},{n:3,e:'0.333...',r:'0.<span class="overbar">3</span>',p:'≈33%'},{n:4,e:'0.444...',r:'0.<span class="overbar">4</span>',p:'≈44%'},{n:5,e:'0.555...',r:'0.<span class="overbar">5</span>',p:'≈56%'},{n:6,e:'0.666...',r:'0.<span class="overbar">6</span>',p:'≈67%'},{n:7,e:'0.777...',r:'0.<span class="overbar">7</span>',p:'≈78%'},{n:8,e:'0.888...',r:'0.<span class="overbar">8</span>',p:'≈89%'},{n:9,e:'1',r:'1',p:'100%'}] },
+            10: { exp: '0.1', rec: '0.1', pct: '10%', pp: '10%', rep: false, rl: 0, term: true, lay: { t: 'g', r: 2, c: 5 }, why: "10 = 2 × 5. The foundation of decimals!", mults: [{n:1,e:'0.1',r:'0.1',p:'10%'},{n:2,e:'0.2',r:'0.2',p:'20%'},{n:3,e:'0.3',r:'0.3',p:'30%'},{n:4,e:'0.4',r:'0.4',p:'40%'},{n:5,e:'0.5',r:'0.5',p:'50%'}] },
+            11: { exp: '0.0909...', rec: '0.<span class="overbar">09</span>', pct: '≈9%', pp: '9.09̄%', rep: true, rl: 2, term: false, lay: { t: 'v', c: 11 }, why: "11 is prime. Shortcut: numerator × 9 = repeating pair!", mults: [{n:1,e:'0.0909...',r:'0.<span class="overbar">09</span>',p:'≈9%'},{n:2,e:'0.1818...',r:'0.<span class="overbar">18</span>',p:'≈18%'},{n:3,e:'0.2727...',r:'0.<span class="overbar">27</span>',p:'≈27%'},{n:4,e:'0.3636...',r:'0.<span class="overbar">36</span>',p:'≈36%'},{n:5,e:'0.4545...',r:'0.<span class="overbar">45</span>',p:'≈45%'}] },
+            12: { exp: '0.0833...', rec: '0.08<span class="overbar">3</span>', pct: '≈8%', pp: '8.3̄%', rep: true, rl: 1, term: false, lay: { t: 'g', r: 3, c: 4 }, why: "12 = 2² × 3. The 3 causes repeating.", mults: [{n:1,e:'0.0833...',r:'0.08<span class="overbar">3</span>',p:'≈8%'},{n:2,e:'0.1666...',r:'0.1<span class="overbar">6</span>',p:'≈17%'},{n:3,e:'0.25',r:'0.25',p:'25%'},{n:4,e:'0.333...',r:'0.<span class="overbar">3</span>',p:'≈33%'}] },
+            13: { exp: '0.076923...', rec: '0.<span class="overbar">076923</span>', pct: '≈8%', pp: '7.69̄%', rep: true, rl: 6, term: false, lay: { t: 'v', c: 13 }, why: "13 is prime with 6-digit cycle (half of 12).", mults: [{n:1,e:'0.076923...',r:'0.<span class="overbar">076923</span>',p:'≈8%'},{n:2,e:'0.153846...',r:'0.<span class="overbar">153846</span>',p:'≈15%'}] },
+            17: { exp: '0.058823...', rec: '0.<span class="overbar">0588235294117647</span>', pct: '≈6%', pp: '5.88̄%', rep: true, rl: 16, term: false, lay: { t: 'v', c: 17 }, why: "17 is a 'full reptend prime' — 16-digit period!", mults: [{n:1,e:'0.058823...',r:'0.<span class="overbar">0588235294117647</span>',p:'≈6%'}] }
+        };
+
+        document.querySelectorAll('.mode-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const m = tab.dataset.mode;
+                document.getElementById('exploreMode').classList.toggle('hidden', m !== 'explore');
+                document.getElementById('quizMode').classList.toggle('hidden', m !== 'quiz');
+                document.getElementById('practiceMode').classList.toggle('hidden', m !== 'practice');
+                if (m === 'quiz') initQuiz();
+                if (m === 'practice') initPractice();
+            });
+        });
+
+        let pieRot = 0;
+        function exploreFraction(d) {
+            const D = FD[d], area = document.getElementById('exploreContent'), ang = 360 / d;
+            let h = `<div class="conversion-display">
+                <div class="conversion-box fraction"><div class="label">Fraction</div><div class="value"><span class="numerator">1</span><span class="frac-line"></span><span class="denominator">${d}</span></div></div>
+                <div class="conversion-box expanded"><div class="label">Expanded</div><div class="value">${D.exp}</div></div>
+                <div class="conversion-box recurring"><div class="label">Notation</div><div class="value">${D.rec}</div></div>
+                <div class="conversion-box percent"><div class="label">≈ Percent</div><div class="value">${D.pct}</div></div>
+            </div>`;
+            h += `<p class="type-note ${D.term ? 'terminating' : 'repeating'}">${D.term ? '✓ <b>Terminating</b> — only 2s and 5s in denominator' : '↻ <b>Repeating</b> (period ' + D.rl + ') — other prime factors'}</p>`;
+            h += `<div class="visuals-row">
+                <div class="visual-panel"><h3>Dots</h3><div class="dot-array" id="dotArray"></div><button class="play-btn" onclick="animDots(${d})">▶</button></div>
+                <div class="visual-panel"><h3>Pie <span style="font-size:0.75rem;color:#999">(click)</span></h3><div class="pie-container"><div class="pie-chart" id="pieChart" onclick="spinPie(${d})"><span class="pie-label">1/${d}</span></div></div></div>
+            </div>`;
+            h += `<div class="info-grid">
+                <div class="insight-box"><h4>💡 Why?</h4><p>${D.why}</p></div>
+                <div class="concept-box"><h4>🔑 Rational Numbers</h4><p>All fractions are <b>rational</b> — whether terminating or repeating!</p><div class="key-point">Terminates ⟺ denom = 2ᵃ × 5ᵇ</div></div>
+                ${[7,13,17].includes(d) ? `<div class="extension-box"><h4>🔬 Extension</h4><p>${d===7?'7 is the smallest "full reptend prime."':d===13?'13 has half-length period (6 = 12/2).':'17 has maximum period 16!'}</p><p class="wonder">Discovering patterns lights a sense of wonder.</p></div>` : ''}
+            </div>`;
+            if (d === 7) {
+                h += `<div class="sevenths-magic"><h3>🎪 142857 Magic</h3><div class="cycle-container"><div class="cycle-digits" id="cycleDigits"><span>1</span><span>4</span><span>2</span><span>8</span><span>5</span><span>7</span></div><div class="bouncing-dots"><div class="bd"></div><div class="bd"></div><div class="bd"></div><div class="bd"></div></div></div><div class="sevenths-fractions">${[1,2,3,4,5,6].map(i=>`<button class="seventh-btn" onclick="showSev(${i})">${i}/7</button>`).join('')}</div></div>`;
+            }
+            h += `<div class="multiples-section"><h3>All ${['','','halves','thirds','quarters','fifths','sixths','sevenths','eighths','ninths','tenths','elevenths','twelfths','thirteenths','','','','seventeenths'][d]}:</h3><div class="multiples-grid">${D.mults.map((m,i)=>`<div class="multiple-card" onclick="hlMult(${i})"><div class="frac"><span class="num">${m.n}</span>/<span class="den">${d}</span></div><div class="dec">${m.r}</div><div class="pct">${m.p}</div></div>`).join('')}</div></div>`;
+            area.innerHTML = h;
+            setTimeout(() => { mkDots(d); mkPie(d); }, 30);
+        }
+
+        function mkPie(d) { const p = document.getElementById('pieChart'); pieRot = 0; p.style.transform = 'rotate(0)'; p.style.background = `conic-gradient(#e74c3c 0deg ${360/d}deg, #3498db ${360/d}deg 360deg)`; }
+        function spinPie(d) { const p = document.getElementById('pieChart'), t = pieRot + (2 + Math.random() * 2) * 360 + [0,45,90,135,180,225,270,315][Math.floor(Math.random()*8)]; p.style.transition = 'transform 2s cubic-bezier(.17,.67,.12,.99)'; p.style.transform = `rotate(${t}deg)`; pieRot = t % 360; setTimeout(() => p.style.transition = 'none', 2100); }
+        function showSev(n) { const cy = ['142857','285714','428571','571428','714285','857142'][n-1], digs = document.querySelectorAll('#cycleDigits span'); document.querySelectorAll('.seventh-btn').forEach((b,i) => b.classList.toggle('active', i===n-1)); digs.forEach(d => d.classList.add('moving')); setTimeout(() => { cy.split('').forEach((c,i) => digs[i].textContent = c); digs.forEach(d => d.classList.remove('moving')); }, 200); }
+        function mkDots(d) { const c = document.getElementById('dotArray'), L = FD[d].lay, n = L.t === 'g' ? L.r * L.c : L.c; c.innerHTML = ''; c.className = 'dot-array ' + (L.t === 'v' ? 'vertical' : 'grid'); if (L.t === 'g') c.style.gridTemplateColumns = `repeat(${L.c}, 22px)`; for (let i = 0; i < n; i++) { const dot = document.createElement('div'); dot.className = 'dot' + (i === 0 ? ' selected' : ''); c.appendChild(dot); setTimeout(() => dot.classList.add('visible'), i * 35); } }
+        function animDots(d) { document.querySelectorAll('#dotArray .dot').forEach((dot, i) => { dot.classList.remove('visible', 'selected'); setTimeout(() => { dot.classList.add('visible'); if (i === 0) dot.classList.add('selected'); }, i * 50); }); }
+        function hlMult(i) { document.querySelectorAll('.multiple-card').forEach((c, j) => c.classList.toggle('active', j === i)); }
+
+        // QUIZ
+        let QS = { qs: [], ci: 0, sc: 0, ans: false, res: [] };
+        const ENCS = [
+            { emoji: "🎯", h: "Halfway There!", p: "You're absolutely smashing it! Three down, three to go." },
+            { emoji: "⚡", h: "Electric!", p: "Your brain is firing on all cylinders right now!" },
+            { emoji: "🦁", h: "Lion Heart!", p: "The courage you're showing is genuinely impressive." },
+            { emoji: "🚀", h: "Lift Off!", p: "You've reached cruising altitude. Now let's land this thing!" },
+            { emoji: "💪", h: "Showing Character!", p: "This is what perseverance looks like. Keep pushing!" },
+            { emoji: "🎸", h: "Rock Star!", p: "You're making maths look easy. Don't stop now!" },
+            { emoji: "🏔️", h: "Summit in Sight!", p: "You've climbed halfway up the mountain. The view from the top is worth it!" },
+            { emoji: "🧠", h: "Big Brain Energy!", p: "Your neurons are doing a victory dance right now." },
+            { emoji: "🌟", h: "Starlight!", p: "You're shining brighter than a supernova. Almost there!" },
+            { emoji: "🎪", h: "Showtime!", p: "Ladies and gentlemen, we have a maths wizard in the building!" },
+            { emoji: "🔥", h: "On Fire!", p: "Someone call the fire brigade — this student is too hot to handle!" },
+            { emoji: "🎬", h: "Plot Twist!", p: "The hero realises they've been brilliant all along. That's you!" },
+            { emoji: "🏃", h: "Marathon Mode!", p: "You've got the stamina of a champion. The finish line awaits!" },
+            { emoji: "🎭", h: "Standing Ovation!", p: "The crowd goes wild! Three more questions and you take a bow." },
+            { emoji: "🦸", h: "Superhero Status!", p: "With great fractions comes great responsibility. You've got this!" },
+            { emoji: "🎯", h: "Bullseye!", p: "Your accuracy is genuinely impressive. Keep that focus!" },
+            { emoji: "🌈", h: "Over the Rainbow!", p: "You're halfway to the pot of gold. Don't stop now!" },
+            { emoji: "🎤", h: "Mic Drop Moment!", p: "You're making this look way too easy. Respect!" },
+            { emoji: "🧗", h: "Climbing Strong!", p: "Every correct answer is another handhold. You're nearly at the top!" },
+            { emoji: "🎁", h: "Unwrapping Success!", p: "Three more answers and you get to see what's inside!" }
+        ];
+        function initQuiz() { QS = { qs: genQs(6), ci: 0, sc: 0, ans: false, res: [] }; renderQ(); }
+        function genQs(n) { const qs = [], used = new Set(), types = ['f2d','f2p','d2f','p2f'], fracs = [{n:1,d:2},{n:1,d:4},{n:3,d:4},{n:1,d:5},{n:2,d:5},{n:3,d:5},{n:4,d:5},{n:1,d:10},{n:3,d:10},{n:1,d:8},{n:3,d:8},{n:5,d:8},{n:7,d:8}]; while(qs.length<n){ const t=types[Math.floor(Math.random()*types.length)], f=fracs[Math.floor(Math.random()*fracs.length)], k=t+f.n+'/'+f.d; if(!used.has(k)){ used.add(k); qs.push(mkQ(t,f.n,f.d)); } } return qs; }
+        function mkQ(t,n,d) { const dec=+(n/d).toFixed(3), pct=Math.round(n/d*100)+'%', frac=n+'/'+d, q={t,n,d}; if(t==='f2d'){ q.pr='As a decimal?'; q.disp={t:'f',n,d}; q.a=dec.toString(); q.opts=genDO(dec); } else if(t==='f2p'){ q.pr='As a %?'; q.disp={t:'f',n,d}; q.a=pct; q.opts=genPO(pct); } else if(t==='d2f'){ q.pr='As a fraction?'; q.disp={t:'d',v:dec}; q.a=frac; q.opts=genFO(n,d); } else { q.pr='As a fraction?'; q.disp={t:'p',v:pct}; q.a=frac; q.opts=genFO(n,d); } return q; }
+        function genDO(c) { const o=[c.toString()]; while(o.length<4){ const w=Math.abs(c+(Math.random()-0.5)*0.5).toFixed(c.toString().split('.')[1]?.length||1); if(!o.includes(w)&&parseFloat(w)>0&&parseFloat(w)<=1)o.push(w); } return shuf(o); }
+        function genPO(c) { const o=[c],v=parseInt(c); while(o.length<4){ const w=Math.abs(v+Math.floor((Math.random()-0.5)*40))+'%'; if(!o.includes(w)&&parseInt(w)>0&&parseInt(w)<=100)o.push(w); } return shuf(o); }
+        function genFO(n,d) { const c=n+'/'+d, o=[c], wrong=['1/2','1/3','2/3','1/4','3/4','1/5','2/5','3/5','4/5','1/8','3/8','5/8','7/8','1/10','3/10'].filter(f=>f!==c); while(o.length<4&&wrong.length)o.push(wrong.splice(Math.floor(Math.random()*wrong.length),1)[0]); return shuf(o); }
+        function shuf(a) { const s=[...a]; for(let i=s.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [s[i],s[j]]=[s[j],s[i]]; } return s; }
+        function renderQ() {
+            const C=document.getElementById('quizContainer'), q=QS.qs[QS.ci]; if(!q){ renderQC(); return; }
+            let disp = q.disp.t==='f' ? `<div class="value fraction"><span class="num">${q.disp.n}</span><span class="frac-line"></span><span class="den">${q.disp.d}</span></div>` : q.disp.t==='d' ? `<div class="value" style="font-family:monospace">${q.disp.v}</div>` : `<div class="value" style="color:#27ae60">${q.disp.v}</div>`;
+            let dots = ''; for(let i=0;i<6;i++) dots += `<div class="progress-dot${i<QS.res.length?' answered':''}${i===QS.ci?' current':''}"></div>`;
+            let miniDots = '<div class="mini-dots" id="quizDots">'; for(let i=0;i<8;i++) miniDots += `<div class="dot-logo ${['green','blue','red','black'][i%4]}" onclick="dotEffect(${i},'quizDots')"></div>`; miniDots += '</div>';
+            C.innerHTML = miniDots + `<div class="quiz-progress"><span class="question-num">Q${QS.ci+1}/6</span><div class="progress-dots">${dots}</div><span class="score">${QS.sc}/6</span></div><div class="quiz-question"><p class="prompt">${q.pr}</p>${disp}</div><div class="quiz-options">${q.opts.map(o=>`<button class="quiz-option" onclick="chkQ('${o}')">${o}</button>`).join('')}</div><div class="quiz-feedback" id="qfb"></div>`;
+            QS.ans = false;
+        }
+        function chkQ(sel) { if(QS.ans)return; QS.ans=true; const q=QS.qs[QS.ci], ok=sel===q.a; document.querySelectorAll('.quiz-option').forEach(o=>{ if(o.textContent===q.a)o.classList.add('correct'); else if(o.textContent===sel&&!ok)o.classList.add('incorrect'); o.style.pointerEvents='none'; }); QS.res.push(ok); if(ok)QS.sc++; const fb=document.getElementById('qfb'); fb.className='quiz-feedback show '+(ok?'correct':'incorrect'); fb.innerHTML=ok?'✓ Correct!':'✗ '+q.a; if(QS.ci===2){ const e=ENCS[Math.floor(Math.random()*ENCS.length)]; showHalfwayOverlay(e); } else setTimeout(()=>{ QS.ci++; renderQ(); },900); }
+        function showHalfwayOverlay(e) { const overlay = document.createElement('div'); overlay.className = 'halfway-overlay'; overlay.id = 'halfwayOverlay'; overlay.innerHTML = `<div class="halfway-card"><div class="emoji">${e.emoji}</div><h2>${e.h}</h2><p>${e.p}</p><button class="btn" onclick="closeHalfway()">Let's Go! →</button></div>`; document.body.appendChild(overlay); }
+        function closeHalfway() { const o = document.getElementById('halfwayOverlay'); if(o) o.remove(); QS.ci++; renderQ(); }
+        function nxtQ() { QS.ci++; renderQ(); }
+        function renderQC() { const C=document.getElementById('quizContainer'); if(QS.sc===6){ confetti(); C.innerHTML=`<div class="celebration-container"><div class="trophy">🏆</div><h2>🎉 PERFECT! 🎉</h2><div class="final-score perfect">6/6</div><div class="certificate"><h3>Certificate</h3><div class="award-text">Fractions Master!</div><div class="dots-award"><div class="dot-award"></div><div class="dot-award"></div><div class="dot-award"></div><div class="dot-award"></div></div><p class="tagline-award">"Maths that meets you where you are"</p></div><button class="next-btn" onclick="initQuiz()">🔄 Again</button></div>`; } else { const m=QS.sc>=5?'So close!':QS.sc>=4?'Great!':QS.sc>=3?'Good!':'Keep trying!'; C.innerHTML=`<div class="quiz-complete"><h2>${QS.sc>=4?'🌟':'👍'} Done!</h2><div class="final-score">${QS.sc}/6</div><p>${m}</p><div style="margin:12px 0"><div class="progress-dots" style="justify-content:center">${QS.res.map(r=>`<div class="progress-dot${r?'':' answered'}"></div>`).join('')}</div></div><button class="next-btn" onclick="initQuiz()">🔄 Again</button></div>`; } }
+        function confetti() { const C=document.getElementById('confettiContainer'); C.innerHTML=''; const cols=['#27ae60','#3498db','#e74c3c','#2c3e50']; for(let i=0;i<70;i++) setTimeout(()=>{ const c=document.createElement('div'); c.className='confetti '+(Math.random()>0.5?'circle':'strip'); c.style.backgroundColor=cols[Math.floor(Math.random()*cols.length)]; c.style.left=Math.random()*100+'vw'; c.style.animationDuration=(2+Math.random()*2)+'s'; C.appendChild(c); setTimeout(()=>c.remove(),3500); },i*15); }
+
+        // PRACTICE
+        let PS = { str: 0, q: null, att: 0 };
+        function initPractice() { PS = { str: 0, q: null, att: 0 }; genPQ(); }
+        function genPQ() { PS.att=0; const types=['f2d','f2p','d2p'], t=types[Math.floor(Math.random()*types.length)], fracs=[{n:1,d:2},{n:1,d:4},{n:3,d:4},{n:1,d:5},{n:2,d:5},{n:1,d:10},{n:3,d:10}], f=fracs[Math.floor(Math.random()*fracs.length)]; PS.q={t,n:f.n,d:f.d,dec:(f.n/f.d).toString(),pct:Math.round(f.n/f.d*100)}; renderPQ(); }
+        function renderPQ() {
+            const C=document.getElementById('practiceContainer'), q=PS.q; let pr,ph,hn,pa;
+            if(q.t==='f2d'){ pr=`<p class="prompt">To decimal:</p><div class="value fraction"><span class="num">${q.n}</span><span class="frac-line"></span><span class="den">${q.d}</span></div>`; ph='0.___'; hn=q.n+' ÷ '+q.d; pa=(q.n/q.d)*360; }
+            else if(q.t==='f2p'){ pr=`<p class="prompt">To %:</p><div class="value fraction"><span class="num">${q.n}</span><span class="frac-line"></span><span class="den">${q.d}</span></div>`; ph='___%'; hn='Decimal × 100'; pa=(q.n/q.d)*360; }
+            else { pr=`<p class="prompt">To %:</p><div class="value" style="font-family:monospace">${q.dec}</div>`; ph='___%'; hn='Move decimal 2→'; pa=parseFloat(q.dec)*360; }
+            let miniDots = '<div class="mini-dots" id="pracDots">'; for(let i=0;i<8;i++) miniDots += `<div class="dot-logo ${['green','blue','red','black'][i%4]}" onclick="dotEffect(${i},'pracDots')"></div>`; miniDots += '</div>';
+            C.innerHTML = miniDots + `<div class="streak-display">🔥 Streak: <span>${PS.str}</span></div><div class="practice-layout"><div class="practice-question">${pr}</div><div class="practice-visual"><h4>Hint:</h4><div class="practice-pie" style="background:conic-gradient(#e74c3c 0deg ${pa}deg, #3498db ${pa}deg 360deg)"></div></div></div><div class="practice-input-area"><input type="text" class="practice-input" id="pIn" placeholder="${ph}" onkeypress="if(event.key==='Enter')chkP()"><button class="check-btn" onclick="chkP()">Check</button></div><p class="practice-hint">${hn}</p><div class="practice-feedback" id="pfb"></div>`;
+            document.getElementById('pIn').focus();
+        }
+        function chkP() { const inp=document.getElementById('pIn'), fb=document.getElementById('pfb'), q=PS.q; let ua=inp.value.trim().replace('%',''), ca, cd; if(q.t==='f2d'){ ca=q.dec; cd=q.dec; } else { ca=q.pct.toString(); cd=q.pct+'%'; } const ok=parseFloat(ua)===parseFloat(ca); PS.att++; if(ok){ PS.str++; inp.classList.remove('incorrect'); inp.classList.add('correct'); fb.className='practice-feedback correct'; fb.innerHTML='✓ Correct!'; document.querySelector('.streak-display span').textContent=PS.str; setTimeout(genPQ,700); } else { inp.classList.remove('correct'); inp.classList.add('incorrect'); fb.className='practice-feedback incorrect'; if(PS.att<2){ fb.innerHTML='Try again!'; inp.value=''; inp.focus(); } else { PS.str=0; document.querySelector('.streak-display span').textContent='0'; fb.innerHTML=`Answer: ${cd} <button class="next-btn" style="padding:6px 16px;font-size:0.9rem;margin-left:8px" onclick="genPQ()">Next →</button>`; } } }
+    </script>
+</body>
+</html>
