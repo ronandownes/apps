@@ -10,7 +10,7 @@
 <style>
 :root{font-family:Arial,Helvetica,sans-serif;--ink:#203246;--muted:#617187;--line:#d8e2ed;--blue:#245dc4;--blue-soft:#edf4ff;--orange:#a95012;--green:#187452;--paper:#fff;--bg:#f2f5f9;color:var(--ink);background:var(--bg)}
 *{box-sizing:border-box}
-html{scroll-behaviour:smooth}
+html{scroll-behavior:smooth}
 body{margin:0}
 button,select{font:inherit}
 button{cursor:pointer;touch-action:manipulation}
@@ -63,7 +63,7 @@ select{border:1px solid #b7c9df;border-radius:8px;padding:9px 12px;background:wh
 .fraction-card{display:flex;align-items:center;justify-content:center;min-width:0;min-height:89px;border:2px solid #cdddf0;border-radius:11px;background:#fff;color:#184da2;box-shadow:0 2px 0 #e6edf6;transition:background .12s,border-color .12s,transform .12s}
 .fraction-card:hover:not(:disabled){background:#eef5ff;border-color:#578bdb;transform:translateY(-1px)}
 .fraction-card.incorrect{background:#fff2f1;border-color:#c74740;color:#99322a}
-.fraction-card.matched{opacity:.2;border-style:dashed;background:#f6f9fc;box-shadow:none;cursor:default;transform:none}
+.fraction-card.matched{visibility:hidden;border-style:dashed;background:#f6f9fc;box-shadow:none;cursor:default;transform:none}
 .fraction-card:disabled{cursor:default}
 .fraction{display:inline-flex;flex-direction:column;align-items:center;line-height:1.08;font:750 clamp(22px,2.3vw,33px) "Cambria Math",Cambria,Georgia,serif}
 .fraction .numerator{border-bottom:2px solid currentColor;display:block;min-width:45px;text-align:center;padding:0 6px 5px}
@@ -81,7 +81,7 @@ summary{padding:11px 14px;font-weight:750;cursor:pointer;color:#285486}
 footer{margin-top:22px;color:#67788b;font-size:13px;text-align:center}
 @media(max-width:920px){.layout{grid-template-columns:1fr}.diagram-wrap{max-height:360px;aspect-ratio:620/330}.bank{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:490px){.brand img{width:102px}.panel{padding:15px}.bank{gap:7px}.fraction-card{min-height:75px}.fraction{font-size:23px}.fraction .numerator{min-width:36px}.question{font-size:29px}.diagram-wrap{min-height:195px}.diagram-wrap .length{font-size:31px}}
-@media print{header,.toolbar,.checkrow,.bottom,footer{display:none!important}body{background:white}.layout{grid-template-columns:1fr 1fr}.panel{border:0}.bank{grid-template-columns:repeat(4,1fr)}.feedback{display:none}.fraction-card.matched{opacity:.2}}
+@media print{header,.toolbar,.checkrow,.bottom,footer{display:none!important}body{background:white}.layout{grid-template-columns:1fr 1fr}.panel{border:0}.bank{grid-template-columns:repeat(4,1fr)}.feedback{display:none}.fraction-card.matched{visibility:hidden}}
 </style>
 </head>
 <body>
