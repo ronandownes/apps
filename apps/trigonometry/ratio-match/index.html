@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="Interactive SOHCAHTOA fraction matching: read a right-angled triangle and find the exact sine, cosine or tangent ratio.">
+<title>SOHCAHTOA Ratio Match · Maths Apps</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/favicon.svg">
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;--ink:#203246;--muted:#617187;--line:#d8e2ed;--blue:#245dc4;--blue-soft:#edf4ff;--orange:#a95012;--green:#187452;--paper:#fff;--bg:#f2f5f9;color:var(--ink);background:var(--bg)}
+*{box-sizing:border-box}
+html{scroll-behaviour:smooth}
+body{margin:0}
+button,select{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #7aabff;outline-offset:3px}
+a{color:#1957af}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#fff;border-bottom:1px solid var(--line);padding:12px clamp(12px,3vw,36px)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);font-weight:750}
+.brand img{width:128px;height:auto;display:block}
+.crumb{font-size:14px;color:var(--muted)}
+.crumb a{text-decoration:none;font-weight:700}
+h1{font-size:clamp(22px,3vw,31px);margin:0;letter-spacing:-.025em}
+.subhead{margin:2px 0 0;color:var(--muted);font-size:14px}
+main{max-width:1480px;margin:auto;padding:18px clamp(12px,2vw,25px) 55px}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:14px}
+.settings{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+label.control{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:750;color:#435971}
+select{border:1px solid #b7c9df;border-radius:8px;padding:9px 12px;background:white;color:var(--ink);font-size:16px}
+.actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid #bfd0e3;border-radius:8px;background:white;color:#184a84;padding:10px 14px;font-weight:750}
+.btn:hover{background:#f2f7ff}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:white}
+.btn.primary:hover{background:#18499f}
+.btn:disabled{opacity:.45;cursor:default}
+.layout{display:grid;grid-template-columns:minmax(320px,.97fr) minmax(390px,1.03fr);align-items:stretch;gap:14px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:13px;min-width:0;padding:clamp(15px,2vw,27px)}
+.eyebrow{color:#627993;font-size:12px;font-weight:850;letter-spacing:.095em;text-transform:uppercase}
+.question-head{display:flex;align-items:start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.question{font-size:clamp(24px,3.6vw,42px);line-height:1.3;font-weight:800;margin:11px 0 4px;color:#132f59}
+.math-serif{font-family:"Cambria Math",Cambria,Georgia,serif}
+.question .ratio{font-style:italic}
+.question .angle{font-size:.88em}
+.diagram-wrap{width:100%;aspect-ratio:620/368;min-height:230px;max-height:430px;display:flex;align-items:center;justify-content:center;padding:8px 0}
+.diagram-wrap svg{display:block;width:100%;height:100%;max-height:430px;overflow:visible}
+.diagram-wrap .vertex{font:27px Arial,sans-serif;fill:#1a344f}
+.diagram-wrap .length{font:800 28px Arial,sans-serif;fill:#172f55;paint-order:stroke;stroke:white;stroke-width:6px;stroke-linejoin:round}
+.diagram-wrap .side-name{font:750 17px Arial,sans-serif;paint-order:stroke;stroke:white;stroke-width:5px;stroke-linejoin:round}
+.diagram-wrap .angle-label{font:700 18px Arial,sans-serif;fill:#9b4d0d}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;color:var(--muted);font-size:14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.swatch{display:inline-block;width:13px;height:13px;border-radius:4px;background:#2768c4}
+.swatch.opp{background:#c34c47}.swatch.adj{background:#245fc2}.swatch.hyp{background:#188266}
+.checkrow{display:flex;align-items:center;gap:9px;font-size:14px;color:#445a74;margin-top:16px}
+.checkrow input{width:18px;height:18px;accent-color:#235fc7}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.counts{display:flex;gap:9px;flex-wrap:wrap}
+.stat{border:1px solid #d8e3f0;border-radius:7px;padding:6px 10px;color:#4b6179;background:#f8fafd;font-size:14px}
+.stat strong{font-size:17px;color:#153b72}
+.instruction{font-size:15px;color:#51667d;margin:9px 0 18px}
+.bank{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.fraction-card{display:flex;align-items:center;justify-content:center;min-width:0;min-height:89px;border:2px solid #cdddf0;border-radius:11px;background:#fff;color:#184da2;box-shadow:0 2px 0 #e6edf6;transition:background .12s,border-color .12s,transform .12s}
+.fraction-card:hover:not(:disabled){background:#eef5ff;border-color:#578bdb;transform:translateY(-1px)}
+.fraction-card.incorrect{background:#fff2f1;border-color:#c74740;color:#99322a}
+.fraction-card.matched{opacity:.2;border-style:dashed;background:#f6f9fc;box-shadow:none;cursor:default;transform:none}
+.fraction-card:disabled{cursor:default}
+.fraction{display:inline-flex;flex-direction:column;align-items:center;line-height:1.08;font:750 clamp(22px,2.3vw,33px) "Cambria Math",Cambria,Georgia,serif}
+.fraction .numerator{border-bottom:2px solid currentColor;display:block;min-width:45px;text-align:center;padding:0 6px 5px}
+.fraction .denominator{display:block;padding-top:4px}
+.feedback{display:flex;align-items:center;min-height:65px;margin-top:17px;padding:11px 13px;background:#f5f8fc;border-left:4px solid #a7b5c9;border-radius:5px;font-size:16px;line-height:1.45}
+.feedback.success{background:#eaf7f0;border-left-color:#188266;color:#115f44}
+.feedback.error{background:#fff5f4;border-left-color:#be4541;color:#8b2e2d}
+.feedback.complete{background:#edf4ff;border-left-color:#245fc2;color:#173e79}
+.bottom{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-top:14px}
+details{margin-top:16px;border:1px solid #dce5ef;border-radius:9px;background:#fbfcfe}
+summary{padding:11px 14px;font-weight:750;cursor:pointer;color:#285486}
+.reasoning{padding:0 14px 14px;font-size:16px;line-height:1.65;color:#344963}
+.reasoning p{margin:8px 0}
+.reasoning .formula{font:750 23px/1.5 "Cambria Math",Cambria,Georgia,serif;color:#234b82}
+footer{margin-top:22px;color:#67788b;font-size:13px;text-align:center}
+@media(max-width:920px){.layout{grid-template-columns:1fr}.diagram-wrap{max-height:360px;aspect-ratio:620/330}.bank{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:490px){.brand img{width:102px}.panel{padding:15px}.bank{gap:7px}.fraction-card{min-height:75px}.fraction{font-size:23px}.fraction .numerator{min-width:36px}.question{font-size:29px}.diagram-wrap{min-height:195px}.diagram-wrap .length{font-size:31px}}
+@media print{header,.toolbar,.checkrow,.bottom,footer{display:none!important}body{background:white}.layout{grid-template-columns:1fr 1fr}.panel{border:0}.bank{grid-template-columns:repeat(4,1fr)}.feedback{display:none}.fraction-card.matched{opacity:.2}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="../../../index.html"><img src="../../../assets/maths-logo.svg" alt="Maths"><span>Apps</span></a>
+  <div><nav class="crumb" aria-label="Breadcrumb"><a href="../../../index.html">Maths</a> / <a href="../../../trigonometry/index.html">Trig</a> / Ratio Match</nav><h1>SOHCAHTOA · Ratio Match</h1><p class="subhead">Look at the triangle. Choose the exact fraction.</p></div>
+</header>
+<main>
+  <section class="toolbar" aria-label="Game controls">
+    <div class="settings">
+      <label class="control" for="ratioMode">Practise <select id="ratioMode"><option value="mixed">Mixed: sin, cos, tan</option><option value="sin">Sine only</option><option value="cos">Cosine only</option><option value="tan">Tangent only</option></select></label>
+      <label class="control" for="roundSize">Cards <select id="roundSize"><option value="12">12 cards</option><option value="16" selected>16 cards</option><option value="20">20 cards</option></select></label>
+    </div>
+    <div class="actions"><button class="btn" type="button" id="fullscreen">Full screen</button><button class="btn" type="button" id="newRound">New round</button></div>
+  </section>
+  <div class="layout">
+    <section class="panel" aria-labelledby="currentTitle">
+      <div class="question-head"><div><div class="eyebrow">Question <span id="number">1</span> of <span id="total">16</span></div><div class="question math-serif" id="currentTitle">Find <span class="ratio">tan</span> <span class="angle">A</span> = ?</div></div></div>
+      <div class="diagram-wrap" id="diagram" role="img" aria-label="A right-angled triangle with side lengths labelled"></div>
+      <div class="legend" id="legend" hidden><span><i class="swatch opp"></i>Opposite</span><span><i class="swatch adj"></i>Adjacent</span><span><i class="swatch hyp"></i>Hypotenuse</span></div>
+      <label class="checkrow"><input type="checkbox" id="showSides"> Show opposite, adjacent and hypotenuse</label>
+      <details id="reasoning"><summary>Explain the ratio (teacher reveal)</summary><div class="reasoning" id="reasoningText"></div></details>
+    </section>
+    <section class="panel" aria-label="Fraction choices">
+      <div class="card-head"><div class="eyebrow">Choose a fraction</div><div class="counts"><span class="stat">Matched <strong id="matched">0</strong>/<span id="target">16</span></span><span class="stat">Mistakes <strong id="mistakes">0</strong></span></div></div>
+      <p class="instruction">Select the fraction equal to the trigonometric ratio shown. Correct matches disappear from the bank.</p>
+      <div class="bank" id="bank" role="group" aria-label="Available fractions"></div>
+      <div class="feedback" id="feedback" role="status" aria-live="polite">Which two sides do you need?</div>
+      <div class="bottom"><button id="next" type="button" class="btn primary" disabled>Next triangle</button><button id="reset" type="button" class="btn">Start again</button></div>
+    </section>
+  </div>
+  <footer>Exact integer-sided right triangles · No calculator needed · <a href="../solving-triangles/index.html">Solving Triangles</a> · <a href="../sine/index.html">Sine</a> · <a href="../cosine/index.html">Cosine</a> · <a href="../tangent/index.html">Tangent</a></footer>
+</main>
+<script>
+(function () {
+  "use strict";
+  var TRIPLES = [
+    [3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29],[9,40,41],
+    [12,35,37],[11,60,61],[28,45,53],[16,63,65],[33,56,65],
+    [48,55,73],[13,84,85],[36,77,85],[39,80,89],[65,72,97],
+    [20,99,101],[60,91,109],[15,112,113],[44,117,125],
+    [88,105,137],[17,144,145],[24,143,145],[51,140,149]
+  ];
+  var state = {questions:[], bank:[], index:0, mistakes:0, answered:false, showSides:false, mode:"mixed"};
+  var $ = function (id) { return document.getElementById(id); };
+  var shuffle = function (array) {
+    for (var i = array.length-1; i>0; i--) {
+      var j = Math.floor(Math.random()*(i+1));
+      var temp = array[i]; array[i] = array[j]; array[j] = temp;
+    }
+    return array;
+  };
+  function fractionHTML(n,d) {
+    return '<span class="fraction" aria-hidden="true"><span class="numerator">'+n+'</span><span class="denominator">'+d+'</span></span>';
+  }
+  function makeQuestion(a,b,h,angle,ratio) {
+    var opp = angle==="A" ? b : a;
+    var adj = angle==="A" ? a : b;
+    var n = ratio==="sin" ? opp : ratio==="cos" ? adj : opp;
+    var d = ratio==="sin" || ratio==="cos" ? h : adj;
+    return {a:a,b:b,h:h,angle:angle,ratio:ratio,n:n,d:d,key:n+"/"+d};
+  }
+  function generateQuestions(mode,size) {
+    var pool = [], seen = new Set();
+    TRIPLES.forEach(function (s) {
+      ["A","B"].forEach(function (angle) {
+        (mode==="mixed" ? ["sin","cos","tan"] : [mode]).forEach(function (ratio) {
+          var q=makeQuestion(s[0],s[1],s[2],angle,ratio);
+          if (!seen.has(q.key)) {pool.push(q);seen.add(q.key);}
+        });
+      });
+    });
+    shuffle(pool);
+    var questions=[];
+    var used = new Set();
+    if(mode==="mixed") {
+      var lead=makeQuestion(21,20,29,"A","tan");
+      questions.push(lead);used.add(lead.key);
+    }
+    // Mix question types; avoid showing the same triangle repeatedly when possible.
+    var usedTriangles = new Set(questions.map(function(q){return [Math.min(q.a,q.b),Math.max(q.a,q.b),q.h].join("-");}));
+    var firstPass = pool.filter(function(q){return !used.has(q.key);});
+    firstPass.forEach(function (q) {
+      var signature=[Math.min(q.a,q.b),Math.max(q.a,q.b),q.h].join("-");
+      if(questions.length<size && !usedTriangles.has(signature)) {
+        questions.push(q);used.add(q.key);usedTriangles.add(signature);
+      }
+    });
+    pool.forEach(function (q) {
+      if(questions.length<size && !used.has(q.key)) { questions.push(q);used.add(q.key); }
+    });
+    if(mode!=="mixed") shuffle(questions);
+    return questions.slice(0,size);
+  }
+  function triangleSVG(q,show) {
+    // Scale both legs by the same factor, retaining the true right-triangle proportions.
+    var scale=Math.min(392/q.a,224/q.b);
+    var w=q.a*scale, h=q.b*scale, cx=532,cy=310,ax=cx-w,by=cy-h;
+    var midX=(ax+cx)/2,midY=(by+cy)/2;
+    var angleAtA=q.angle==="A";
+    var colA=show ? (angleAtA?"#245fc2":"#c34c47") : "#245fc2";
+    var colB=show ? (angleAtA?"#c34c47":"#245fc2") : "#245fc2";
+    var arc=angleAtA
+      ? '<path d="M '+(ax+42)+' '+cy+' A 42 42 0 0 0 '+(ax+42*w/q.h)+' '+(cy-42*h/q.h)+'" fill="none" stroke="#bd781b" stroke-width="4"/>'
+      : '<path d="M '+cx+' '+(by+42)+' A 42 42 0 0 1 '+(cx-42*w/q.h)+' '+(by+42*h/q.h)+'" fill="none" stroke="#bd781b" stroke-width="4"/>';
+    var sideLabels="";
+    if(show){
+      var labelA=angleAtA?"Adjacent":"Opposite",labelB=angleAtA?"Opposite":"Adjacent";
+      var colourA=angleAtA?"#245fc2":"#c34c47",colourB=angleAtA?"#c34c47":"#245fc2";
+      sideLabels='<text class="side-name" x="'+midX+'" y="'+(cy+55)+'" text-anchor="middle" fill="'+colourA+'">'+labelA+'</text>'+
+       '<text class="side-name" x="'+(cx-9)+'" y="'+(midY+9)+'" text-anchor="end" fill="'+colourB+'">'+labelB+'</text>'+
+       '<text class="side-name" x="'+(midX-22)+'" y="'+(midY-49)+'" text-anchor="middle" fill="#188266">Hypotenuse</text>';
+    }
+    var aria='Triangle ABC, right angle C. AC is '+q.a+', BC is '+q.b+', AB is '+q.h+'. Find '+q.ratio+' of angle '+q.angle+'.';
+    $("diagram").setAttribute("aria-label",aria);
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 368" role="presentation" aria-hidden="true">'+
+      '<path d="M '+ax+' '+cy+' L '+cx+' '+by+' L '+cx+' '+cy+' Z" fill="#eaf1ff" stroke="none"/>'+
+      '<line x1="'+ax+'" y1="'+cy+'" x2="'+cx+'" y2="'+by+'" stroke="'+(show?"#188266":"#245fc2")+'" stroke-width="4.5"/>'+
+      '<line x1="'+ax+'" y1="'+cy+'" x2="'+cx+'" y2="'+cy+'" stroke="'+colA+'" stroke-width="4.5"/>'+
+      '<line x1="'+cx+'" y1="'+by+'" x2="'+cx+'" y2="'+cy+'" stroke="'+colB+'" stroke-width="4.5"/>'+
+      '<path d="M '+(cx-18)+' '+cy+' V '+(cy-18)+' H '+cx+'" fill="none" stroke="#384c75" stroke-width="3"/>'+
+      arc+
+      '<text class="vertex" x="'+(ax-29)+'" y="'+(cy+8)+'">A</text>'+
+      '<text class="vertex" x="'+(cx+10)+'" y="'+(by-8)+'">B</text>'+
+      '<text class="vertex" x="'+(cx+12)+'" y="'+(cy+7)+'">C</text>'+
+      '<text class="length" x="'+midX+'" y="'+(cy+29)+'" text-anchor="middle">'+q.a+'</text>'+
+      '<text class="length" x="'+(cx+20)+'" y="'+(midY+9)+'">'+q.b+'</text>'+
+      '<text class="length" x="'+(midX-20)+'" y="'+(midY-15)+'" text-anchor="middle">'+q.h+'</text>'+
+      sideLabels+'</svg>';
+  }
+  function explain(q) {
+    var full={sin:"sine",cos:"cosine",tan:"tangent"}[q.ratio];
+    var pair=q.ratio==="sin" ? ["opposite","hypotenuse"] :
+      q.ratio==="cos" ? ["adjacent","hypotenuse"] : ["opposite","adjacent"];
+    var opposite=q.angle==="A" ? q.b : q.a;
+    var adjacent=q.angle==="A" ? q.a : q.b;
+    return '<p>For angle <strong>'+q.angle+'</strong>: opposite = <strong>'+opposite+
+      '</strong>, adjacent = <strong>'+adjacent+'</strong>, hypotenuse = <strong>'+q.h+'</strong>.</p>'+
+      '<p><strong>'+full.charAt(0).toUpperCase()+full.slice(1)+'</strong> = '+pair[0]+' ÷ '+pair[1]+'.</p>'+
+      '<p class="formula">'+q.ratio+' '+q.angle+' = '+fractionHTML(q.n,q.d)+'</p>';
+  }
+  function feedback(message,kind) {
+    $("feedback").className="feedback"+(kind?" "+kind:"");
+    $("feedback").textContent=message;
+  }
+  function renderBank() {
+    var bank=$("bank");bank.innerHTML="";
+    state.bank.forEach(function(q) {
+      var button=document.createElement("button");
+      button.type="button";button.className="fraction-card";
+      button.setAttribute("aria-label",q.n+" over "+q.d);
+      button.dataset.key=q.key;
+      button.innerHTML=fractionHTML(q.n,q.d);
+      button.addEventListener("click",function(){choose(q.key,button);});
+      bank.appendChild(button);
+    });
+  }
+  function renderCurrent() {
+    var q=state.questions[state.index];
+    $("number").textContent=String(state.index+1);
+    $("total").textContent=String(state.questions.length);
+    $("target").textContent=String(state.questions.length);
+    $("matched").textContent=String(state.index+(state.answered?1:0));
+    $("mistakes").textContent=String(state.mistakes);
+    if(!q) return;
+    $("currentTitle").innerHTML='Find <span class="ratio">'+q.ratio+
+      '</span> <span class="angle">∠'+q.angle+'</span> = ?';
+    $("diagram").innerHTML=triangleSVG(q,state.showSides);
+    $("legend").hidden=!state.showSides;
+    $("reasoning").open=false;
+    $("reasoningText").innerHTML=explain(q);
+    $("next").disabled=true;
+    $("next").textContent="Next triangle";
+    state.bank.forEach(function(item) {
+      var tile=document.querySelector('[data-key="'+item.key+'"]');
+      if(tile){tile.classList.toggle("matched",item.solved===true);tile.disabled=item.solved===true;}
+    });
+    feedback("Which two sides do you need?","");
+  }
+  function choose(key,button) {
+    if(state.answered || state.index>=state.questions.length || button.disabled) return;
+    var q=state.questions[state.index];
+    if(key!==q.key){
+      state.mistakes++;
+      $("mistakes").textContent=String(state.mistakes);
+      button.classList.add("incorrect");
+      window.setTimeout(function(){button.classList.remove("incorrect");},650);
+      feedback("Not quite. Identify the opposite, adjacent and hypotenuse relative to angle "+q.angle+".","error");
+      return;
+    }
+    state.answered=true;
+    state.bank.find(function(item){return item.key===key;}).solved=true;
+    button.classList.add("matched");button.disabled=true;
+    $("matched").textContent=String(state.index+1);
+    feedback("Correct: "+q.ratio+" "+q.angle+" = "+q.n+"/"+q.d+". Select Next triangle to continue.","success");
+    $("next").disabled=false;
+    $("next").focus();
+    if(state.index===state.questions.length-1){
+      feedback("Round complete! "+state.questions.length+" correct matches; "+state.mistakes+" mistake"+(state.mistakes===1?"":"s")+". Start a new round to practise again.","complete");
+      $("next").textContent="New round";
+    }
+  }
+  function next() {
+    if(!state.answered) return;
+    if(state.index===state.questions.length-1){start();return;}
+    state.index++;state.answered=false;renderCurrent();
+  }
+  function start() {
+    state.mode=$("ratioMode").value;
+    var count=Number($("roundSize").value);
+    state.questions=generateQuestions(state.mode,count);
+    state.bank=shuffle(state.questions.map(function(q){
+      return {key:q.key,n:q.n,d:q.d,solved:false};
+    }));
+    state.index=0;state.mistakes=0;state.answered=false;
+    renderBank();renderCurrent();
+  }
+  $("ratioMode").addEventListener("change",start);
+  $("roundSize").addEventListener("change",start);
+  $("newRound").addEventListener("click",start);
+  $("reset").addEventListener("click",start);
+  $("next").addEventListener("click",next);
+  $("showSides").addEventListener("change",function(e){
+    state.showSides=e.target.checked;
+    var q=state.questions[state.index];
+    if(q){$("diagram").innerHTML=triangleSVG(q,state.showSides);}
+    $("legend").hidden=!state.showSides;
+  });
+  $("fullscreen").addEventListener("click",function(){
+    if(document.fullscreenElement){document.exitFullscreen();return;}
+    if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){});
+  });
+  start();
+}());
+</script>
+</body>
+</html>
