@@ -187,18 +187,18 @@
         "description": "One starting point for sine, cosine, tangent and SOHCAHTOA."
       },
       {
-        "slug": "ratio-match",
-        "title": "SOHCAHTOA Ratio Match",
-        "ready": true,
-        "app": "apps/trigonometry/ratio-match/index.html",
-        "description": "An interactive fraction-matching game for sine, cosine and tangent: exact right triangles, feedback and classroom rounds."
-      },
-      {
         "slug": "solving-triangles",
         "title": "Solving triangles",
         "ready": true,
         "app": "apps/trigonometry/solving-triangles/index.html",
         "description": "The main classroom app: right and general triangles, sine and cosine rules, and step-by-step solutions."
+      },
+      {
+        "slug": "ratio-match",
+        "title": "SOHCAHTOA Ratio Match",
+        "ready": true,
+        "app": "apps/trigonometry/ratio-match/index.html",
+        "description": "An interactive fraction-matching game for sine, cosine and tangent: exact right triangles, feedback and classroom rounds."
       },
       {
         "slug": "right-triangle-applications",
