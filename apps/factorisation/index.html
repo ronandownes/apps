@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en-IE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Factorisation — Maths Apps</title>
+<style>
+*{box-sizing:border-box}body{font:18px/1.5 Arial,sans-serif;margin:0;background:#f4f6f9;color:#17243b}
+header{background:#fff;border-bottom:1px solid #d8dce5;padding:14px max(18px,calc((100vw - 1050px)/2))}
+main{max-width:1050px;margin:auto;padding:24px 18px}h1{font-size:1.7em;margin:0}h2{font-size:1.15em}
+.panel{background:#fff;padding:20px;border:1px solid #d8dce5;border-radius:12px;margin:14px 0}
+label,button{font:inherit}select,button{padding:10px;border:1px solid #abb9c9;border-radius:7px;background:white}
+button{cursor:pointer}button.primary{background:#174e8f;color:white}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.math{font-size:1.7em;font-family:Georgia,serif;white-space:normal}
+canvas{width:100%;max-width:480px;border:1px solid #d2d7e0;border-radius:6px}
+.step{min-height:100px;padding:15px;background:#f3f6fa;border-radius:8px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+</style></head><body><header><a href="../../index.html">JC and LC Maths Apps</a> / Algebra / Factorisation</header>
+<main><h1>Factorisation: patterns, signs and decisions</h1>
+<p>Explore how the sign of the constant determines whether to add or subtract cross-product magnitudes. Establish the magnitude first; assign the middle-term sign afterwards.</p>
+<div class="panel"><label for="pattern">Pattern</label>
+<select id="pattern"><option value="pp">Both positive</option><option value="nn">Both negative</option><option value="mp">Mixed, positive middle</option><option value="mn">Mixed, negative middle</option><option value="ds">Difference of two squares</option></select>
+<button id="random">Another question</button></div>
+<div class="grid"><section class="panel"><h2>Step-by-step</h2><div id="expression" class="math" aria-live="polite"></div><p id="guidance"></p>
+<div class="step" id="step" aria-live="polite"></div><button id="previous">Previous</button> <button class="primary" id="next">Next step</button></section>
+<section class="panel"><h2>Graph connection</h2><canvas id="plot" width="480" height="340" role="img" aria-label="Graph of the quadratic showing the roots"></canvas><p>The points where the curve meets the x-axis correspond to the linear factors.</p></section></div>
+<p><small>Initial teaching prototype — not a replacement for the existing expansion methods. Example factors use a positive leading coefficient.</small></p>
+</main><script>
+const el=id=>document.getElementById(id),primes=[2,3,5,7,11];let model={a:1,b:2,c:1,d:3},stage=0;
+function sample(){let p=primes[Math.floor(Math.random()*primes.length)],q=primes[Math.floor(Math.random()*primes.length)];if(p===q)q=3===p?5:3;
+let kind=el('pattern').value,b=p,d=q;
+if(kind==='nn'){b=-p;d=-q}
+if(kind==='mp'){b=Math.max(p,q);d=-Math.min(p,q)}
+if(kind==='mn'){b=-Math.max(p,q);d=Math.min(p,q)}
+if(kind==='ds'){b=p;d=-p}
+model={a:1,b,c:1,d};stage=0;render()}
+function num(n,variable=''){return (n<0?'−':'+')+Math.abs(n)+variable}
+function poly(A,B,C){return (A===1?'':A)+'x² '+(B===0?'':num(B,'x')+' ')+num(C)}
+function render(){
+let {a,b,c,d}=model,A=a*c,B=a*d+b*c,C=b*d,upper=b*c,lower=a*d,mag=Math.abs(B);
+el('expression').textContent=poly(A,B,C);
+el('guidance').textContent=C>0?'Positive constant → sum of magnitudes.':C<0?'Negative constant → difference of magnitudes.':'Zero constant.';
+const steps=[
+'Identify the constant '+C+' and the target middle-coefficient magnitude '+mag+'.',
+'Find the two cross-product magnitudes: '+Math.abs(upper)+'x and '+Math.abs(lower)+'x.',
+'Combine magnitudes using '+(C>0?'addition':'subtraction')+': '+(C>0?Math.abs(upper)+' + '+Math.abs(lower):Math.max(Math.abs(upper),Math.abs(lower))+' − '+Math.min(Math.abs(upper),Math.abs(lower)))+' = '+mag+'.',
+'Now consider the middle-term sign. The middle coefficient is '+B+'. For mixed signs, the larger signed cross-product controls this sign.',
+'Factors: (x '+num(b)+')(x '+num(d)+').'
+];
+el('step').textContent='Step '+(stage+1)+' of 5: '+steps[stage];
+const cv=el('plot'),ctx=cv.getContext('2d'),w=cv.width,h=cv.height,roots=[-b/a,-d/c],range=Math.max(5,...roots.map(Math.abs))+1;
+let vals=Array.from({length:151},(_,i)=>{let x=range*(2*i/150-1);return A*x*x+B*x+C});
+let v=Math.max(1,...vals.map(Math.abs))*1.1;
+ctx.clearRect(0,0,w,h);ctx.lineWidth=1;ctx.strokeStyle='#7c8794';ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.stroke();
+ctx.strokeStyle='#2467ac';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=480;i++){let x=range*(2*i/480-1),y=h/2-(A*x*x+B*x+C)/v*h*.46;if(!i)ctx.moveTo(i,y);else ctx.lineTo(i,y)}ctx.stroke();
+ctx.fillStyle='#a33';for(let root of roots){ctx.beginPath();ctx.arc((root/range+1)*w/2,h/2,5,0,2*Math.PI);ctx.fill()}
+}
+el('random').onclick=sample;el('pattern').onchange=sample;el('previous').onclick=()=>{stage=Math.max(0,stage-1);render()};el('next').onclick=()=>{stage=Math.min(4,stage+1);render()};sample();
+</script></body></html>
