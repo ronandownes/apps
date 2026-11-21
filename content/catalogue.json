@@ -104,8 +104,10 @@
       },
       {
         "slug": "function-notation",
-        "title": "Function notation",
-        "ready": false
+        "title": "Functions: square a number",
+        "ready": true,
+        "app": "apps/functions/square-a-number/index.html",
+        "description": "Choose an input numeral and see the deterministic square-number output."
       },
       {
         "slug": "linear-functions",
