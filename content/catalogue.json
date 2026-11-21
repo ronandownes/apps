@@ -304,8 +304,10 @@
       },
       {
         "slug": "sample-spaces",
-        "title": "Sample spaces",
-        "ready": false
+        "title": "Sample spaces — roll a die",
+        "ready": true,
+        "app": "apps/probability/roll-a-die/index.html",
+        "description": "A compact six-sided die with real pips: predict, roll and observe."
       },
       {
         "slug": "probability-rules",
