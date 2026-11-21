@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Roll a Die</title><style>
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#213e52;background:#fff}
-main{min-height:190px;display:flex;align-items:center;justify-content:center;gap:22px;padding:12px;flex-wrap:wrap}
+main{min-height:190px;display:flex;align-items:center;justify-content:center;gap:22px;padding:12px;flex-wrap:wrap}.history{border-top:1px solid #e0e8ee;padding:8px 14px 12px;min-height:54px;display:flex;align-items:center;gap:9px;overflow:hidden}.history-label{font-size:.78rem;color:#526779;flex:none}.rolls{display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;min-width:0;flex:1;justify-content:flex-end}.rolls span{display:inline-grid;place-items:center;flex:none;width:27px;height:27px;border:1px solid #d7e5ef;border-radius:7px;background:#f4f9fc;font-weight:600;font-size:.85rem}.rolls span:last-child{border-color:#4d91bd;background:#e2f0fa}
 button{border:1px solid #91b7d1;background:#eaf5fc;color:#174e75;border-radius:10px;padding:10px 20px;font-size:1rem;font-weight:650;cursor:pointer}
 button:hover{background:#d9ecf9}button:focus-visible{outline:3px solid #2879b8;outline-offset:3px}
 .die{width:116px;height:116px;border:3px solid #d1dae2;border-radius:19px;box-shadow:inset -5px -5px 8px #e9edf2,0 3px 8px #0002;background:#fff;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:15px;gap:7px}
@@ -14,7 +14,7 @@ button:hover{background:#d9ecf9}button:focus-visible{outline:3px solid #2879b8;o
 </style></head><body><main aria-label="Interactive six-sided die">
 <div class="die" id="die" data-face="1" role="img" aria-label="Die showing 1"><span class="pip p1"></span><span class="pip p2"></span><span class="pip p3"></span><span class="pip p4"></span><span class="pip p5"></span><span class="pip p6"></span><span class="pip p7"></span><span class="pip p8"></span><span class="pip p9"></span></div>
 <div class="controls"><button type="button" id="roll">Roll the die</button><p class="hint" id="result" role="status" aria-live="polite">What will come up?</p></div>
-</main><script>
-const die=document.getElementById('die'),button=document.getElementById('roll'),result=document.getElementById('result');
-button.addEventListener('click',()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);const n=(a[0]%6)+1;die.dataset.face=String(n);die.setAttribute('aria-label','Die showing '+n);result.textContent='You rolled '+n+'.';});
+</main><div class="history" aria-label="Previous rolls"><span class="history-label">Rolls:</span><div class="rolls" id="rolls" aria-live="off"></div></div><script>
+const die=document.getElementById('die'),button=document.getElementById('roll'),result=document.getElementById('result'),rolls=document.getElementById('rolls');
+button.addEventListener('click',()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);const n=(a[0]%6)+1;die.dataset.face=String(n);die.setAttribute('aria-label','Die showing '+n);result.textContent='You rolled '+n+'.';const chip=document.createElement('span');chip.textContent=String(n);rolls.appendChild(chip);while(rolls.scrollWidth>rolls.clientWidth&&rolls.children.length>1){rolls.firstElementChild.remove();}});
 </script></body></html>
