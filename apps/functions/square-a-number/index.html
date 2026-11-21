@@ -1,1 +1,47 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Square a Number</title><style>*{box-sizing:border-box}body{margin:0;font:16px system-ui,sans-serif;color:#23455d;background:white}.wrap{padding:10px;display:grid;gap:8px;justify-items:center}.numbers{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}button{font:inherit;min-width:38px;padding:7px 10px;background:#eaf3fa;border:1px solid #a4c7df;border-radius:7px;cursor:pointer}button[aria-pressed=true]{background:#d1e8fa;border-color:#2879b8;font-weight:700}.mapping{font-size:1.25rem;font-weight:650;min-height:36px}.hint{font-size:.83rem;color:#526779;text-align:center;margin:0}</style></head><body><div class="wrap"><div class="numbers" id="numbers" aria-label="Choose an input number"></div><div class="mapping" id="mapping" role="status" aria-live="polite">Choose a number</div><p class="hint">The same input always gives the same output.</p></div><script>const row=document.getElementById('numbers'),out=document.getElementById('mapping');for(let n=0;n<=9;n++){let b=document.createElement('button');b.textContent=n;b.type='button';b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>{row.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));out.textContent=n+' → '+n+'² = '+(n*n)});row.appendChild(b)}</script></body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Square Function Machine</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:white;color:#243c4c;font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{padding:8px 12px 6px;max-width:800px;margin:auto}
+.machine{height:116px;display:grid;grid-template-columns:minmax(0,1fr) 132px minmax(0,1fr);align-items:center;position:relative;overflow:hidden}
+.pipe{height:32px;background:linear-gradient(#e8f1f6,#c9dce8,#e9f3f9);border-block:2px solid #a4bbca;position:relative}
+.pipe.left{border-radius:18px 0 0 18px}.pipe.right{border-radius:0 18px 18px 0}
+.box{height:98px;border-radius:14px;background:linear-gradient(135deg,#1c2c3d,#111820);border:3px solid #40556b;box-shadow:0 5px 12px #0003,inset 0 0 12px #0005;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;position:relative;z-index:2}
+.box strong{font-size:2rem;font-family:Georgia,serif}.box small{font-size:.68rem;color:#c6d5e0;letter-spacing:.06em;text-transform:uppercase}
+.token{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:1.25rem;font-weight:750;min-width:40px;text-align:center;border-radius:8px;padding:3px 5px;background:#e6f3fb;border:1px solid #83b3d4;color:#164d73;z-index:3;white-space:nowrap}
+.token.input{left:12%}.token.output{left:88%;background:#e6f5eb;border-color:#8bbda0;color:#22623b}
+.token.hidden{display:none}
+@keyframes feed{0%{left:12%;opacity:1}65%{left:50%;opacity:1}100%{left:50%;opacity:0}}
+@keyframes emerge{0%{left:50%;opacity:0}18%{opacity:1}100%{left:88%;opacity:1}}
+.token.input.moving{animation:feed .65s ease-in forwards}.token.output.moving{animation:emerge .65s ease-out forwards}
+.controls{display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 4px}
+label{font-size:.9rem}input{width:94px;padding:6px 8px;font:inherit;border:1px solid #a3b9c8;border-radius:7px}
+button{padding:7px 15px;background:#e5f1f9;color:#164c71;border:1px solid #8cb9d7;border-radius:8px;font:inherit;font-weight:650;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid #377fac;outline-offset:2px}
+.result{text-align:center;min-height:20px;font-size:.85rem;color:#4d6372}
+@media(max-width:440px){.machine{grid-template-columns:minmax(0,1fr) 102px minmax(0,1fr);height:105px}.box{height:85px}.box strong{font-size:1.6rem}.token{font-size:1rem;min-width:30px}.controls{gap:5px}}
+@media(prefers-reduced-motion:reduce){.token.input.moving,.token.output.moving{animation-duration:.01ms}}
+</style></head>
+<body><div class="wrap">
+<div class="machine" aria-label="Function machine: number goes in from the left, is squared, and comes out on the right">
+<div class="pipe left"></div><div class="box"><small>Function machine</small><strong>x²</strong></div><div class="pipe right"></div>
+<div class="token input hidden" id="incoming"></div><div class="token output hidden" id="outgoing"></div>
+</div>
+<form class="controls" id="form"><label for="number">Input</label><input id="number" type="number" step="any" value="3" required aria-label="Input number"><button id="feed" type="submit">Feed into machine</button></form>
+<div class="result" id="result" role="status" aria-live="polite">Choose a number and feed it into the machine.</div>
+</div>
+<script>
+const form=document.getElementById('form'),input=document.getElementById('number'),incoming=document.getElementById('incoming'),outgoing=document.getElementById('outgoing'),result=document.getElementById('result');
+let run=0;
+form.addEventListener('submit',e=>{
+e.preventDefault();if(!input.reportValidity())return;
+const n=Number(input.value);if(!Number.isFinite(n))return;
+const squared=n*n;if(!Number.isFinite(squared)){result.textContent='Try a smaller number.';return}
+const output=Number(squared.toPrecision(12)).toString();const value=input.value;const id=++run;
+incoming.className='token input hidden';outgoing.className='token output hidden';void incoming.offsetWidth;
+incoming.textContent=value;outgoing.textContent=output;
+incoming.className='token input moving';result.textContent='Input '+value+' is entering the machine…';
+setTimeout(()=>{if(id!==run)return;incoming.className='token input hidden';outgoing.className='token output moving';result.textContent=value+'² = '+output+'. Same input, same output.'},650);
+});
+</script></body></html>
