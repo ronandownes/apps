@@ -312,6 +312,13 @@
         "description": "A compact six-sided die with real pips: predict, roll and observe."
       },
       {
+        "slug": "card-sample-space",
+        "title": "Playing cards from two random numbers",
+        "ready": true,
+        "app": "apps/probability/card-from-two-numbers/index.html",
+        "description": "Map a random value 1–13 and suit 1–4 to one of 52 cards."
+      },
+      {
         "slug": "probability-rules",
         "title": "Probability rules",
         "ready": false
