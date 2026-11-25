@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en-IE"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AF3-01 | Positive Factors, Unit Factor</title>
+<style>
+*{box-sizing:border-box}body{font:17px system-ui,sans-serif;color:#18222e;background:#fff;margin:0}main{max-width:850px;margin:auto;padding:16px}h1{font-size:1.35rem;margin:0 0 12px}fieldset{border:0;padding:0;margin:10px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center}button,select,input{font:inherit;padding:7px 10px;border:1px solid #64748b;border-radius:5px;background:white;color:#18222e}button[aria-pressed=true]{background:#173b62;color:white}input{width:5em}label{display:inline-flex;align-items:center;gap:5px}.math{font-family:Cambria,Georgia,serif;font-size:clamp(20px,4vw,32px);text-align:center;margin:14px 0}.panel{border:1px solid #ccd4dc;border-radius:8px;padding:12px}.hint{font-size:15px;color:#425166}svg{width:100%;max-height:240px}table{margin:auto;border-collapse:collapse;font:24px Cambria,serif}th,td{padding:9px 18px;text-align:center}td{border:1px solid #aab7c4}th{font-weight:normal}.cross{background:#e4eef7}.display{font:25px Cambria,serif;display:grid;grid-template-columns:repeat(3, minmax(60px,100px));justify-content:center;text-align:right;gap:4px 10px}.rule{grid-column:1/-1;border-bottom:2px solid #18222e}.controls{display:flex;gap:8px;flex-wrap:wrap}button:focus-visible,input:focus-visible{outline:3px solid #3979b5}a{color:#154a78}
+</style><main>
+<h1>AF3-01 — Positive factors, unit factor</h1><p>Predict, expand, recognise the shortcut, then reverse the process.</p>
+<fieldset><legend>Coefficients</legend><label>a <input id="a" type="number" min="1" max="999" value="7"></label><label>b <input id="b" type="number" min="1" max="999" value="3"></label><button id="symbol">Use letters</button><button id="swap">Swap factors</button></fieldset>
+<fieldset><legend>Direction</legend><button id="expand" aria-pressed="true">Expand</button><button id="factor" aria-pressed="false">Factorise</button></fieldset>
+<fieldset><legend>Representation</legend><button data-view="inline" aria-pressed="true">Inline arcs</button><button data-view="display" aria-pressed="false">Display</button><button data-view="area" aria-pressed="false">Area model</button></fieldset>
+<div id="question" class="math" aria-live="polite"></div><div class="controls"><button id="reveal">Reveal next step</button><button id="reset">Reset steps</button><button id="next">New example</button></div>
+<div id="work" class="panel" aria-live="polite" style="margin-top:12px"></div>
+<p class="hint">The area model represents lengths for positive x. It is not a scale drawing. The algebraic identity holds for every real x.</p>
+</main><script>
+const $=id=>document.getElementById(id);let symbolic=false,swapped=false,reverse=false,view='inline',step=0;
+const examples=[[7,3],[11,89],[8,12],[13,17],[6,4],[23,77]];let n=0;
+function render(){
+let a=symbolic?'a':Math.max(1,Math.min(999,Number($('a').value)||1)),b=symbolic?'b':Math.max(1,Math.min(999,Number($('b').value)||1));
+let ax=a===1?'x':a+'x',bx=b===1?'x':b+'x',sq=a===1?'x²':a+'x²',sum=symbolic?'(a+b)':a+b,mid=sum+'x',f='('+ax+' + '+b+')',u='(x + 1)',prod=swapped?u+f:f+u,poly=sq+' + '+mid+' + '+b;
+$('question').textContent=(reverse?'Factorise: ':'Expand: ')+(reverse?poly:prod);
+$('symbol').textContent=symbolic?'Use numbers':'Use letters';$('expand').setAttribute('aria-pressed',!reverse);$('factor').setAttribute('aria-pressed',reverse);document.querySelectorAll('[data-view]').forEach(e=>e.setAttribute('aria-pressed',e.dataset.view===view));
+let h='';if(!step){h='<p>Predict the two middle contributions. '+(reverse?'Which two factors could give this trinomial?':'What happens when each coefficient is multiplied by 1?')+'</p>';}
+else {
+if(view==='area'){
+const cols=swapped?['x','1']:[ax,b],rows=swapped?[ax,b]:['x','1'],cells=swapped?[[sq,ax],[bx,b]]:[[sq,bx],[ax,b]];
+h='<table aria-label="Area model"><tr><th></th><th>'+cols[0]+'</th><th>'+cols[1]+'</th></tr><tr><th>'+rows[0]+'</th><td>'+cells[0][0]+'</td><td class="cross">'+cells[0][1]+'</td></tr><tr><th>'+rows[1]+'</th><td class="cross">'+cells[1][0]+'</td><td>'+cells[1][1]+'</td></tr></table>';
+}else if(view==='display'){
+let top=swapped?['x','1']:[ax,b],bottom=swapped?[ax,b]:['x','1'],r1=swapped?['',bx,b]:['',ax,b],r2=swapped?[sq,ax,'']:[sq,bx,''];
+h='<div class="display"><span></span><span>'+top[0]+'</span><span>+ '+top[1]+'</span><span>×</span><span>'+bottom[0]+'</span><span>+ '+bottom[1]+'</span><div class="rule"></div>'+r1.map(t=>'<span>'+t+'</span>').join('')+r2.map(t=>'<span>'+t+'</span>').join('')+'<div class="rule"></div>'+(step>=2?'<span>'+sq+'</span><span>+ '+mid+'</span><span>+ '+b+'</span>':'')+'</div>';
+}else{
+let terms=swapped?['x','1',ax,b]:[ax,b,'x','1'];let xs=[64,148,252,336];let inner=swapped?ax:bx,outer=swapped?bx:ax;
+h='<svg viewBox="0 0 400 174" role="img" aria-label="Four products: first, last, inner and outer"><g fill="#18222e" font-family="Cambria,Georgia" font-size="22" text-anchor="middle">'+terms.map((t,i)=>'<text x="'+xs[i]+'" y="91">'+t+'</text>').join('')+'<text x="24" y="91">(</text><text x="188" y="91">)(</text><text x="376" y="91">)</text><text x="106" y="91">+</text><text x="294" y="91">+</text><text x="200" y="15" font-size="16">'+outer+'</text><text x="200" y="48" font-size="16">'+inner+'</text><text x="158" y="157" font-size="16">'+sq+'</text><text x="242" y="173" font-size="16">'+b+'</text></g><g fill="none" stroke="#236397" stroke-width="2"><path d="M64 69 Q200 -25 336 69"/><path d="M148 69 Q200 30 252 69"/></g><g fill="none" stroke="#64748b" stroke-width="2"><path d="M64 100 Q158 170 252 100"/><path d="M148 100 Q242 195 336 100"/></g></svg>';
+}
+h+='<div class="math">'+sq+' + '+ax+' + '+bx+' + '+b+'</div>';
+if(step>=2)h+='<p>Multiplication by 1 leaves a coefficient unchanged. The middle coefficient is '+a+' + '+b+' = '+sum+'.</p>';
+if(step>=3)h+='<div class="math">'+(reverse?poly+' = '+prod:prod+' = '+poly)+'</div><p>Check by reversing the operation.</p>';
+}
+$('work').innerHTML=h;$('reveal').disabled=step>=3;
+}
+function restart(){step=0;render()}$('a').oninput=restart;$('b').oninput=restart;$('symbol').onclick=()=>{symbolic=!symbolic;restart()};$('swap').onclick=()=>{swapped=!swapped;restart()};$('expand').onclick=()=>{reverse=false;restart()};$('factor').onclick=()=>{reverse=true;restart()};document.querySelectorAll('[data-view]').forEach(e=>e.onclick=()=>{view=e.dataset.view;render()});$('reveal').onclick=()=>{step=Math.min(3,step+1);render()};$('reset').onclick=restart;$('next').onclick=()=>{n=(n+1)%examples.length;[$('a').value,$('b').value]=examples[n];symbolic=false;restart()};render();
+</script></html>
