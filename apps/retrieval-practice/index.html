@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-IE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recall and Defend | Full Cycle Maths</title><style>
+*{box-sizing:border-box}body{margin:0;background:#fff;color:#253342;font:16px/1.45 system-ui,sans-serif}main{max-width:850px;margin:auto;padding:12px 16px}header{display:flex;align-items:center;gap:10px}header img{width:32px;height:32px;object-fit:contain}h1{font-size:1.25rem;margin:0}p{margin:6px 0 12px}.sub,small{color:#566473}a{color:#285e8a}button,select{font:inherit;background:white;color:inherit;border:1px solid #9ba9b5;border-radius:6px;padding:7px 10px;cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #285e8a;outline-offset:2px}button[aria-pressed=true],button.primary{background:#285e8a;color:white;border-color:#285e8a}button:disabled{opacity:.5;cursor:default}.toolbar,.top,.actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.toolbar{margin:12px 0}.toolbar select{max-width:100%}.cards{display:grid;gap:7px}.card{border:1px solid #ccd5dd;border-left:4px solid #285e8a;border-radius:7px;padding:9px 11px}.cue{font-weight:650;flex:1}.answer{margin:8px 0 4px}.empty{min-height:1.5rem;border-bottom:1px dashed #a6b1bd}.actions{margin-top:7px}.actions button,.eye{font-size:.84rem;padding:4px 8px}.eye{display:inline-flex;align-items:center;gap:6px}.eye svg{width:18px;height:18px}.reason{font-size:.9rem;color:#52606d}.status{font-size:.9rem;margin:10px 0}.rating{font-size:.82rem;color:#465a6d}details{margin-top:12px}summary{cursor:pointer}[hidden]{display:none!important}@media print{.toolbar,.actions,.eye,.status,details,header img{display:none}.card{break-inside:avoid}.empty{height:2.5em}}
+</style></head><body><main>
+<header><img src="../../assets/maths-logo.svg" alt="Maths logo"><div><h1>Recall and Defend</h1><small>Revisit. Connect. Extend.</small></div></header>
+<p>Recall the idea aloud, reveal it, then explain or justify it. Assess your own understanding.</p>
+<div class="toolbar"><label for="deck">Topic</label><select id="deck"></select><button id="toggle" class="primary">Hide and practise recalling</button><button id="cues" aria-pressed="true">Cues on</button><button id="reset">Reset self-assessment</button></div>
+<p class="status" id="status" role="status" aria-live="polite"></p><div id="cards" class="cards"></div><p id="source"></p>
+<details><summary>Assessment as learning</summary><p>Try to retrieve each idea before looking. Explain it in your own words, give an example or justify a claim. Compare your explanation with the reference. Mark it secure only if you can explain it independently. Otherwise, revisit it. Self-ratings are not automatic marks. They are stored only on this device when browser storage is available.</p></details>
+<p class="sub"><a href="https://ronandownes.github.io/book/" target="_blank" rel="noopener">Full Cycle Maths book</a> · <a href="../../index.html" target="_blank" rel="noopener">Maths Apps</a></p>
+</main><script>
+"use strict";
+const decks={
+tao:{title:"Terence Tao — learning habits",url:"https://terrytao.wordpress.com/career-advice/does-one-have-to-be-a-genius-to-do-maths/",source:"Tao: Does one have to be a genius to do maths? (adapted)",cards:[
+["Effort","Work persistently.","Why is regular practice more useful than waiting for inspiration?"],
+["Foundations","Learn the mathematics well.","Name a foundational idea that helps you factorise."],
+["Literature","Learn from existing mathematical knowledge.","How might another explanation help you?"],
+["Conversation","Ask questions and talk to other mathematicians.","What question would you ask about your current topic?"],
+["Connections","Look for the bigger picture and connections.","Give an example of two connected mathematical ideas."]]},
+descartes:{title:"René Descartes — five takeaways",url:"https://plato.stanford.edu/entries/descartes-mathematics/",source:"Stanford Encyclopedia of Philosophy: Descartes' Mathematics",cards:[
+["Who?","A French mathematician and philosopher (1596–1650).","What connection did he develop?"],
+["When?","La Géométrie was published in 1637.","Why is this work important?"],
+["Connection","Algebra and geometry can describe the same relationships.","Give an equation and describe its graph."],
+["Coordinates","Cartesian coordinates are named after Descartes.","How do two coordinates locate a point?"],
+["Circle","In modern notation, x² + y² = r² describes a circle centred at the origin (r > 0).","Explain using Pythagoras' theorem."]]},
+polya:{title:"Pólya — problem-solving",url:"https://press.princeton.edu/books/paperback/9780691164076/how-to-solve-it",source:"Pólya, How to Solve It (1945); adapted",cards:[
+["Understand","Identify what is known, what is unknown and the constraints.","Restate the problem in your own words."],
+["Plan","Choose a strategy: draw, simplify, use analogy or work backwards.","Why might your chosen strategy help?"],
+["Carry out","Apply the strategy and justify each step.","Which mathematical law supports your calculation?"],
+["Look back","Check, compare methods and consider generalisation.","How could this result help with a different problem?"]]},
+squares:{title:"Perfect squares — positive coefficients",url:"https://ronandownes.github.io/book/algebra-spiral-practice.html",source:"Full Cycle Maths: Revisit, Connect, Extend",cards:[
+["Leading term","(2x)² = 4x².","Why must both the coefficient and variable be squared?"],
+["Middle term","2 × 2x × 5 = 20x.","Explain where the factor of 2 comes from."],
+["Constant term","5² = 25.","Why is this the product of the two constants?"],
+["Expansion","(2x + 5)² = 4x² + 20x + 25.","Derive this by multiplying the equal brackets."],
+["Reverse","9x² + 42x + 49 = (3x + 7)².","Check the middle term and verify by expanding."]]},
+signed:{title:"Perfect squares — introduce signs",url:"https://ronandownes.github.io/book/algebra-spiral-practice.html",source:"Full Cycle Maths: Revisit, Connect, Extend",cards:[
+["Structure","(a − b)² = a² − 2ab + b².","Why does the constant square remain non-negative?"],
+["Expansion","(2x − 5)² = 4x² − 20x + 25.","Explain the sign of each term."],
+["Reverse","9x² − 42x + 49 = (3x − 7)².","How do you know the middle coefficient is correct?"],
+["Common error","(a − b)² is not generally a² − b².","Give a numerical counterexample."],
+["Compare","(a − b)(a + b) = a² − b².","Why do the middle terms cancel here but not in a perfect square?"]]}
+};
+const $=id=>document.getElementById(id);
+const requested=new URLSearchParams(location.search).get("deck");
+let key=Object.hasOwn(decks,requested)?requested:"tao",visible=[],ratings=[],showCues=true;
+function load(){try{const r=JSON.parse(localStorage.getItem("fcm-recall-"+key)||"[]");return decks[key].cards.map((_,i)=>["secure","revisit"].includes(r[i])?r[i]:"")}catch{return decks[key].cards.map(()=>"")}}
+function save(){try{localStorage.setItem("fcm-recall-"+key,JSON.stringify(ratings))}catch{}}
+function el(tag,txt,cls){const e=document.createElement(tag);if(txt!==undefined)e.textContent=txt;if(cls)e.className=cls;return e}
+function btn(txt,fn){const b=el("button",txt);b.type="button";b.addEventListener("click",fn);return b}
+function eyeIcon(b,shown){const ns="http://www.w3.org/2000/svg",s=document.createElementNS(ns,"svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");s.setAttribute("fill","none");s.setAttribute("stroke","currentColor");s.setAttribute("stroke-width","1.8");const p=document.createElementNS(ns,"path");p.setAttribute("d","M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0");s.append(p);if(!shown){const l=document.createElementNS(ns,"path");l.setAttribute("d","M3 3l18 18");s.append(l)}b.prepend(s)}
+function update(i){const c=$("cards").children[i],v=visible[i],e=c.querySelector(".eye");c.querySelector(".answer").hidden=!v;c.querySelector(".empty").hidden=v;e.textContent=v?"Hide":"Reveal";eyeIcon(e,v);e.setAttribute("aria-expanded",String(v));c.querySelector(".cue").textContent=(i+1)+". "+(showCues?decks[key].cards[i][0]:"Recall the idea");c.querySelector(".rating").textContent=ratings[i]==="secure"?"Secure":ratings[i]==="revisit"?"Revisit":"Not assessed";c.querySelectorAll("[data-rating]").forEach(b=>{b.setAttribute("aria-pressed",String(b.dataset.rating===ratings[i]));b.disabled=!v})}
+function status(){const n=ratings.filter(x=>x==="secure").length;$("status").textContent=n+" of "+ratings.length+" self-rated secure · "+ratings.filter(x=>x==="revisit").length+" to revisit";$("toggle").textContent=visible.some(Boolean)?"Hide and practise recalling":"Reveal all"}
+function render(){const root=$("cards");root.replaceChildren();decks[key].cards.forEach((item,i)=>{const c=el("article",undefined,"card"),top=el("div",undefined,"top"),cue=el("div",undefined,"cue"),eye=btn("",()=>{visible[i]=!visible[i];update(i);status()});eye.className="eye";eye.setAttribute("aria-controls","answer-"+i);top.append(cue,eye);const answer=el("div",undefined,"answer");answer.id="answer-"+i;answer.append(el("p",item[1]),el("p","Defend: "+item[2],"reason"));const empty=el("div","Recall before revealing.","empty");const actions=el("div",undefined,"actions");for(const [v,t] of [["secure","I can defend this"],["revisit","Revisit"]]){const b=btn(t,()=>{ratings[i]=v;save();update(i);status()});b.dataset.rating=v;actions.append(b)}actions.append(el("span",undefined,"rating"));c.append(top,answer,empty,actions);root.append(c);update(i)});const source=el("a",decks[key].source);source.href=decks[key].url;source.target="_blank";source.rel="noopener";$("source").replaceChildren(source);status()}
+function choose(k){key=k;visible=decks[key].cards.map(()=>true);ratings=load();$("deck").value=key;render()}
+for(const [id,d] of Object.entries(decks)){const o=el("option",d.title);o.value=id;$("deck").append(o)}
+$("deck").addEventListener("change",e=>choose(e.target.value));
+$("toggle").addEventListener("click",()=>{const v=!visible.some(Boolean);visible.fill(v);visible.forEach((_,i)=>update(i));status()});
+$("cues").addEventListener("click",()=>{showCues=!showCues;$("cues").textContent=showCues?"Cues on":"Cues off";$("cues").setAttribute("aria-pressed",String(showCues));visible.forEach((_,i)=>update(i))});
+$("reset").addEventListener("click",()=>{ratings.fill("");save();visible.forEach((_,i)=>update(i));status()});choose(key);
+</script></body></html>
