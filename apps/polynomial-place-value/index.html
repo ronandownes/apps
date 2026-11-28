@@ -904,8 +904,10 @@ LEVEL</label><div class="coefficient-quick-pair"><select id="coefficientSelect">
 <section id="testArea" hidden aria-label="Polynomial expansion test"></section>
 </main>
 <script src="../shared/assessment.js"></script>
+<script src="../shared/step-narration.js"></script>
 <script>(()=>{'use strict';
 const $ = id=>document.getElementById(id);
+const stepNarration=window.WCMStepNarration?.mount(document.querySelector(".practice-working"));
 const distributionMethod=document.getElementById('distributionMethod');
 const distributionRoutes={
   fan:'../foil/index.html',
@@ -2915,6 +2917,7 @@ function drawRace(){
 
 function switchMode(mode){
  const previous=assessment.mode;
+ if(mode!=='practice')stepNarration?.update('');
  if(assessment.started&&mode!==assessment.mode){assessment.started=false;assessment.questions=[];assessment.configureRequested=false;setAssessmentControlsLocked()}
  assessment.mode=mode;
  if(previous==='game'&&mode!=='game')stopRaceTimer();
@@ -2967,8 +2970,36 @@ function connectTableOperands(){
  line.style.transform='rotate('+Math.atan2(y2-y1,x2-x1)+'rad)';
  host.append(line);
 }
+function updateStepNarration(){
+ if(!stepNarration)return;
+ if(assessment.mode!=='practice'||state.method!=='place-value'||state.mode!=='step'||!state.question){stepNarration.update('');return}
+ const hcf=hcfData(state.question);
+ const action=hcfSteps(hcf)[state.step-1]||'Read the question';
+ const explanations={
+ 'Read the question':'Look at both factors. Identify the highest power of x and the constant term in each.',
+ 'Set up place-value columns':'Write the powers of x in descending order. Use the number column for constants.',
+ 'Align coefficients':'Write only the numerical coefficients under their matching powers of x. Keep the constant terms in the same column.',
+ 'Calculate partial products':'Multiply every term in the upper factor by each term in the lower factor. Record a partial product in its correct place-value column. Complete one row before moving to the next.',
+ 'Combine like terms':'Add the coefficients in each column. There is no carrying between powers of x.',
+ 'Restore powers of x':'Write each coefficient with its corresponding power of x. Omit zero terms from the final expression.',
+ 'Distribute the HCF':'Multiply every coefficient by the common factor that was kept outside.',
+ 'Box the answer':'Check the signs, the leading coefficient and the constant term. Write your final answer.'
+ };
+ let speech=explanations[action]||action+'. Keep the common factor outside until the smaller product has been expanded.';
+ if(action==='Calculate partial products'&&!state.partialAll&&state.partialCount){
+  const products=individualProducts(hcf.a,hcf.b), p=products[state.partialCount-1];
+  if(p){const name=k=>k===0?'constant':k===1?'x':k===2?'x squared':k===3?'x cubed':'x to the power '+k;
+   speech='Multiply the '+name(hcf.b.length-1-p.j)+' coefficient in the lower factor by the '+name(hcf.a.length-1-p.i)+' coefficient in the upper factor. '+p.right+' times '+p.left+' equals '+p.value+'. Place this partial product in the '+name(p.power)+' column.';}
+ }
+ if(action==='Combine like terms'&&!state.groupAll&&state.groupCount){
+  const power=hcf.a.length+hcf.b.length-1-state.groupCount;
+  speech='Add the coefficients in the '+(power===0?'constant':power===1?'x':'x to the power '+power)+' column.';
+ }
+ stepNarration.update(speech,JSON.stringify([state.question,state.step,state.partialAll,state.partialCount,state.groupAll,state.groupCount]));
+}
 function render(){
  renderSelectors();coefficientInputs();draw();connectTableOperands();
+ updateStepNarration();
  if(assessment.mode==='board')drawBoard();else if(assessment.mode==='worksheet')wsStatus();
 }
 window.addEventListener('resize',connectTableOperands);
